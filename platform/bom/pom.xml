@@ -290,6 +290,16 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibaseVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.jdbc</groupId>
+                <artifactId>pax-jdbc-pool-common</artifactId>
+                <version>${pax.jdbc.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
                 <version>${json.version}</version>

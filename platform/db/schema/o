@@ -1,0 +1,18 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< org.opennms.horizon.db:schema >--------------------
+[INFO] Building OpenNMS Horizon :: DB :: Schema 0.1.0-SNAPSHOT
+[INFO] -------------------------------[ bundle ]-------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ schema ---
+[INFO] org.opennms.horizon.db:schema:bundle:0.1.0-SNAPSHOT
+[INFO] +- commons-lang:commons-lang:jar:2.6:compile
+[INFO] \- org.liquibase:liquibase-core:jar:3.6.3:compile
+[INFO]    +- org.yaml:snakeyaml:jar:1.18:compile
+[INFO]    \- org.slf4j:slf4j-api:jar:1.7.33:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.813 s
+[INFO] Finished at: 2022-01-31T12:57:42-07:00
+[INFO] ------------------------------------------------------------------------

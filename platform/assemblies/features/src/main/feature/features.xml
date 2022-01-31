@@ -3,6 +3,7 @@
 
     <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/1.0.6/xml</repository>
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
+    <repository>mvn:no.priv.bang.karaf/liquibase-core-karaf/${liquibaseVersion}/xml/features</repository>
 
     <feature name="guava" version="${guava.version}" description="Google :: Guava">
         <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
@@ -53,14 +54,19 @@
 
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
         <feature>horizon-events-api</feature>
+        <feature>liquibase-core</feature>
 
         <bundle>mvn:org.opennms.horizon.db/dao-api/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/dao-impl/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.db/schema/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.db/schema-liquibase/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/model/${project.version}</bundle>
 
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+
+        <bundle dependency="true">mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
 
         <config name="org.ops4j.datasource-opennms">
             osgi.jdbc.driver.class=org.postgresql.Driver
@@ -68,6 +74,14 @@
             dataSourceName=opennms
             user=opennms
             password=opennms
+            ops4j.preHook=openNmsDatabasePreHook
+        </config>
+        <config name="org.ops4j.datasource-opennmsAdmin">
+            osgi.jdbc.driver.class=org.postgresql.Driver
+            url=jdbc:postgresql://localhost:5432/template1
+            dataSourceName=opennmsAdmin
+            user=postgres
+            password=
         </config>
         <capability>
             osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=opennms

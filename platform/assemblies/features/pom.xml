@@ -152,6 +152,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.opennms.horizon.db</groupId>
+            <artifactId>schema</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.db</groupId>
+            <artifactId>schema-liquibase</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.opennms.horizon.events</groupId>
             <artifactId>daemon</artifactId>
             <version>${project.version}</version>

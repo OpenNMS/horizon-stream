@@ -55,11 +55,13 @@
         <json.version>20171018</json.version>
         <jsr250.version>1.0</jsr250.version>
         <karaf.version>4.3.6</karaf.version>
+        <liquibaseVersion>3.6.3</liquibaseVersion>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <mockito.version>3.4.6</mockito.version>
         <opennms.tracker.version>0.7</opennms.tracker.version>
         <opentracing.version>0.31.0</opentracing.version>
         <osgi.version>7.0.0</osgi.version>
+        <pax.jdbc.version>1.5.2</pax.jdbc.version>
         <protobuf.version>3.16.1</protobuf.version>
         <rate.limitted.logger.version>2.0.2</rate.limitted.logger.version>
         <skipTests>false</skipTests>

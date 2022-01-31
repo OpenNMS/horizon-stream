@@ -19,6 +19,8 @@
     <module>dao-api</module>
     <module>dao-impl</module>
     <module>model</module>
+    <module>schema</module>
+    <module>schema-liquibase</module>
   </modules>
 
 </project>
