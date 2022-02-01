@@ -80,8 +80,8 @@
     </feature>
 
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
-        <feature prerequisite="true">horizon-db-config</feature>
-        <feature>pax-jdbc-config</feature>
+        <!--<feature prerequisite="true">horizon-db-config</feature>-->
+        <!--<feature>pax-jdbc-config</feature>-->
         <feature>pax-jdbc-postgresql</feature>
         <feature>pax-jdbc-pool-hikaricp</feature>
 
@@ -90,6 +90,7 @@
 
         <bundle>mvn:org.opennms.horizon.db/dao-api/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/dao-impl/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.db/datasource/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/schema/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/schema-liquibase/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/model/${project.version}</bundle>
