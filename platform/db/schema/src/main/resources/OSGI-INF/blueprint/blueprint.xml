@@ -37,18 +37,28 @@
                 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.3.0.xsd
             ">
 
-    <cm:cm-properties id="openms-datasource-properties" persistent-id="org.ops4j.datasource-opennms"/>
-    <cm:cm-properties id="openms-admin-datasource-properties" persistent-id="org.ops4j.datasource-opennmsAdmin"/>
+    <cm:cm-properties id="opennms-datasource-properties" persistent-id="org.ops4j.datasource~opennms"/>
+    <cm:cm-properties id="opennms-admin-datasource-properties" persistent-id="org.ops4j.datasource~opennmsAdmin"/>
 
-    <reference id="adminDatasource" interface="javax.sql.DataSource" filter="(osgi.jndi.service.name=opennmsAdmin)">
+    <reference id="opennmsLiquibaseChangeLogProvider" interface="org.opennms.core.schema.liquibase.OpennmsLiquibaseChangeLogProvider"/>
+    <bean id="liquibaseResourceClassLoader" factory-ref="opennmsLiquibaseChangeLogProvider" factory-method="getResourceClassLoader"/>
+
+    <!-- TBD999: get FILTER working -->
+    <reference id="adminDatasource" interface="javax.sql.DataSource" filter="(&amp;(osgi.jndi.service.name=opennmsAdmin))">
+    <!--<reference id="adminDatasource" interface="javax.sql.DataSource">-->
         <!--<reference-listener ref="openNmsDatabasePreHook" bind-method="onAdminDatasourceBind"/>-->
     </reference>
 
     <bean id="openNmsDatabasePreHook" class="org.opennms.core.schema.OpenNMSDatabasePrehook">
         <property name="adminDatasource" ref="adminDatasource"/>
-        <property name="opennmsAdminDatasourceProperties" ref="opennms-datasource-properties"/>
-        <property name="opennmsDatasourceProperties" ref="openms-admin-datasource-properties"/>
+        <property name="opennmsAdminDatasourceProperties" ref="opennms-admin-datasource-properties"/>
+        <property name="opennmsDatasourceProperties" ref="opennms-datasource-properties"/>
+        <property name="liquibaseResourceClassLoader" ref="liquibaseResourceClassLoader"/>
     </bean>
 
-    <service ref="openNmsDatabasePreHook" interface="org.ops4j.pax.jdbc.hook.PreHook"/>
+    <service ref="openNmsDatabasePreHook" interface="org.ops4j.pax.jdbc.hook.PreHook">
+        <service-properties>
+            <entry key="name" value="openNmsDatabasePreHook"/>
+        </service-properties>
+    </service>
 </blueprint>

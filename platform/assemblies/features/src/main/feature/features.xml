@@ -52,7 +52,32 @@
 <!--        <bundle>mvn:org.opennms.horizon.core/jaas/${project.version}</bundle>-->
     </feature>
 
+    <feature name="horizon-db-config" version="${project.version}" description="Default Configs for DB">
+        <config name="org.ops4j.datasource-opennms">
+            osgi.jdbc.driver.class=org.postgresql.Driver
+            url=jdbc:postgresql://localhost:5432/opennms
+            dataSourceName=opennms
+            databaseName=opennms
+            user=opennms
+            password=opennms
+            ops4j.preHook=openNmsDatabasePreHook
+        </config>
+        <config name="org.ops4j.datasource-opennmsAdmin">
+            osgi.jdbc.driver.class=org.postgresql.Driver
+            url=jdbc:postgresql://localhost:5432/template1
+            dataSourceName=opennmsAdmin
+            databaseName=template1
+            user=postgres
+            password=
+        </config>
+    </feature>
+
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
+        <feature prerequisite="true">horizon-db-config</feature>
+        <feature>pax-jdbc-config</feature>
+        <feature>pax-jdbc-postgresql</feature>
+        <feature>pax-jdbc-pool-hikaricp</feature>
+
         <feature>horizon-events-api</feature>
         <feature>liquibase-core</feature>
 
@@ -68,21 +93,6 @@
 
         <bundle dependency="true">mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
 
-        <config name="org.ops4j.datasource-opennms">
-            osgi.jdbc.driver.class=org.postgresql.Driver
-            url=jdbc:postgresql://localhost:5432/opennms
-            dataSourceName=opennms
-            user=opennms
-            password=opennms
-            ops4j.preHook=openNmsDatabasePreHook
-        </config>
-        <config name="org.ops4j.datasource-opennmsAdmin">
-            osgi.jdbc.driver.class=org.postgresql.Driver
-            url=jdbc:postgresql://localhost:5432/template1
-            dataSourceName=opennmsAdmin
-            user=postgres
-            password=
-        </config>
         <capability>
             osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=opennms
         </capability>
@@ -92,10 +102,6 @@
         <feature>jndi</feature>
         <feature>jpa</feature>
         <feature>transaction</feature>
-
-        <feature>pax-jdbc-config</feature>
-        <feature>pax-jdbc-postgresql</feature>
-        <feature>pax-jdbc-pool-hikaricp</feature>
     </feature>
 
     <feature name="horizon-events-api" version="${project.version}" description="Horizon :: Events :: API">
