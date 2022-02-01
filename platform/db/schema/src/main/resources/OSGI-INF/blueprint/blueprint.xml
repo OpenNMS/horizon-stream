@@ -44,8 +44,8 @@
     <bean id="liquibaseResourceClassLoader" factory-ref="opennmsLiquibaseChangeLogProvider" factory-method="getResourceClassLoader"/>
 
     <!-- TBD999: get FILTER working -->
-    <reference id="adminDatasource" interface="javax.sql.DataSource" filter="(&amp;(osgi.jndi.service.name=opennmsAdmin))">
-    <!--<reference id="adminDatasource" interface="javax.sql.DataSource">-->
+    <reference id="adminDatasource" interface="javax.sql.DataSource" filter="(osgi.jndi.service.name=opennmsAdmin)">
+<!--    <reference id="adminDatasource" interface="javax.sql.DataSource">-->
         <!--<reference-listener ref="openNmsDatabasePreHook" bind-method="onAdminDatasourceBind"/>-->
     </reference>
 
