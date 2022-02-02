@@ -18,7 +18,6 @@
   <modules>
     <module>dao-api</module>
     <module>dao-impl</module>
-    <module>datasource</module>
     <module>model</module>
     <module>schema</module>
     <module>schema-liquibase</module>

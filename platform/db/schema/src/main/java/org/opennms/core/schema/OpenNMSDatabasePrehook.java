@@ -11,6 +11,9 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Pre-Hook to perform database setup / migration before the datasource is registered in the OSGi service registry.
+ */
 public class OpenNMSDatabasePrehook implements PreHook {
 
     private Logger log = LoggerFactory.getLogger(OpenNMSDatabasePrehook.class);
@@ -21,6 +24,11 @@ public class OpenNMSDatabasePrehook implements PreHook {
     private Properties opennmsAdminDatasourceProperties;
 
     private ClassLoader liquibaseResourceClassLoader = getClass().getClassLoader();
+    private boolean validateDatabaseVersion = true;
+
+//========================================
+// Getters and Setters
+//----------------------------------------
 
     public boolean isEnabled() {
         return enabled;
@@ -62,15 +70,13 @@ public class OpenNMSDatabasePrehook implements PreHook {
         this.liquibaseResourceClassLoader = liquibaseResourceClassLoader;
     }
 
-//========================================
-//
-//----------------------------------------
+    public boolean isValidateDatabaseVersion() {
+        return validateDatabaseVersion;
+    }
 
-    // public void onAdminDatasourceBind(ServiceReference serviceReference) {
-    //     serviceReference.getProperty();
-    // }
-
-
+    public void setValidateDatabaseVersion(boolean validateDatabaseVersion) {
+        this.validateDatabaseVersion = validateDatabaseVersion;
+    }
 
 //========================================
 // PreHook Operations
@@ -79,17 +85,6 @@ public class OpenNMSDatabasePrehook implements PreHook {
     @Override
     public void prepare(DataSource dataSource) throws SQLException {
         if (enabled) {
-            // MigratorAdminInitialize migratorAdminInitialize = new MigratorAdminInitialize();
-            //
-            // migratorAdminInitialize.setAdminDataSource(adminDatasource);
-            //
-            // migratorAdminInitialize.setAdminUser(opennmsAdminDatasourceProperties.getProperty("user"));
-            // migratorAdminInitialize.setAdminPassword(opennmsAdminDatasourceProperties.getProperty("password"));
-            // migratorAdminInitialize.setDatabaseName(opennmsDatasourceProperties.getProperty("databaseName"));
-            // migratorAdminInitialize.setDatabaseUser(opennmsDatasourceProperties.getProperty("user"));
-            // migratorAdminInitialize.setDatabasePassword(opennmsDatasourceProperties.getProperty("password"));
-            // migratorAdminInitialize.setValidateDatabaseVersion(true); // TBD999: configurable property
-
             this.log.info("INITIALIZE DATABASE");
 
             try {
@@ -109,6 +104,12 @@ public class OpenNMSDatabasePrehook implements PreHook {
 // Internals
 //----------------------------------------
 
+    /**
+     * Initialize the database.  These steps need to be completed before regular access to the database will function,
+     * such as creation of the opennms database, and user.
+     *
+     * @throws Exception
+     */
     private void initializeDb() throws Exception {
         MigratorAdminInitialize migratorAdminInitialize = new MigratorAdminInitialize();
 
@@ -119,11 +120,17 @@ public class OpenNMSDatabasePrehook implements PreHook {
         migratorAdminInitialize.setDatabaseName(opennmsDatasourceProperties.getProperty("databaseName"));
         migratorAdminInitialize.setDatabaseUser(opennmsDatasourceProperties.getProperty("user"));
         migratorAdminInitialize.setDatabasePassword(opennmsDatasourceProperties.getProperty("password"));
-        migratorAdminInitialize.setValidateDatabaseVersion(true); // TBD999: configurable property
+        migratorAdminInitialize.setValidateDatabaseVersion(validateDatabaseVersion);
 
         migratorAdminInitialize.initializeDatabase(true, false);
     }
 
+    /**
+     * Migrate the database.  Primarily executes Liquibase, but also includes some additional admin.
+     *
+     * @param dataSource
+     * @throws Exception
+     */
     private void migrateDb(DataSource dataSource) throws Exception {
         ClassLoaderBasedMigratorResourceProvider resourceProvider =
                 new ClassLoaderBasedMigratorResourceProvider(liquibaseResourceClassLoader);

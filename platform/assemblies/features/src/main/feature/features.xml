@@ -53,35 +53,24 @@
     </feature>
 
     <feature name="horizon-db-config" version="${project.version}" description="Default Configs for DB">
-        <config name="org.ops4j.datasource-opennms">
+        <config name="org.opennms.netmgt.distributed.datasource">
             osgi.jdbc.driver.class=org.postgresql.Driver
-            url=jdbc:postgresql://localhost:5432/opennms
-            dataSourceName=opennms
-            databaseName=opennms
-            user=opennms
-            password=opennms
-            ops4j.preHook=openNmsDatabasePreHook
-        </config>
-        <config name="org.ops4j.datasource-opennmsAdmin">
-            osgi.jdbc.driver.class=org.postgresql.Driver
-            url=jdbc:postgresql://localhost:5432/template1
-            dataSourceName=opennmsAdmin
-            databaseName=template1
-            user=postgres
-            password=
-        </config>
 
-        <capability>
-            osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=opennms
-        </capability>
-        <capability>
-            osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=opennmsAdmin
-        </capability>
+            datasource.adminUrl=jdbc:postgresql://localhost:5432/template1
+            datasource.adminDatabaseName=postgres
+            datasource.adminUsername=postgres
+            datasource.adminPassword=
+
+            datasource. url=jdbc:postgresql://localhost:5432/opennms
+            datasource.username=opennms
+            datasource.password=
+            datasource.databaseName=opennms
+            datasource.initialize=true
+        </config>
     </feature>
 
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
         <!--<feature prerequisite="true">horizon-db-config</feature>-->
-        <!--<feature>pax-jdbc-config</feature>-->
         <feature>pax-jdbc-postgresql</feature>
         <feature>pax-jdbc-pool-hikaricp</feature>
 
@@ -90,7 +79,6 @@
 
         <bundle>mvn:org.opennms.horizon.db/dao-api/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/dao-impl/${project.version}</bundle>
-        <bundle>mvn:org.opennms.horizon.db/datasource/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/schema/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/schema-liquibase/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/model/${project.version}</bundle>

@@ -6,10 +6,17 @@ import org.opennms.core.schema.PreparedDataSourceProvider;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
+/**
+ * Takes the "early" datasource for accessing the opennms database, executes the DB Setup + Migration PreHook, and
+ * returns the "prepared" datasource, ready for Application use.
+ *
+ * Note that this replaces the pre-hook logic from pax-jdbc-config; the pax bundle is not in-use here due to problems
+ * sharing settings shared with the migrator.
+ */
 public class MigratorPreparedDataSourceProviderImpl implements PreparedDataSourceProvider {
 
     private OpenNMSDatabasePrehook prehook;
-    private DataSource rawDatasource;
+    private DataSource earlyDatasource;
 
     public OpenNMSDatabasePrehook getPrehook() {
         return prehook;
@@ -19,23 +26,24 @@ public class MigratorPreparedDataSourceProviderImpl implements PreparedDataSourc
         this.prehook = prehook;
     }
 
-    public DataSource getRawDatasource() {
-        return rawDatasource;
+    public DataSource getEarlyDatasource() {
+        return earlyDatasource;
     }
 
-    public void setRawDatasource(DataSource rawDatasource) {
-        this.rawDatasource = rawDatasource;
+    public void setEarlyDatasource(DataSource earlyDatasource) {
+        this.earlyDatasource = earlyDatasource;
     }
 
 //========================================
-//
+// Operations
 //----------------------------------------
 
     @Override
     public DataSource retrieve() throws SQLException {
-        prehook.prepare(rawDatasource);
+        prehook.prepare(earlyDatasource);
 
-        // The raw datasource is now cooked, so we can just return it
-        return rawDatasource;
+        // The early datasource is now prepared, so we can just return it, as the datasource itself hasn't changed,
+        //  but the DB it accesses is now setup so the datasource will function.
+        return earlyDatasource;
     }
 }
