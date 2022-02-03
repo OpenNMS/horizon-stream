@@ -48,26 +48,12 @@
             <artifactId>osgi.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ops4j.pax.jdbc</groupId>
-            <artifactId>pax-jdbc-pool-common</artifactId>
-        </dependency>
-        <!-- TBD999: version / remove? -->
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.compendium</artifactId>
-            <version>4.2.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.jdbc</artifactId>
-            <version>1.0.0</version>
         </dependency>
-
         <dependency>
-            <groupId>org.apache.aries.component-dsl</groupId>
-            <artifactId>org.apache.aries.component-dsl.component-dsl</artifactId>
-            <version>1.2.2</version>
+            <groupId>org.ops4j.pax.jdbc</groupId>
+            <artifactId>pax-jdbc-pool-common</artifactId>
         </dependency>
     </dependencies>
 

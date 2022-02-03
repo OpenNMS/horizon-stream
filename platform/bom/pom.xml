@@ -300,6 +300,11 @@
                 <version>${pax.jdbc.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.service.jdbc</artifactId>
+                <version>${org.osgi.service.jdbc.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.json</groupId>
                 <artifactId>json</artifactId>
                 <version>${json.version}</version>
