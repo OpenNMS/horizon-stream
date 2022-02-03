@@ -22,6 +22,8 @@
         <module>icmp</module>
         <module>ipc</module>
         <module>snmp</module>
+
+        <module>docker-it</module>
     </modules>
 
     <properties>
@@ -31,6 +33,7 @@
         <eclipselink.version>2.5.1</eclipselink.version>
         <commons.io.version>2.8.0</commons.io.version>
         <commons.lang.version>2.6</commons.lang.version>
+        <cucumber.version>7.1.0</cucumber.version>
         <cxf.version>3.4.5</cxf.version>
         <drools.version>7.31.0.Final</drools.version>
         <glassfish.jaxb.version>2.3.2</glassfish.jaxb.version>
@@ -56,6 +59,7 @@
         <jsr250.version>1.0</jsr250.version>
         <karaf.version>4.3.6</karaf.version>
         <liquibaseVersion>3.6.3</liquibaseVersion>
+        <log4j2.version>2.17.1</log4j2.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <mockito.version>3.4.6</mockito.version>
         <opennms.tracker.version>0.7</opennms.tracker.version>
@@ -63,8 +67,10 @@
         <org.osgi.service.jdbc.version>1.0.0</org.osgi.service.jdbc.version>
         <osgi.version>7.0.0</osgi.version>
         <pax.jdbc.version>1.5.2</pax.jdbc.version>
+        <postgresql.version>42.3.2</postgresql.version>
         <protobuf.version>3.16.1</protobuf.version>
         <rate.limitted.logger.version>2.0.2</rate.limitted.logger.version>
+        <rest-assured.version>4.3.3</rest-assured.version>
         <skipTests>false</skipTests>
         <slf4j.version>1.7.33</slf4j.version>
         <snmp4j.version>2.5.5</snmp4j.version>
