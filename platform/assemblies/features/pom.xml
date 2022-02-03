@@ -51,8 +51,7 @@
                 <artifactId>karaf-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <configuration>
-                    <skip>true</skip>
-                    <!--<skip>${skipTests}</skip>-->
+                    <skip>${skipTests}</skip>
                 </configuration>
                 <executions>
                     <execution>
