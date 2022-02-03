@@ -37,12 +37,10 @@
                 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.3.0.xsd
             ">
 
-    <!-- TBD999: duplicated from "datasource" -->
     <cm:property-placeholder id="datasourceProperties" persistent-id="org.opennms.netmgt.distributed.datasource" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="connection.pool.factory" value="org.opennms.core.db.HikariCPConnectionFactory" />
             <cm:property name="connection.pool.idleTimeout" value="600" />
-            <cm:property name="connection.pool.loginTimeout" value="3" />
+            <cm:property name="connection.pool.loginTimeout" value="3000" />
             <cm:property name="connection.pool.minPool" value="50" />
             <cm:property name="connection.pool.maxPool" value="50" />
             <cm:property name="connection.pool.maxSize" value="50" />
@@ -63,9 +61,11 @@
     </cm:property-placeholder>
 
     <reference id="opennmsLiquibaseChangeLogProvider" interface="org.opennms.core.schema.liquibase.OpennmsLiquibaseChangeLogProvider"/>
+    <reference id="dataSourceFactory" interface="org.osgi.service.jdbc.DataSourceFactory" />
+    <reference id="pooledDataSourceFactory" interface="org.ops4j.pax.jdbc.pool.common.PooledDataSourceFactory" />
+
     <bean id="liquibaseResourceClassLoader" factory-ref="opennmsLiquibaseChangeLogProvider" factory-method="getResourceClassLoader"/>
 
-    <reference id="dataSourceFactory" interface="org.osgi.service.jdbc.DataSourceFactory" />
 
     <!--                                                                      -->
     <!-- ADMIN datasource - for creating the opennms database and other admin -->
@@ -75,11 +75,11 @@
     <bean id="adminDatasource" factory-ref="dataSourceFactory" factory-method="createDataSource">
         <argument>
             <props>
-                <prop key="databaseName" value="${datasource.adminDatabaseName}"/>
+                <prop key="databaseName" value="${datasource.adminDatabaseName}" />
 
-                <prop key="user" value="${datasource.adminUsername}"/>
-                <prop key="password" value="${datasource.adminPassword}"/>
-                <prop key="url" value="${datasource.adminUrl}"/>
+                <prop key="user" value="${datasource.adminUsername}" />
+                <prop key="password" value="${datasource.adminPassword}" />
+                <prop key="url" value="${datasource.adminUrl}" />
 
                 <!--<prop key="osgi.jdbc.driver.class" value="${datasource.driverClass}"/>-->
             </props>
@@ -87,49 +87,21 @@
     </bean>
 
     <!-- RAW datasource - accessible before DB setup + Liquibase executes -->
-    <!-- TBD999: Connection pooling - do we use createConnectionPoolDataSource() which does NOT return a javax.sql.DataSource??? -->
     <bean id="earlyDatasource" factory-ref="dataSourceFactory" factory-method="createDataSource">
         <argument>
             <props>
-                <prop key="databaseName" value="${datasource.databaseName}"/>
+                <prop key="databaseName" value="${datasource.databaseName}" />
 
-                <prop key="user" value="${datasource.username}"/>
-                <prop key="password" value="${datasource.password}"/>
-                <prop key="url" value="${datasource.url}"/>
-
-                <!-- TBD999: pool settings -->
-                <!--<prop key="osgi.jdbc.driver.class" value="${datasource.driverClass}"/>-->
+                <prop key="user" value="${datasource.username}" />
+                <prop key="password" value="${datasource.password}" />
+                <prop key="url" value="${datasource.url}" />
             </props>
         </argument>
     </bean>
 
-
-    <!--&lt;!&ndash;                              &ndash;&gt;-->
-    <!--&lt;!&ndash; DATABASE SETUP AND MIGRATION &ndash;&gt;-->
-    <!--&lt;!&ndash;                              &ndash;&gt;-->
-    <!--<reference id="opennmsLiquibaseChangeLogProvider" interface="org.opennms.core.schema.liquibase.OpennmsLiquibaseChangeLogProvider"/>-->
-    <!--<bean id="liquibaseResourceClassloader" factory-ref="opennmsLiquibaseChangeLogProvider" factory-method="getResourceClassLoader"/>-->
-
-    <!--<bean id="initialDatabaseSetup" class="org.opennms.netmgt.distributed.datasource.BootTimeDatabaseInit" init-method="init">-->
-    <!--    <property name="enabled" value="${datasource.initialize}" />-->
-    <!--    <property name="databaseName" value="${datasource.databaseName}" />-->
-    <!--    <property name="databaseUsername" value="${datasource.username}" />-->
-    <!--    <property name="databasePassword" value="${datasource.password}" />-->
-
-    <!--    <property name="adminDataSourceConfig" ref="adminDataSourceConfig"/>-->
-    <!--    <property name="adminDatasource" ref="adminDatasource"/>-->
-    <!--</bean>-->
-    <!--<bean id="datasourceMigration" class="org.opennms.netmgt.distributed.datasource.BootTimeDatabaseMigration" init-method="init" depends-on="initialDatabaseSetup">-->
-    <!--    <property name="enabled" value="${datasource.initialize}" />-->
-    <!--    <property name="datasource" ref="datasource" />-->
-    <!--    <property name="dataSourceConfig" ref="dataSourceConfig" />-->
-
-    <!--    <property name="adminDataSourceConfig" ref="adminDataSourceConfig"/>-->
-    <!--    <property name="adminDatasource" ref="adminDatasource"/>-->
-
-    <!--    <property name="liquibaseResourceClassLoader" ref="liquibaseResourceClassloader"/>-->
-    <!--</bean>-->
-
+    <!--                              -->
+    <!-- DATABASE SETUP AND MIGRATION -->
+    <!--                              -->
     <bean id="openNmsDatabasePreHook" class="org.opennms.core.schema.OpenNMSDatabasePrehook">
         <property name="enabled" value="${datasource.initialize}"/>
         <property name="adminDatasource" ref="adminDatasource"/>
@@ -160,10 +132,29 @@
     <bean id="preparedDataSourceProvider" class="org.opennms.core.schema.impl.MigratorPreparedDataSourceProviderImpl">
         <property name="earlyDatasource" ref="earlyDatasource"/>
         <property name="prehook" ref="openNmsDatabasePreHook"/>
+        <property name="pooledDataSourceFactory" ref="pooledDataSourceFactory" />
+        <property name="dataSourceFactory" ref="dataSourceFactory" />
+        <property name="pooledDataSourceProperties">
+            <props>
+                <prop key="databaseName" value="${datasource.databaseName}"/>
+
+                <prop key="user" value="${datasource.username}"/>
+                <prop key="password" value="${datasource.password}"/>
+                <prop key="url" value="${datasource.url}"/>
+
+                <prop key="pool.idleTimeout" value="${connection.pool.idleTimeout}"/>
+                <prop key="pool.connectionTimeout" value="${connection.pool.loginTimeout}"/>
+                <prop key="pool.minimumIdle" value="${connection.pool.minPool}"/>
+                <prop key="pool.maximumPoolSize" value="${connection.pool.maxPool}"/>
+            </props>
+        </property>
     </bean>
 
     <bean id="preparedDataSource" factory-ref="preparedDataSourceProvider" factory-method="retrieve"/>
 
+    <!--                   -->
+    <!-- EXPORTED SERVICES -->
+    <!--                   -->
     <service ref="preparedDataSource" interface="javax.sql.DataSource">
         <service-properties>
             <entry key="osgi.jndi.service.name" value="opennms"/>

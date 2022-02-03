@@ -69,10 +69,18 @@
         </config>
     </feature>
 
+    <feature name="TBD999">
+        <feature>pax-jdbc-pool-hikaricp</feature>
+
+        <capability>
+            osgi.service;effective:=active;objectClass=org.ops4j.pax.jdbc.pool.common.PooledDataSourceFactory
+        </capability>
+    </feature>
+
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
         <!--<feature prerequisite="true">horizon-db-config</feature>-->
         <feature>pax-jdbc-postgresql</feature>
-        <feature>pax-jdbc-pool-hikaricp</feature>
+        <feature>TBD999</feature>
 
         <feature>horizon-events-api</feature>
         <feature>liquibase-core</feature>
