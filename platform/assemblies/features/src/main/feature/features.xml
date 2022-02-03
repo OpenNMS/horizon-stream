@@ -69,7 +69,9 @@
         </config>
     </feature>
 
-    <feature name="TBD999">
+    <!-- WORKAROUND: the PooledDataSourceFactory service exported by pax-jdbc-pool-hikaricp for some reason -->
+    <!--             fails the feature install unless we explicitly declare the capability.                 -->
+    <feature name="pax-jdbc-pool-capability-workaround">
         <feature>pax-jdbc-pool-hikaricp</feature>
 
         <capability>
@@ -80,7 +82,7 @@
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
         <!--<feature prerequisite="true">horizon-db-config</feature>-->
         <feature>pax-jdbc-postgresql</feature>
-        <feature>TBD999</feature>
+        <feature>pax-jdbc-pool-capability-workaround</feature>
 
         <feature>horizon-events-api</feature>
         <feature>liquibase-core</feature>
