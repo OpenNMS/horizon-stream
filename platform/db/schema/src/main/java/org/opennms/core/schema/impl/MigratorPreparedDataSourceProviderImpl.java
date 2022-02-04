@@ -4,6 +4,8 @@ import org.opennms.core.schema.OpenNMSDatabasePrehook;
 import org.opennms.core.schema.PreparedDataSourceProvider;
 import org.ops4j.pax.jdbc.pool.common.PooledDataSourceFactory;
 import org.osgi.service.jdbc.DataSourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -17,6 +19,8 @@ import java.util.Properties;
  * sharing settings shared with the migrator.
  */
 public class MigratorPreparedDataSourceProviderImpl implements PreparedDataSourceProvider {
+
+    private Logger log = LoggerFactory.getLogger(MigratorPreparedDataSourceProviderImpl.class);
 
     private OpenNMSDatabasePrehook prehook;
     private DataSource earlyDatasource;
@@ -78,6 +82,8 @@ public class MigratorPreparedDataSourceProviderImpl implements PreparedDataSourc
 
         // Now prepare the pooled data source.
         DataSource pooledResult = pooledDataSourceFactory.create(dataSourceFactory, pooledDataSourceProperties);
+
+        log.info("DATABASE HAS BEEN PREPARED");
 
         // Return the pooled datasource.
         return pooledResult;

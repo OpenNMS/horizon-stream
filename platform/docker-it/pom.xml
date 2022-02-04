@@ -244,7 +244,7 @@
       <plugin> <!-- for running the integration tests -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.18</version>
+        <!--<version>2.18</version>-->
         <inherited>false</inherited>
         <configuration>
             <skipITs>${skipTests}</skipITs>
