@@ -57,7 +57,7 @@ jobs:
           at: ~/
       - setup_remote_docker
       - run:
-          name: DEBUG: list contents of .m2 folder
+          name: DEBUG list contents of .m2 folder
           command: |
             find ~/.m2 -ls
       - run:
