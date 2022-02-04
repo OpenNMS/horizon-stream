@@ -61,7 +61,7 @@
             datasource.adminUsername=postgres
             datasource.adminPassword=
 
-            datasource. url=jdbc:postgresql://localhost:5432/opennms
+            datasource.url=jdbc:postgresql://localhost:5432/opennms
             datasource.username=opennms
             datasource.password=
             datasource.databaseName=opennms
