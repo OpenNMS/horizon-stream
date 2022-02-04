@@ -6,6 +6,9 @@ executors:
       - image: circleci/openjdk:11.0.7-jdk-buster
         environment:
           MAVEN_OPTS: -Xmx1g
+    test-executor:
+        machine:
+            image: ubuntu-2004:202010-01
 
 workflows:
   build-deploy:
@@ -50,7 +53,7 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
   tests:
-    executor: build-executor
+    executor: test-executor
     working_directory: ~/horizon-stream/platform
     steps:
       - attach_workspace:
