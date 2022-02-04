@@ -241,41 +241,27 @@
         </executions>
       </plugin>
 
-      <plugin> <!-- for running the integration tests -->
+      <!--                -->
+      <!-- TEST EXECUTION -->
+      <!--                -->
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <!--<version>2.18</version>-->
-        <inherited>false</inherited>
         <configuration>
             <skipITs>${skipTests}</skipITs>
+          <reuseForks>true</reuseForks>
+          <useSystemClassLoader>false</useSystemClassLoader>
+          <systemProperties>
+            <property>
+              <name>database.url</name>
+              <value>jdbc:postgresql://localhost:${postgresql.port}/opennms</value>
+            </property>
+            <property>
+              <name>application.base-url</name>
+              <value>http://localhost:${karaf-http-port}</value>
+            </property>
+          </systemProperties>
         </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-            <configuration>
-              <reuseForks>true</reuseForks>
-              <useSystemClassLoader>false</useSystemClassLoader>
-              <systemProperties>
-                <property>
-                  <name>database.url</name>
-                  <value>jdbc:postgresql://localhost:${postgresql.port}/opennms</value>
-                </property>
-                <property>
-                  <name>application.base-url</name>
-                  <value>http://localhost:${karaf-http-port}</value>
-                </property>
-              </systemProperties>
-            </configuration>
-          </execution>
-          <execution>
-            <id>verify-it</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
     </plugins>
