@@ -58,11 +58,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - setup_remote_docker
-      - run:
-          name: DEBUG list contents of .m2 folder
-          command: |
-            find ~/.m2 -ls
+      # - setup_remote_docker
       - run:
           name: Run system test with docker-compose
           command: |
