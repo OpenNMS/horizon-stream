@@ -94,4 +94,31 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>build-docker-images-enabled</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>build-docker-images</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals><goal>build</goal></goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

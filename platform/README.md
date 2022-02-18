@@ -67,5 +67,8 @@ config:update
     $ mvn clean install
 
     # Full build, including docker image creation and Integration Tests
+    $ mvn -Prun-it clean install
+
+    # Full build, the old way
     $ mvn -DskipITs=false clean install docker:build
 
