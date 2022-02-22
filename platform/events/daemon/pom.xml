@@ -39,6 +39,21 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-kafka</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.camel</groupId>
+          <artifactId>camel-jaxb</artifactId>
+          <version>${camel.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

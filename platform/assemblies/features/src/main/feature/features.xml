@@ -4,6 +4,7 @@
     <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/${aries.jax.rs.whiteboard.version}/xml</repository>
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
     <repository>mvn:no.priv.bang.karaf/liquibase-core-karaf/${liquibaseVersion}/xml/features</repository>
+    <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
 
     <feature name="guava" version="${guava.version}" description="Google :: Guava">
         <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
@@ -14,6 +15,9 @@
         <feature>horizon-events</feature>
         <feature>horizon-db</feature>
         <feature>horizon-core-rest</feature>
+        <feature>camel</feature>
+        <feature>camel-kafka</feature>
+        <feature>camel-jaxb</feature>
 
         <feature version="${drools.version}">kie-drools</feature>
 
@@ -103,6 +107,9 @@
         <feature>horizon-events-api</feature>
         <feature>horizon-db</feature>
         <feature>horizon-core-rest</feature>
+        <feature>camel</feature>
+        <feature>camel-kafka</feature>
+        <feature>camel-jaxb</feature>
 
         <bundle>mvn:org.opennms.horizon.events/dao/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.events/daemon/${project.version}</bundle>

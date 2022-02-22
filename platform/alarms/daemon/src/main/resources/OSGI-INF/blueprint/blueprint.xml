@@ -6,7 +6,10 @@
 		http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 
 		http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.5.0
-		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.5.xsd">
+		http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.5.xsd
+
+		http://camel.apache.org/schema/blueprint
+		http://camel.apache.org/schema/blueprint/camel-blueprint-3.15.0.xsd">
 
     <!-- Load system properties -->
     <ext:property-placeholder />
@@ -16,7 +19,6 @@
     <reference id="sessionUtils" interface="org.opennms.horizon.db.dao.api.SessionUtils" />
     <reference id="eventForwarder" interface="org.opennms.horizon.events.api.EventForwarder" />
     <reference id="eventDao" interface="org.opennms.horizon.db.dao.api.EventDao" />
-    <reference id="annotationBasedEventListenerFactory" interface="org.opennms.horizon.events.api.AnnotationBasedEventListenerFactory" />
     <reference id="acknowledgmentDao" interface="org.opennms.horizon.db.dao.api.AcknowledgmentDao" />
 
     <bean id="alarmEntityNotifier" class="org.opennms.netmgt.alarmd.AlarmEntityNotifierImpl"/>
@@ -70,14 +72,18 @@
         <property name="alarmLifecycleListenerManager" ref="alarmLifecycleListenerManager" />
     </bean>
 
-    <bean id="listener" factory-ref="annotationBasedEventListenerFactory" factory-method="createAnnotationBasedEventListener" init-method="start" destroy-method="stop">
-        <argument ref="daemon" />
-    </bean>
-
     <service interface="org.opennms.horizon.alarms.api.AlarmEntityListener" ref="alarmLifecycleListenerManager"/>
     <reference-list id="alarmLifecycleListeners" interface="org.opennms.horizon.alarms.api.AlarmLifecycleListener" availability="optional">
         <reference-listener ref="alarmLifecycleListenerManager" bind-method="onListenerRegistered" unbind-method="onListenerUnregistered" />
     </reference-list>
 
+    <camelContext autoStartup="true" id="alarmCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
+        <route id="receiveEvent">
+            <from uri="kafka:events?brokers=localhost:9092"/>
+            <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
+            <log message="Received Event: ${body}"/>
+            <to uri="bean:daemon?method=onEvent"/>
+        </route>
+    </camelContext>
 
 </blueprint>

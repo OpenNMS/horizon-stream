@@ -45,6 +45,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.opennms.horizon.core.lib.LogPreservingThreadFactory;
 import org.opennms.horizon.core.lib.Logging;
 import org.opennms.horizon.events.api.EventHandler;
@@ -128,6 +130,10 @@ public class EventIpcManagerDefaultImpl implements EventIpcManager, EventIpcBroa
     private Integer m_handlerQueueLength;
 
     private final MetricRegistry m_registry;
+
+    // magic?
+    @Produce
+    private ProducerTemplate producer;
 
     /**
      * A thread dedicated to each listener. The events meant for each listener
@@ -304,6 +310,9 @@ public class EventIpcManagerDefaultImpl implements EventIpcManager, EventIpcBroa
         List<CompletableFuture<Void>> listenerFutures = new ArrayList<>();
 
         IEvent immutableEvent = ImmutableMapper.fromMutableEvent(event);
+
+        // Send to camel route
+        producer.sendBody("direct:forwardEvent", event);
 
         // Send to listeners interested in receiving all events
         for (EventListener listener : m_listeners) {

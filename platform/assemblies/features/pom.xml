@@ -94,6 +94,9 @@
                                 <feature>opentracing-api</feature>
                                 <feature>rate-limited-logger</feature>
                                 <feature>spring</feature>
+                                <feature>camel-core</feature>
+                                <feature>camel-kafka</feature>
+                                <feature>camel-jaxb</feature>
                             </features>
                         </configuration>
                     </execution>

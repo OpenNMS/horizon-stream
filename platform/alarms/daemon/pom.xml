@@ -66,6 +66,21 @@
       <groupId>org.kie.soup</groupId>
       <artifactId>kie-soup-maven-support</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-kafka</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-jaxb</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

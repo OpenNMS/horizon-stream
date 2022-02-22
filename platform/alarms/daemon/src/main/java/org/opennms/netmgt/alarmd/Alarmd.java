@@ -29,12 +29,11 @@
 package org.opennms.netmgt.alarmd;
 
 import org.opennms.horizon.core.lib.SystemProperties;
-import org.opennms.horizon.events.annotations.EventHandler;
-import org.opennms.horizon.events.annotations.EventListener;
 import org.opennms.horizon.events.api.DaemonTools;
 import org.opennms.horizon.events.api.EventForwarder;
-import org.opennms.horizon.events.api.ThreadAwareEventListener;
 import org.opennms.horizon.events.model.IEvent;
+import org.opennms.horizon.events.model.ImmutableEvent;
+import org.opennms.horizon.events.model.ImmutableMapper;
 import org.opennms.horizon.events.xml.Event;
 import org.opennms.netmgt.alarmd.drools.DroolsAlarmContext;
 import org.slf4j.Logger;
@@ -47,8 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jwhite
  * @author <a href="mailto:david@opennms.org">David Hustace</a>
  */
-@EventListener(name=Alarmd.NAME, logPrefix="alarmd")
-public class Alarmd implements ThreadAwareEventListener {
+public class Alarmd {
     private static final Logger LOG = LoggerFactory.getLogger(Alarmd.class);
 
     /** Constant <code>NAME="alarmd"</code> */
@@ -67,20 +65,13 @@ public class Alarmd implements ThreadAwareEventListener {
     @Autowired
     private EventForwarder m_eventForwarder;
 
-    /**
-     * Listens for all events.
-     *
-     * This method is thread-safe.
-     *
-     * @param e a {@link org.opennms.horizon.events.model.IEvent} object.
-     */
-    @EventHandler(uei = EventHandler.ALL_UEIS)
-    public void onEvent(IEvent e) {
+    public void onEvent(Event e) {
     	if (e.getUei().equals("uei.opennms.org/internal/reloadDaemonConfig")) {
-           handleReloadEvent(e);
-           return;
+            ImmutableEvent immutableEvent = ImmutableMapper.fromMutableEvent(e);
+            handleReloadEvent(immutableEvent);
+            return;
     	}
-    	m_persister.persist(Event.copyFrom(e));
+    	m_persister.persist(e);
     }
 
     private synchronized void handleReloadEvent(IEvent e) {
@@ -117,11 +108,6 @@ public class Alarmd implements ThreadAwareEventListener {
     public synchronized void onStop() {
         // Stop the Drools context
         m_droolsAlarmContext.stop();
-    }
-
-    @Override
-    public int getNumThreads() {
-        return THREADS;
     }
 
     public void setAlarmLifecycleListenerManager(AlarmLifecycleListenerManager allm) {
