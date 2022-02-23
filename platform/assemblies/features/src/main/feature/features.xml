@@ -5,11 +5,9 @@
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
     <repository>mvn:no.priv.bang.karaf/liquibase-core-karaf/${liquibaseVersion}/xml/features</repository>
 
-    <feature name="guava" version="${guava.version}" description="Google :: Guava">
-        <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
-        <bundle dependency="true">mvn:com.google.guava/failureaccess/1.0.1</bundle>
-    </feature>
-
+    <!--         -->
+    <!-- HORIZON -->
+    <!--         -->
     <feature name="horizon-alarms" version="${project.version}">
         <feature>horizon-events</feature>
         <feature>horizon-db</feature>
@@ -54,16 +52,6 @@
 <!--        <bundle>mvn:org.opennms.horizon.core/jaas/${project.version}</bundle>-->
 
         <bundle start-level="79">mvn:org.opennms.horizon.core/rest/${project.version}</bundle>
-    </feature>
-
-    <!-- WORKAROUND: the PooledDataSourceFactory service exported by pax-jdbc-pool-hikaricp for some reason -->
-    <!--             fails the feature install unless we explicitly declare the capability.                 -->
-    <feature name="pax-jdbc-pool-capability-workaround">
-        <feature>pax-jdbc-pool-hikaricp</feature>
-
-        <capability>
-            osgi.service;effective:=active;objectClass=org.ops4j.pax.jdbc.pool.common.PooledDataSourceFactory
-        </capability>
     </feature>
 
     <feature name="horizon-db" version="${project.version}" description="Horizon :: DB">
@@ -181,6 +169,15 @@
         <bundle>mvn:org.opennms.horizon.snmp/shell/${project.version}</bundle>
     </feature>
 
+
+    <!--        -->
+    <!-- COMMON -->
+    <!--        -->
+    <feature name="guava" version="${guava.version}" description="Google :: Guava">
+        <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
+        <bundle dependency="true">mvn:com.google.guava/failureaccess/1.0.1</bundle>
+    </feature>
+
     <feature name="jackson" version="${jackson.version}">
         <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxrs-api-2.1/2.9.1</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
@@ -260,6 +257,21 @@
         <bundle start-level="30">
             mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-context-support/${spring.version}
         </bundle>
+    </feature>
+
+
+    <!--             -->
+    <!-- WORKAROUNDS -->
+    <!--             -->
+
+    <!-- WORKAROUND: the PooledDataSourceFactory service exported by pax-jdbc-pool-hikaricp for some reason -->
+    <!--             fails the feature install unless we explicitly declare the capability.                 -->
+    <feature name="pax-jdbc-pool-capability-workaround">
+        <feature>pax-jdbc-pool-hikaricp</feature>
+
+        <capability>
+            osgi.service;effective:=active;objectClass=org.ops4j.pax.jdbc.pool.common.PooledDataSourceFactory
+        </capability>
     </feature>
 
 </features>
