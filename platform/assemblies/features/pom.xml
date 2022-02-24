@@ -95,8 +95,9 @@
                                 <feature>rate-limited-logger</feature>
                                 <feature>spring</feature>
                                 <feature>camel-core</feature>
-                                <feature>camel-kafka</feature>
                                 <feature>camel-jaxb</feature>
+                                <feature>camel-kafka</feature>
+                                <feature>camel-activemq</feature>
                             </features>
                         </configuration>
                     </execution>

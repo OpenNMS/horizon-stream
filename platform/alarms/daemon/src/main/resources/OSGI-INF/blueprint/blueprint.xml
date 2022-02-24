@@ -77,16 +77,34 @@
 
     <cm:property-placeholder id="alarmdListenerProperties" persistent-id="org.opennms.horizon.alarmd.camel" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="brokers" value="localhost:9092"/>
-            <cm:property name="topic" value="events"/>
+            <cm:property name="useKafka" value="true"/>
+            <cm:property name="kafkaBrokers" value="localhost:9092"/>
+            <cm:property name="kafkaTopic" value="events"/>
+
+            <cm:property name="useActiveMq" value="false"/>
+            <cm:property name="activeMqBrokerURL" value="tcp://localhost:61616"/>
+            <cm:property name="activeMqQueueName" value="events"/>
         </cm:default-properties>
     </cm:property-placeholder>
+
+    <!-- Work around Camel using the wrong ActiveMQ component -->
+    <bean id="customamq" class="org.apache.camel.component.activemq.ActiveMQComponent">
+        <property name="brokerURL" value="${activeMqBrokerURL}"/>
+        <property name="usePooledConnection" value="false"/>
+    </bean>
 
     <camelContext autoStartup="true" id="alarmCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
         <propertyPlaceholder id="properties" location="blueprint:alarmdListenerProperties" />
 
-        <route id="receiveEvent">
-            <from uri="kafka:{{topic}}?brokers={{brokers}}"/>
+        <route id="receiveEventKafka" autoStartup="{{useKafka}}">
+            <from uri="kafka:{{kafkaTopic}}?brokers={{kafkaBrokers}}"/>
+            <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
+            <log message="Received Event: ${body}"/>
+            <to uri="bean:daemon?method=onEvent"/>
+        </route>
+
+        <route id="receiveEventAMQ" autoStartup="{{useActiveMq}}">
+            <from uri="customamq:{{activeMqQueueName}}"/>
             <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
             <log message="Received Event: ${body}"/>
             <to uri="bean:daemon?method=onEvent"/>

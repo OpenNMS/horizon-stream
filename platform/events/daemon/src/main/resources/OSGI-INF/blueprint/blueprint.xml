@@ -84,18 +84,35 @@
 
     <cm:property-placeholder id="eventProducerProperties" persistent-id="org.opennms.horizon.eventd.camel" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="brokers" value="localhost:9092"/>
-            <cm:property name="topic" value="events"/>
+            <cm:property name="useKafka" value="true"/>
+            <cm:property name="kafkaBrokers" value="localhost:9092"/>
+            <cm:property name="kafkaTopic" value="events"/>
+
+            <cm:property name="useActiveMq" value="false"/>
+            <cm:property name="activeMqBrokerURL" value="tcp://localhost:61616"/>
+            <cm:property name="activeMqQueueName" value="events"/>
         </cm:default-properties>
     </cm:property-placeholder>
+
+    <!-- Work around Camel using the wrong ActiveMQ component -->
+    <bean id="customamq" class="org.apache.camel.component.activemq.ActiveMQComponent">
+        <property name="brokerURL" value="${activeMqBrokerURL}"/>
+        <property name="usePooledConnection" value="false"/>
+    </bean>
 
     <camelContext autoStartup="true" id="eventForwarderCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
         <propertyPlaceholder id="properties" location="blueprint:eventProducerProperties" />
 
-        <route id="forwardEvent">
+        <route id="produceEventKafka" autoStartup="{{useKafka}}">
             <from uri="direct:forwardEvent"/>
             <marshal><jaxb contextPath="org.opennms.horizon.events.xml"/></marshal>
-            <to uri="kafka:{{topic}}?brokers={{brokers}}" />
+            <to uri="kafka:{{kafkaTopic}}?brokers={{kafkaBrokers}}" />
+        </route>
+
+        <route id="produceEventActiveMq" autoStartup="{{useActiveMq}}">
+            <from uri="direct:forwardEvent"/>
+            <marshal><jaxb contextPath="org.opennms.horizon.events.xml"/></marshal>
+            <to uri="customamq:{{activeMqQueueName}}" />
         </route>
     </camelContext>
 

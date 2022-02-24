@@ -5,6 +5,8 @@
     <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf.version}/xml/features</repository>
     <repository>mvn:no.priv.bang.karaf/liquibase-core-karaf/${liquibaseVersion}/xml/features</repository>
     <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
+    <repository>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</repository>
+    <repository>mvn:org.apache.activemq/activemq-karaf/${activemq.version}/xml/features-core</repository>
 
     <feature name="guava" version="${guava.version}" description="Google :: Guava">
         <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
@@ -16,8 +18,10 @@
         <feature>horizon-db</feature>
         <feature>horizon-core-rest</feature>
         <feature>camel</feature>
-        <feature>camel-kafka</feature>
         <feature>camel-jaxb</feature>
+        <feature>camel-kafka</feature>
+        <feature>camel-activemq</feature>
+        <feature>activemq-client</feature>
 
         <feature version="${drools.version}">kie-drools</feature>
 
@@ -108,8 +112,9 @@
         <feature>horizon-db</feature>
         <feature>horizon-core-rest</feature>
         <feature>camel</feature>
-        <feature>camel-kafka</feature>
         <feature>camel-jaxb</feature>
+        <feature>camel-kafka</feature>
+        <feature>camel-activemq</feature>
 
         <bundle>mvn:org.opennms.horizon.events/dao/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.events/daemon/${project.version}</bundle>
