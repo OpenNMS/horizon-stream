@@ -249,29 +249,4 @@
         <bundle>wrap:mvn:com.swrve/rate-limited-logger/${rate.limitted.logger.version}</bundle>
     </feature>
 
-    <!-- FIXME: Should we define this here, or pull it in? -->
-    <feature name="spring" description="Spring support" version="${spring.version}">
-        <bundle dependency="true" start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aopalliance/1.0_6
-        </bundle>
-        <bundle start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-core/${spring.version}
-        </bundle>
-        <bundle start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-expression/${spring.version}
-        </bundle>
-        <bundle start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-beans/${spring.version}
-        </bundle>
-        <bundle start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-aop/${spring.version}
-        </bundle>
-        <bundle start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-context/${spring.version}
-        </bundle>
-        <bundle start-level="30">
-            mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-context-support/${spring.version}
-        </bundle>
-    </feature>
-
 </features>
