@@ -194,6 +194,16 @@
         </dependency>
         <dependency>
             <groupId>org.opennms.horizon.icmp</groupId>
+            <artifactId>rpc-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.icmp</groupId>
+            <artifactId>rpc-module-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.icmp</groupId>
             <artifactId>rpc-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -210,6 +220,11 @@
         <dependency>
             <groupId>org.opennms.horizon.ipc.grpc</groupId>
             <artifactId>client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.ipc.grpc</groupId>
+            <artifactId>heartbeat</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
