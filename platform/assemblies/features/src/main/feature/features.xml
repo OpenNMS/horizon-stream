@@ -126,6 +126,8 @@
         <bundle>mvn:org.opennms.horizon.icmp/jni6/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.icmp/shell/${project.version}</bundle>
 
+        <bundle>mvn:org.opennms.horizon.icmp/rpc-common/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/rpc-module-impl/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.icmp/rpc-impl/${project.version}</bundle>
     </feature>
 
@@ -167,6 +169,42 @@
         <bundle>mvn:org.opennms.horizon.snmp/rpc-impl/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.snmp/snmp4j/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.snmp/shell/${project.version}</bundle>
+    </feature>
+
+
+    <!--        -->
+    <!-- MINION -->
+    <!--        -->
+    <feature name="minion-grpc" version="${project.version}" description="Minion :: gRPC">
+        <feature>horizon-ipc-api</feature>
+
+        <bundle>mvn:org.opennms.horizon.3rdparty/grpc/${project.version}</bundle>
+        <bundle>mvn:com.google.protobuf/protobuf-java/${protobuf.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.ipc.grpc/client/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.ipc.grpc/common/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.ipc.grpc/heartbeat/${project.version}</bundle>
+    </feature>
+
+    <feature name="minion-icmp" version="${project.version}" description="Minion :: ICMP">
+        <feature>java-native-access</feature>
+        <feature>guava</feature>
+        <feature>minion-grpc</feature>
+
+        <bundle>mvn:org.opennms.horizon.core/lib/${project.version}</bundle>
+        <bundle>mvn:org.opennms.lib/org.opennms.lib.tracker/${opennms.tracker.version}</bundle>
+        <bundle>mvn:org.opennms/jicmp-api/${jicmp.version}</bundle>
+        <bundle>mvn:org.opennms/jicmp6-api/${jicmp.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.icmp/api/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/best/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/jna/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/jni/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/jni6/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/shell/${project.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.icmp/rpc-common/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.icmp/rpc-module-impl/${project.version}</bundle>
     </feature>
 
 

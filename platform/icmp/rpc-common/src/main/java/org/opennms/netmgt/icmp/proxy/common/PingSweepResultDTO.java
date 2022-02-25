@@ -26,87 +26,49 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.icmp.proxy.impl;
+package org.opennms.netmgt.icmp.proxy.common;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opennms.core.xml.InetAddressXmlAdapter;
 
-@XmlRootElement(name = "ip-range")
+@XmlRootElement(name = "pinger-result")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class IPRangeDTO {
+public class PingSweepResultDTO {
 
-    @XmlAttribute(name = "begin")
+    @XmlElement(name = "address")
     @XmlJavaTypeAdapter(value = InetAddressXmlAdapter.class)
-    private InetAddress begin;
+    private InetAddress address;
 
-    @XmlAttribute(name = "end")
-    @XmlJavaTypeAdapter(value = InetAddressXmlAdapter.class)
-    private InetAddress end;
+    @XmlElement(name = "rtt")
+    private double rtt;
 
-    @XmlAttribute(name = "retries")
-    private int retries;
-
-    @XmlAttribute(name = "timeout")
-    private long timeout;
-
-    public IPRangeDTO() {
+    public InetAddress getAddress() {
+        return address;
     }
 
-    public IPRangeDTO(InetAddress begin, InetAddress end, int retries, long timeout) {
-        this.begin = begin;
-        this.end = end;
-        this.retries = retries;
-        this.timeout = timeout;
+    public void setAddress(InetAddress address) {
+        this.address = address;
     }
 
-    public IPRangeDTO(String begin, String end, int retries, int timeout) throws UnknownHostException {
-        this(InetAddress.getByName(begin), InetAddress.getByName(end), retries, timeout);
+    public double getRtt() {
+        return rtt;
     }
 
-    public InetAddress getBegin() {
-        return begin;
-    }
-
-    public void setBegin(InetAddress begin) {
-        this.begin = begin;
-    }
-
-    public InetAddress getEnd() {
-        return end;
-    }
-
-    public void setEnd(InetAddress end) {
-        this.end = end;
-    }
-
-    public int getRetries() {
-        return retries;
-    }
-
-    public void setRetries(int retries) {
-        this.retries = retries;
-    }
-
-    public long getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
+    public void setRtt(double rtt) {
+        this.rtt = rtt;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(begin, end, retries, timeout);
+        return Objects.hash(address, rtt);
     }
 
     @Override
@@ -117,11 +79,8 @@ public class IPRangeDTO {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        IPRangeDTO other = (IPRangeDTO) obj;
-        return Objects.equals(this.begin, other.begin)
-                && Objects.equals(this.end, other.end)
-                && Objects.equals(this.retries, other.retries)
-                && Objects.equals(this.timeout, other.timeout);
+        PingSweepResultDTO other = (PingSweepResultDTO) obj;
+        return Objects.equals(this.address, other.address) && Objects.equals(this.rtt, other.rtt);
     }
 
 }

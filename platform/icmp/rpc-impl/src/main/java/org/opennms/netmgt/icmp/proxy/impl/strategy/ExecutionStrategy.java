@@ -30,8 +30,8 @@ package org.opennms.netmgt.icmp.proxy.impl.strategy;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.opennms.netmgt.icmp.proxy.impl.PingRequestDTO;
 import org.opennms.netmgt.icmp.proxy.PingSummary;
+import org.opennms.netmgt.icmp.proxy.common.PingRequestDTO;
 
 /**
  * Allows implementing different execution strategies based on the {@link org.opennms.netmgt.icmp.proxy.PingRequestBuilder}'s properties.

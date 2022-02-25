@@ -202,6 +202,7 @@ public class MinionGrpcClient extends AbstractMessageDispatcherFactory<String> {
     }
 
     private void initializeRpcStub() {
+        // TODO: reconnect anytime the connection is not active (rpcStream == null)
         if (getChannelState().equals(ConnectivityState.READY)) {
             rpcStream = asyncStub.rpcStreaming(new RpcMessageHandler());
             // Need to send minion headers to gRPC server in order to register.
@@ -213,6 +214,7 @@ public class MinionGrpcClient extends AbstractMessageDispatcherFactory<String> {
     }
 
     private void initializeSinkStub() {
+        // TODO: reconnect anytime the connection is not active (rpcStream == null)
         if (getChannelState().equals(ConnectivityState.READY)) {
             sinkStream = asyncStub.sinkStreaming(new EmptyMessageReceiver());
             LOG.info("Initialized Sink stream");

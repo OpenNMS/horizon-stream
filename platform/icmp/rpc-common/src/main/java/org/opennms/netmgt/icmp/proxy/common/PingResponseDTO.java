@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.icmp.proxy.impl;
+package org.opennms.netmgt.icmp.proxy.common;
 
 import java.util.Objects;
 

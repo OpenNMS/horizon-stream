@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.icmp.proxy.impl.model;
+package org.opennms.netmgt.icmp.proxy.common.model;
 
 import java.io.Serializable;
 import java.net.InetAddress;

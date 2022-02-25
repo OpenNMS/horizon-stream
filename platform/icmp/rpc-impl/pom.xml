@@ -29,6 +29,11 @@
   <dependencies>
     <dependency>
       <groupId>org.opennms.horizon.icmp</groupId>
+      <artifactId>rpc-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.horizon.icmp</groupId>
       <artifactId>api</artifactId>
       <version>${project.version}</version>
     </dependency>

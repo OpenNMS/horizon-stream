@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.icmp.proxy.impl;
+package org.opennms.netmgt.icmp.proxy.module.impl;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -48,8 +48,13 @@ import org.opennms.netmgt.icmp.EchoPacket;
 import org.opennms.netmgt.icmp.PingResponseCallback;
 import org.opennms.netmgt.icmp.Pinger;
 import org.opennms.netmgt.icmp.PingerFactory;
-import org.opennms.netmgt.icmp.proxy.impl.model.IPPollAddress;
-import org.opennms.netmgt.icmp.proxy.impl.model.IPPollRange;
+import org.opennms.netmgt.icmp.proxy.common.IPRangeDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepRequestDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepResponseDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepResultDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepRpcModule;
+import org.opennms.netmgt.icmp.proxy.common.model.IPPollAddress;
+import org.opennms.netmgt.icmp.proxy.common.model.IPPollRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +64,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 @Component
-public class PingSweepRpcModule extends AbstractXmlRpcModule<PingSweepRequestDTO, PingSweepResponseDTO> {
+public class PingSweepRpcModuleImpl extends AbstractXmlRpcModule<PingSweepRequestDTO, PingSweepResponseDTO> implements PingSweepRpcModule {
 
     public static final String RPC_MODULE_ID = "PING-SWEEP";
 
@@ -72,7 +77,7 @@ public class PingSweepRpcModule extends AbstractXmlRpcModule<PingSweepRequestDTO
     @Autowired
     private PingerFactory pingerFactory;
 
-    public PingSweepRpcModule() {
+    public PingSweepRpcModuleImpl() {
         super(PingSweepRequestDTO.class, PingSweepResponseDTO.class);
     }
 

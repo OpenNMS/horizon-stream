@@ -21,6 +21,8 @@
     <module>jni</module>
     <module>jni6</module>
     <module>jna</module>
+    <module>rpc-common</module>
+    <module>rpc-module-impl</module>
     <module>rpc-impl</module>
     <module>shell</module>
   </modules>

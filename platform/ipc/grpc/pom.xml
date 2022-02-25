@@ -18,6 +18,7 @@
   <modules>
     <module>client</module>
     <module>common</module>
+    <module>heartbeat</module>
     <module>server</module>
   </modules>
 

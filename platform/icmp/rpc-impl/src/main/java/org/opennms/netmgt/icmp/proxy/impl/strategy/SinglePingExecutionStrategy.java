@@ -32,10 +32,10 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.opennms.horizon.ipc.rpc.api.RpcClient;
-import org.opennms.netmgt.icmp.proxy.impl.PingRequestDTO;
 import org.opennms.netmgt.icmp.proxy.PingResponse;
-import org.opennms.netmgt.icmp.proxy.impl.PingResponseDTO;
 import org.opennms.netmgt.icmp.proxy.PingSummary;
+import org.opennms.netmgt.icmp.proxy.common.PingRequestDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingResponseDTO;
 
 /**
  * Is used to perform one ping.

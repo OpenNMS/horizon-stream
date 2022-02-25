@@ -28,11 +28,11 @@
 
 package org.opennms.horizon.ipc.sink.aggregation;
 
+import org.opennms.horizon.ipc.sink.api.AggregationPolicy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
-import org.opennms.horizon.ipc.sink.api.AggregationPolicy;
 
 /**
  * An aggregation policy that creates {@link ArrayList} aggregates.

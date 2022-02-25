@@ -8,7 +8,21 @@
 		http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.3.0.xsd
 ">
 
-  <bean id="identity" class="org.opennms.horizon.core.identity.IdentityImpl"/>
+  <cm:property-placeholder id="serverProperties" persistent-id="org.opennms.identity"
+                           update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="identity.id" value="0ddba11"/>
+      <cm:property name="identity.location" value="cloud"/>
+      <cm:property name="identity.type" value="somethingnew"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <bean id="identity" class="org.opennms.horizon.core.identity.IdentityImpl">
+    <argument value="${identity.id}"/>
+    <argument value="${identity.location}"/>
+    <argument value="${identity.type}"/>
+  </bean>
+
   <service ref="identity" interface="org.opennms.horizon.core.identity.Identity"/>
 
 </blueprint>

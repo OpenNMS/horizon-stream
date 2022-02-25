@@ -5,18 +5,9 @@
 		https://osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 ">
 
-    <reference id="pingerFactory" interface="org.opennms.netmgt.icmp.PingerFactory" />
     <reference id="rpcClientFactory" interface="org.opennms.horizon.ipc.rpc.api.RpcClientFactory" />
-
-    <bean id="pingProxyRpcModule" class="org.opennms.netmgt.icmp.proxy.impl.PingProxyRpcModule">
-        <property name="pingerFactory" ref="pingerFactory" />
-    </bean>
-    <service interface="org.opennms.horizon.ipc.rpc.api.RpcModule" ref="pingProxyRpcModule"/>
-
-    <bean id="pingSweepRpcModule" class="org.opennms.netmgt.icmp.proxy.impl.PingSweepRpcModule">
-        <property name="pingerFactory" ref="pingerFactory" />
-    </bean>
-    <service interface="org.opennms.horizon.ipc.rpc.api.RpcModule" ref="pingSweepRpcModule"/>
+    <reference id="pingProxyRpcModule" interface="org.opennms.netmgt.icmp.proxy.common.PingProxyRpcModule"/>
+    <reference id="pingSweepRpcModule" interface="org.opennms.netmgt.icmp.proxy.common.PingSweepRpcModule"/>
 
     <service interface="org.opennms.netmgt.icmp.proxy.LocationAwarePingClient">
         <bean class="org.opennms.netmgt.icmp.proxy.impl.LocationAwarePingClientImpl">

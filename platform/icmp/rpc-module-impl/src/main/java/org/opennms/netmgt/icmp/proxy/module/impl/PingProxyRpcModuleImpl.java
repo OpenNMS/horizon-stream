@@ -26,20 +26,24 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.icmp.proxy.impl;
+package org.opennms.netmgt.icmp.proxy.module.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.opennms.netmgt.icmp.proxy.common.PingProxyRpcModule;
 import org.opennms.netmgt.icmp.PingerFactory;
 import org.opennms.horizon.ipc.rpc.api.AbstractXmlRpcModule;
+import org.opennms.netmgt.icmp.proxy.common.PingRequestDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingResponseDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingResultTracker;
 
-public class PingProxyRpcModule extends AbstractXmlRpcModule<PingRequestDTO, PingResponseDTO>  {
+public class PingProxyRpcModuleImpl extends AbstractXmlRpcModule<PingRequestDTO, PingResponseDTO> implements PingProxyRpcModule {
 
     public static final String RPC_MODULE_ID = "PING";
 
     private PingerFactory pingerFactory;
 
-    public PingProxyRpcModule() {
+    public PingProxyRpcModuleImpl() {
         super(PingRequestDTO.class, PingResponseDTO.class);
     }
 

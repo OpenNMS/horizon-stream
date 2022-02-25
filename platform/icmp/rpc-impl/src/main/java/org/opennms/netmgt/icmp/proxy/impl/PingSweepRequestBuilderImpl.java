@@ -41,6 +41,10 @@ import org.opennms.horizon.ipc.rpc.api.RpcClient;
 import org.opennms.netmgt.icmp.PingConstants;
 import org.opennms.netmgt.icmp.proxy.PingSweepRequestBuilder;
 import org.opennms.netmgt.icmp.proxy.PingSweepSummary;
+import org.opennms.netmgt.icmp.proxy.common.IPRangeDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepRequestDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepResponseDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingSweepResultDTO;
 
 public class PingSweepRequestBuilderImpl implements PingSweepRequestBuilder {
 

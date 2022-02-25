@@ -39,6 +39,8 @@ import org.opennms.horizon.ipc.rpc.api.RpcRequest;
 import org.opennms.netmgt.icmp.PingConstants;
 import org.opennms.netmgt.icmp.proxy.PingRequestBuilder;
 import org.opennms.netmgt.icmp.proxy.PingSummary;
+import org.opennms.netmgt.icmp.proxy.common.PingRequestDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingResponseDTO;
 import org.opennms.netmgt.icmp.proxy.impl.strategy.MultiplePingExecutionStrategy;
 import org.opennms.netmgt.icmp.proxy.impl.strategy.SinglePingExecutionStrategy;
 

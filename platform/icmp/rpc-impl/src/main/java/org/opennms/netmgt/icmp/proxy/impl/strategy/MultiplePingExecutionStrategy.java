@@ -41,10 +41,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.opennms.horizon.ipc.rpc.api.RpcClient;
 import org.opennms.netmgt.icmp.proxy.PingRequestBuilder;
-import org.opennms.netmgt.icmp.proxy.impl.PingRequestDTO;
-import org.opennms.netmgt.icmp.proxy.impl.PingResponseDTO;
 import org.opennms.netmgt.icmp.proxy.PingSequence;
 import org.opennms.netmgt.icmp.proxy.PingSummary;
+import org.opennms.netmgt.icmp.proxy.common.PingRequestDTO;
+import org.opennms.netmgt.icmp.proxy.common.PingResponseDTO;
 
 /**
  * The {@link MultiplePingExecutionStrategy} allows the execution of more than 1 pings with the same configuration.
