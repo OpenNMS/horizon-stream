@@ -39,7 +39,7 @@ jobs:
       - run:
           name: Compile source, run unit tests and build containers
           command: |
-            mvn clean install docker:build
+            mvn -Pbuild-docker-images-enabled clean install
       - run:
           name: Save containers
           command: |
