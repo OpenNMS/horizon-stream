@@ -12,6 +12,8 @@
 		http://camel.apache.org/schema/blueprint
 		http://camel.apache.org/schema/blueprint/camel-blueprint-3.15.0.xsd">
 
+    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+
     <!-- service imports DAOs (services et al) -->
     <reference id="alarmDao" interface="org.opennms.horizon.db.dao.api.AlarmDao" />
     <reference id="sessionUtils" interface="org.opennms.horizon.db.dao.api.SessionUtils" />
@@ -78,11 +80,11 @@
     <cm:property-placeholder id="alarmdListenerProperties" persistent-id="org.opennms.horizon.alarmd.camel" update-strategy="reload">
         <cm:default-properties>
             <cm:property name="useKafka" value="true"/>
-            <cm:property name="kafkaBrokers" value="localhost:9092"/>
+            <cm:property name="kafkaBrokers" value="$[env:KAFKA_BROKER_HOST]:$[env:KAFKA_BROKER_PORT]"/>
             <cm:property name="kafkaTopic" value="events"/>
 
             <cm:property name="useActiveMq" value="false"/>
-            <cm:property name="activeMqBrokerURL" value="tcp://localhost:61616"/>
+            <cm:property name="activeMqBrokerURL" value="$[env:ACTIVEMQ_BROKER_URL]"/>
             <cm:property name="activeMqQueueName" value="events"/>
         </cm:default-properties>
     </cm:property-placeholder>
@@ -103,7 +105,7 @@
             <to uri="bean:daemon?method=onEvent"/>
         </route>
 
-        <route id="receiveEventAMQ" autoStartup="{{useActiveMq}}">
+        <route id="receiveEventActiveMq" autoStartup="{{useActiveMq}}">
             <from uri="customamq:{{activeMqQueueName}}"/>
             <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
             <log message="Received Event: ${body}"/>

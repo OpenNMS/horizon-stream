@@ -167,6 +167,34 @@
               </run>
             </image>
 
+            <!--                -->
+            <!-- KAFKA IMAGE -->
+            <!--                -->
+            <image>
+              <name>kafka-it-image</name>
+              <alias>kafka</alias>
+              <build>
+                <!-- POSTGRES VERSION PROPERTY -->
+                <from>blacktop/kafka:2.6</from>
+              </build>
+              <run>
+                <env>
+                  <KAFKA_ADVERTISED_HOST_NAME>kafka-host</KAFKA_ADVERTISED_HOST_NAME>
+                </env>
+                <ports>
+                  <port>kafka.port:9092</port>
+                </ports>
+                <wait>
+                  <log>(?s)started \(kafka.server.KafkaServer\)</log>
+                  <time>120000</time>
+                </wait>
+                <network>
+                  <mode>custom</mode>
+                  <name>alarm-docker-it-network</name>
+                  <alias>kafka-host</alias>
+                </network>
+              </run>
+            </image>
 
             <!--                    -->
             <!-- APPLICATION IMAGE  -->
@@ -211,6 +239,9 @@
                   <PGSQL_SERVICE_NAME>db</PGSQL_SERVICE_NAME>
                   <PGSQL_ADMIN_USERNAME>postgres</PGSQL_ADMIN_USERNAME>
                   <PGSQL_ADMIN_PASSWORD>unused</PGSQL_ADMIN_PASSWORD>
+                  <KAFKA_BROKER_HOST>kafka-host</KAFKA_BROKER_HOST>
+                  <KAFKA_BROKER_PORT>9092</KAFKA_BROKER_PORT>
+                  <ACTIVEMQ_BROKER_URL>tcp://localhost:61616</ACTIVEMQ_BROKER_URL>
                 </env>
                 <wait>
                   <log>Blueprint bundle org.opennms.horizon.alarms.daemon/.* has been started</log>

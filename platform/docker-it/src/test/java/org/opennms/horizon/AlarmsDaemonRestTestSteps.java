@@ -37,6 +37,7 @@ import io.restassured.internal.util.IOUtils;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
@@ -160,50 +164,11 @@ public class AlarmsDaemonRestTestSteps {
 
     @Then("send GET request at path {string} with retry timeout {int}")
     public void sendGETRequestAtPath(String path, int retryTimeout) throws Throwable {
-        URL requestUrl = new URL(new URL(this.applicationBaseUrl), path);
-
-        RestAssuredConfig restAssuredConfig = this.createRestAssuredTestConfig();
-
-        RequestSpecification requestSpecification =
-                RestAssured
-                        .given()
-                        .config(restAssuredConfig)
-                        ;
-
-        if (this.username != null) {
-            requestSpecification =
-                    requestSpecification
-                            .auth()
-                            .preemptive()
-                            .basic(this.username, this.password)
-                            ;
-        }
-
-        if (this.acceptEncoding != null) {
-            requestSpecification =
-                    requestSpecification
-                            .header("Accept", this.acceptEncoding)
-                            ;
-        }
-
-        final RequestSpecification finalRequestSpecification = requestSpecification;
-        Supplier<Response> operation =
-            () ->
-                    finalRequestSpecification
-                            .get(requestUrl)
-                            .thenReturn()
-                            ;
-
-        //
-        // Retry the operation until success or timeout
-        //
-        this.restAssuredResponse =
-            this.retryUtils.retry(
-                    operation,
-                    (response) -> ( ( response != null ) && ( response.getStatusCode() != 500 ) && ( response.getStatusCode() != 404 ) ),
-                    1000,
-                    retryTimeout,
-                    null);
+        this.restAssuredResponse = this.sendGetRequestWithRetry(path, retryTimeout,
+                //
+                // Retry the operation until success or timeout
+                //
+                (response) -> ((response != null) && (response.getStatusCode() != 500) && (response.getStatusCode() != 404)));
 
         assertNotNull(this.restAssuredResponse);
     }
@@ -326,5 +291,67 @@ public class AlarmsDaemonRestTestSteps {
 
             return new String(payloadBytes, StandardCharsets.UTF_8);
         }
+    }
+
+    @Then("request alarm list with retry timeout {int}")
+    public void requestAlarmListWithRetryTimeout(int retryTimeout) throws Throwable {
+        this.restAssuredResponse = this.sendGetRequestWithRetry("/alarms/list", retryTimeout,
+                //
+                // Retry the operation until response body has an alarm or timeout
+                //
+                (response) -> {
+                    if (response == null || response.getStatusCode() == 500 || response.getStatusCode() == 404) {
+                        return false;
+                    }
+
+                    if (response.getStatusCode() == 200) {
+                        JsonPath body = JsonPath.from(response.getBody().asString());
+                        return (int) body.get("totalCount") > 0;
+                    }
+
+                    return false;
+                });
+    }
+
+    private Response sendGetRequestWithRetry(String path, int retryTimeout, Predicate<Response> completionPredicate) throws Throwable {
+        URL requestUrl = new URL(new URL(this.applicationBaseUrl), path);
+
+        RestAssuredConfig restAssuredConfig = this.createRestAssuredTestConfig();
+
+        RequestSpecification requestSpecification =
+                RestAssured
+                        .given()
+                        .config(restAssuredConfig)
+                ;
+
+        if (this.username != null) {
+            requestSpecification =
+                    requestSpecification
+                            .auth()
+                            .preemptive()
+                            .basic(this.username, this.password)
+            ;
+        }
+
+        if (this.acceptEncoding != null) {
+            requestSpecification =
+                    requestSpecification
+                            .header("Accept", this.acceptEncoding)
+            ;
+        }
+
+        final RequestSpecification finalRequestSpecification = requestSpecification;
+        Supplier<Response> operation =
+                () ->
+                        finalRequestSpecification
+                                .get(requestUrl)
+                                .thenReturn();
+
+        return this.retryUtils.retry(
+                        operation,
+                        completionPredicate,
+                        1000,
+                        retryTimeout,
+                        null);
     }
 }

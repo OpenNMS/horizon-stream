@@ -1,22 +1,20 @@
 package org.opennms.horizon.alarms.itests;
 
+import com.google.common.collect.ImmutableMap;
+import org.testcontainers.containers.*;
+import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
+import org.testcontainers.lifecycle.TestLifecycleAware;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-import org.testcontainers.lifecycle.TestLifecycleAware;
-
-import com.google.common.collect.ImmutableMap;
-
 public class CoreContainer extends GenericContainer<CoreContainer> implements TestLifecycleAware {
     public static final String ALIAS = "core";
     public static final String DB_ALIAS = "db";
+    public static final String KAFKA_ALIAS = "kafka";
+    public static final Integer KAFKA_PORT = 9092;
 
     public static final int CORE_WEB_PORT = 8181;
     private static final int CORE_SSH_PORT = 8101;
@@ -34,10 +32,13 @@ public class CoreContainer extends GenericContainer<CoreContainer> implements Te
 
     private final PostgreSQLContainer<?> pgContainer;
 
-    public CoreContainer(PostgreSQLContainer<?> pgContainer) {
+    private final KafkaContainer kafkaContainer;
+
+    public CoreContainer(PostgreSQLContainer<?> pgContainer, KafkaContainer kafkaContainer) {
         // use the 'local' tag so that we don't accidentally pull 'latest' or another tag for the container registry
         super("opennms/horizon-stream-core:local");
         this.pgContainer = Objects.requireNonNull(pgContainer);
+        this.kafkaContainer = Objects.requireNonNull(kafkaContainer);
     }
 
     @Override
@@ -55,6 +56,8 @@ public class CoreContainer extends GenericContainer<CoreContainer> implements Te
                 .withEnv("PGSQL_SERVICE_NAME", DB_ALIAS)
                 .withEnv("PGSQL_ADMIN_USERNAME", pgContainer.getUsername())
                 .withEnv("PGSQL_ADMIN_PASSWORD", pgContainer.getPassword())
+                .withEnv("KAFKA_BROKER_HOST", KAFKA_ALIAS)
+                .withEnv("KAFKA_BROKER_PORT", KAFKA_PORT.toString())
                 .withNetwork(Network.SHARED)
                 .withNetworkAliases(ALIAS)
                 .withCommand(containerCommand)

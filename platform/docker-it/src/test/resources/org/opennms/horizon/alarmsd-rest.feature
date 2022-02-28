@@ -30,7 +30,7 @@ Feature: OpenNMS Alarm Daemon Rest
     Given POST request body in resource "test-data/event001.xml"
     Then send POST request at path "/events"
     Then verify the response code 202 was returned
-    Then send GET request at path "/alarms/list" with retry timeout 20000
+    Then request alarm list with retry timeout 20000
     Then verify the response code 200 was returned
     Then DEBUG dump the response body
     Then parse the JSON response
