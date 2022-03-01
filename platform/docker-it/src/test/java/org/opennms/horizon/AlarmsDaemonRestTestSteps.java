@@ -293,7 +293,7 @@ public class AlarmsDaemonRestTestSteps {
         }
     }
 
-    @Then("request alarm list with retry timeout {int}")
+    @Then("request non-empty alarm list with retry timeout {int}")
     public void requestAlarmListWithRetryTimeout(int retryTimeout) throws Throwable {
         this.restAssuredResponse = this.sendGetRequestWithRetry("/alarms/list", retryTimeout,
                 //
