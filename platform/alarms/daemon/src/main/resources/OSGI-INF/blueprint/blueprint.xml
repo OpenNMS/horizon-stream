@@ -95,11 +95,19 @@
         <property name="usePooledConnection" value="false"/>
     </bean>
 
+    <bean id="offsetFile" class="java.io.File">
+        <argument value="etc/alarm-kafka-offset.dat" />
+    </bean>
+    <bean id="offsetRepo" class="org.apache.camel.impl.engine.FileStateRepository"
+          factory-method="fileStateRepository">
+        <argument ref="offsetFile" />
+    </bean>
+
     <camelContext autoStartup="true" id="alarmCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
         <propertyPlaceholder id="properties" location="blueprint:alarmdListenerProperties" />
 
         <route id="receiveEventKafka" autoStartup="{{useKafka}}">
-            <from uri="kafka:{{kafkaTopic}}?brokers={{kafkaBrokers}}"/>
+            <from uri="kafka:{{kafkaTopic}}?brokers={{kafkaBrokers}}&amp;offsetRepository=#offsetRepo"/>
             <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
             <log message="Received Event: ${body}"/>
             <to uri="bean:daemon?method=onEvent"/>
