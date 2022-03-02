@@ -95,12 +95,12 @@
         <property name="usePooledConnection" value="false"/>
     </bean>
 
-    <bean id="offsetFile" class="java.io.File">
-        <argument value="etc/alarm-kafka-offset.dat" />
+    <bean id="offsetRepoFactory" class="org.opennms.netmgt.alarmd.AlarmKafkaOffsetRepositoryFactory">
+        <argument value="etc/alarm-kafka-offset.dat	"/>
     </bean>
-    <bean id="offsetRepo" class="org.apache.camel.impl.engine.FileStateRepository"
-          factory-method="fileStateRepository">
-        <argument ref="offsetFile" />
+    <bean id="offsetRepo" class="org.apache.camel.spi.StateRepository"
+          factory-ref="offsetRepoFactory" factory-method="get">
+        <argument value="$[env:ALARM_KAFKA_OFFSET_FILE]" />
     </bean>
 
     <camelContext autoStartup="true" id="alarmCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
