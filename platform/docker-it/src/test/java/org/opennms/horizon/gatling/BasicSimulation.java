@@ -41,6 +41,7 @@ public class BasicSimulation extends Simulation {
                   .body(RawFileBody("alarm-event.xml")));
 
   {
-    setUp(scn.injectOpen(rampUsersPerSec(1).to(100).during(10)).protocols(httpProtocol));
+    setUp(scn.injectOpen(rampUsersPerSec(1).to(100).during(10)).protocols(httpProtocol))
+            .assertions(global().responseTime().max().lte(10)); // bogus value for testing assertions
   }
 }

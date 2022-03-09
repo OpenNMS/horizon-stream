@@ -95,11 +95,17 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
             mkdir -p ~/cucumber/
             find . -type f -regex ".*/target/cucumber.*" -exec cp {} ~/cucumber/ \;
+            mkdir -p ~/gatling/
+            export GATLING_RESULT_FOLDER=$(find . -regex ".*/target/gatling")
+            cp -r $GATLING_RESULT_FOLDER/$(head -n 1 $GATLING_RESULT_FOLDER/lastRun.txt) ~/gatling/
+            unset GATLING_RESULT_FOLDER
           when: always
       - store_test_results:
           path: ~/junit
       - store_artifacts:
           path: ~/cucumber
+      - store_artifacts:
+          path: ~/gatling
 
   build-ui:
     executor: ui-executor

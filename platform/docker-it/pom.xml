@@ -325,7 +325,7 @@
           <jvmArgs>
             <arg>-DgatlingBaseUrl=http://localhost:${karaf-http-port}</arg>
           </jvmArgs>
-          <simulationClass>org.opennms.horizon.gatling.BasicSimulation</simulationClass>
+          <runMultipleSimulations>true</runMultipleSimulations>
         </configuration>
         <executions>
           <execution>
