@@ -24,6 +24,7 @@
         <module>snmp</module>
 
         <module>docker-it</module>
+<!--        <module>gatling-it</module>-->
     </modules>
 
     <properties>
@@ -40,6 +41,8 @@
         <cucumber.version>7.1.0</cucumber.version>
         <cxf.version>3.5.0</cxf.version>
         <drools.version>7.31.0.Final</drools.version>
+        <gatling.version>3.7.6</gatling.version>
+        <gatling-maven-plugin.version>4.1.3</gatling-maven-plugin.version>
         <glassfish.jaxb.version>2.3.2</glassfish.jaxb.version>
         <grpc.version>1.43.2</grpc.version>
         <guava.version>31.0.1-jre</guava.version>

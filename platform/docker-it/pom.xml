@@ -116,6 +116,13 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>io.gatling.highcharts</groupId>
+      <artifactId>gatling-charts-highcharts</artifactId>
+      <version>${gatling.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -304,6 +311,30 @@
             </property>
           </systemProperties>
         </configuration>
+      </plugin>
+
+      <!--                     -->
+      <!-- LOAD TEST EXECUTION -->
+      <!--                     -->
+      <plugin>
+        <groupId>io.gatling</groupId>
+        <artifactId>gatling-maven-plugin</artifactId>
+        <version>${gatling-maven-plugin.version}</version>
+        <configuration>
+          <skip>${skipITs}</skip>
+          <jvmArgs>
+            <arg>-DgatlingBaseUrl=http://localhost:${karaf-http-port}</arg>
+          </jvmArgs>
+          <simulationClass>org.opennms.horizon.gatling.BasicSimulation</simulationClass>
+        </configuration>
+        <executions>
+          <execution>
+            <id>load-test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

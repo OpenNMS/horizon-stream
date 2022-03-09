@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<event xmlns="http://xmlns.opennms.org/xsd/event">
+    <time>2022-01-12 17:12:11</time>
+    <uei>uei.opennms.org/alarms/trigger</uei>
+    <source>x-source-x</source>
+    <creation-time>2022-01-12 17:12:11</creation-time>
+    <descr>A problem has been triggered...</descr>
+    <parms>
+        <parm>
+            <parmName>service</parmName>
+            <value>x-service-x</value>
+        </parm>
+    </parms>
+</event>
