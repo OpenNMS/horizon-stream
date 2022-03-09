@@ -109,14 +109,14 @@
         <route id="receiveEventKafka" autoStartup="{{useKafka}}">
             <from uri="kafka:{{kafkaTopic}}?brokers={{kafkaBrokers}}&amp;offsetRepository=#offsetRepo"/>
             <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
-            <log message="Received Event: ${body}"/>
+            <log message="Received Event: ${body}" loggingLevel="DEBUG"/>
             <to uri="bean:daemon?method=onEvent"/>
         </route>
 
         <route id="receiveEventActiveMq" autoStartup="{{useActiveMq}}">
             <from uri="customamq:{{activeMqQueueName}}"/>
             <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
-            <log message="Received Event: ${body}"/>
+            <log message="Received Event: ${body}" loggingLevel="DEBUG"/>
             <to uri="bean:daemon?method=onEvent"/>
         </route>
     </camelContext>
