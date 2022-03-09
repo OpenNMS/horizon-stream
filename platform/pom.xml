@@ -24,7 +24,6 @@
         <module>snmp</module>
 
         <module>docker-it</module>
-<!--        <module>gatling-it</module>-->
     </modules>
 
     <properties>
