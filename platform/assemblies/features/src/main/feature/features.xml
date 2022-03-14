@@ -7,6 +7,7 @@
     <repository>mvn:org.apache.camel.karaf/apache-camel/${camel.version}/xml/features</repository>
     <repository>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</repository>
     <repository>mvn:org.apache.activemq/activemq-karaf/${activemq.version}/xml/features-core</repository>
+    <repository>mvn:org.keycloak/keycloak-osgi-features/${keycloak.version}/xml/features</repository>
 
     <!--         -->
     <!-- HORIZON -->
@@ -43,6 +44,7 @@
 
     <feature name="horizon-core-rest" version="${project.version}">
         <feature>horizon-core</feature>
+        <feature>horizon-keycloak</feature>
 
         <feature>cxf</feature>
         <feature>cxf-jaxrs</feature>
@@ -181,6 +183,11 @@
         <bundle>mvn:org.opennms.horizon.snmp/rpc-impl/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.snmp/snmp4j/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.snmp/shell/${project.version}</bundle>
+    </feature>
+
+    <feature name="horizon-keycloak" version="${project.version}" description="Horizon :: Keycloak">
+        <feature>keycloak-jaas</feature>
+        <feature>jaas-deployer</feature>
     </feature>
 
 
