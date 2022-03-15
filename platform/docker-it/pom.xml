@@ -82,6 +82,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <!--      -->
     <!-- JAXB -->

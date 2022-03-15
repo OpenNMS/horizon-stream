@@ -53,6 +53,7 @@
         <java.version>11</java.version>
         <javax.validation.version>2.0.1.Final</javax.validation.version>
         <jaxrs.version>2.1</jaxrs.version>
+        <jcraft.version>0.1.55</jcraft.version>
         <jexl.version>2.1.1</jexl.version>
         <jicmp.version>2.0.1</jicmp.version>
         <jicmp6.version>2.0.1</jicmp6.version>

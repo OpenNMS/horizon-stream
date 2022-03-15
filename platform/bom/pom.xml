@@ -446,6 +446,11 @@
                 <version>${testcontainers.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>${jcraft.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>
