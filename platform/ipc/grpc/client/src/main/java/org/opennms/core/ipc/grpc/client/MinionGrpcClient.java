@@ -305,7 +305,7 @@ public class MinionGrpcClient extends AbstractMessageDispatcherFactory<String> {
         this.tracerRegistry = tracerRegistry;
     }
 
-    ConnectivityState getChannelState() {
+    public ConnectivityState getChannelState() {
         return currentChannelState = channel.getState(true);
     }
 
