@@ -62,16 +62,11 @@ public class IcmpMinionProcessingTestSteps {
         this.username = username;
         this.password = password;
     }
-    @Given("host {string} and port number {int}")
-    public void setHostAndPort(String host, int port) {
+    @Given("host {string} and port in system property {string}")
+    public void setHost(String host, String portKey) {
         this.host = host;
-        this.port = port;
+        this.port = Integer.parseInt(System.getProperty(portKey));
     }
-    /*@Then("start the mock minion ICMP server")
-    public void start_the_mock_minion_icmp_server() {
-        // Write code here that turns the phrase above into concrete actions
-        //TODO: the local container is manually started now
-    }*/
     @Then("ping the mock minion ICMP server via ssh connection")
     public void pingMockMinion() throws Exception {
         connectAndRunCommand();

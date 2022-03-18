@@ -271,8 +271,9 @@
               </build>
               <run>
                 <ports>
-                  <port>karaf-ssh-port:8101</port>
+                  <port>horizon-ssh-port:8101</port>
                   <port>karaf-http-port:8181</port>
+                  <port>grpc-server-port:8990</port>
                   <!--<port>5005:5005</port>-->
                 </ports>
                 <env>
@@ -335,6 +336,14 @@
             <property>
               <name>application.base-url</name>
               <value>http://localhost:${karaf-http-port}</value>
+            </property>
+            <property>
+              <name>grpc.server.port</name>
+              <value>${grpc-server-port}</value>
+            </property>
+            <property>
+              <name>horizon.ssh.port</name>
+              <value>${horizon-ssh-port}</value>
             </property>
           </systemProperties>
         </configuration>

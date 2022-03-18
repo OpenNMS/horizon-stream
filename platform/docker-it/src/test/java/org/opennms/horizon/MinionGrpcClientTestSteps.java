@@ -63,10 +63,10 @@ public class MinionGrpcClientTestSteps {
         identity = new IdentityImpl(id, location, type);
     }
 
-    @Given("server host {string} port {int}")
-    public void setServerHost(String host, Integer port) {
+    @Given("server host {string} port in system property {string}")
+    public void setServerHost(String host, String propertyName) {
         grpcServer = host;
-        grpcPort = port;
+        grpcPort = Integer.parseInt(System.getProperty(propertyName));
     }
 
     @Given("client retry times {int}")
@@ -76,7 +76,7 @@ public class MinionGrpcClientTestSteps {
     }
 
     @Then("initial MinionGrpc client")
-    public void initialAndStartMinionGrpcClient() throws IOException, InterruptedException {
+    public void initialAndStartMinionGrpcClient() throws IOException {
         Dictionary properties = new Properties();
         properties.put(GRPC_HOST, grpcServer);
         properties.put(GRPC_PORT, grpcPort);
