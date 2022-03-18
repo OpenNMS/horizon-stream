@@ -29,20 +29,20 @@
 package org.opennms.horizon;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+import org.opennms.horizon.it.utils.SshClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -54,8 +54,6 @@ public class IcmpMinionProcessingTestSteps {
     private String password;
     private String host;
     private int port;
-    private Session session;
-    private ChannelExec channel;
     private String response;
     @Given("SSH username {string} and password {string}")
     public void setUsernameAndPassword(String username, String password) {
@@ -73,34 +71,29 @@ public class IcmpMinionProcessingTestSteps {
     }
     @Then("verify the response matches {string}")
     public void verifyResponse(String expectedTemplate) throws UnknownHostException {
-        assertEquals(1, regexMatches(expectedTemplate));
+        assertTrue(response.contains("PING:"));
     }
 
     private void connectAndRunCommand() throws Exception{
+        SshClient client = null;
         try {
-            session = new JSch().getSession(username, host, port);
-            session.setPassword(password);
-            session.setConfig("StrictHostKeyChecking", "no");
-            session.connect();
-            channel = (ChannelExec) session.openChannel("exec");
-            channel.setCommand(PING_COMMAND);
-            ByteArrayOutputStream responseStream = new ByteArrayOutputStream();
-            channel.setOutputStream(responseStream);
-            ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-            channel.setErrStream(errorStream);
-            channel.connect();
-            while (channel.isConnected()) {
-                TimeUnit.MILLISECONDS.sleep(100);
+            client = new SshClient(host, port, username, password);
+            PrintStream printer = client.openShell();
+            while(response==null || response.isEmpty()) {
+                printer.println(PING_COMMAND);
+                response = StringUtils.substringAfter(client.getStdout(), PING_COMMAND).trim();
+                TimeUnit.SECONDS.sleep(1);
             }
-            String error = errorStream.toString();
-            if (!error.isEmpty()) {
-                LOG.error("error happened during execute command {} against host {} on port {}: {}", PING_COMMAND, host, port, error);
-                throw new Exception(error);
+            String error = client.getStderr();
+            if(error != null && !error.isEmpty()){
+                LOG.error("Error happened during ping on host {}: {}",host, error);
             }
-            response = responseStream.toString();
-            LOG.info("ping response from {}:{}: {}", host, port, response);
+            LOG.info("ping response from {}: {}", host, response);
+            printer.println("logout");
         } finally {
-            closeSshConnection();
+            if (client !=null) {
+                client.isClearAndClose();
+            }
         }
     }
 
@@ -114,14 +107,5 @@ public class IcmpMinionProcessingTestSteps {
             matches++;
         }
         return matches;
-    }
-
-    private void closeSshConnection() {
-        if(channel!= null) {
-            channel.disconnect();
-        }
-        if(session != null) {
-            session.disconnect();
-        }
     }
 }

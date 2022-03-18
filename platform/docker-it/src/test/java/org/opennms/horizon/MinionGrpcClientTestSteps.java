@@ -95,6 +95,7 @@ public class MinionGrpcClientTestSteps {
             while (counter < clientReadyRetry && !ConnectivityState.READY.equals(state)) {
                 TimeUnit.SECONDS.sleep(1);
                 state = client.getChannelState();
+                counter++;
             }
             assertEquals("Grpc client should connect to the server", ConnectivityState.READY, state);
         } finally {
