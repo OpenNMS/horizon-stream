@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: org.micronaut.example
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, assertj, data, data-jpa, http-client, jackson-databind, java, java-application, jdbc-hikari, junit, logback, lombok, maven, netty-server, postgres, readme, shade, testcontainers, yaml]
