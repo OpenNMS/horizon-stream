@@ -28,6 +28,7 @@
 
 package org.opennms.horizon;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.restassured.RestAssured;

@@ -19,22 +19,32 @@
     <cm:property-placeholder persistent-id="org.opennms.core.rest">
         <cm:default-properties>
             <cm:property name="http.realm" value="karaf"/>
+            <cm:property name="keycloak.use-static-pubkey" value="false"/>
+            <cm:property name="keycloak.static-pubkey-path" value="etc/keycloak-pubkey.pem"/>
+            <cm:property name="keycloak.realm" value="opennms"/>
+            <cm:property name="keycloak.base-url" value="http://localhost:9000"/>
+            <cm:property name="keycloak.issuer-url" value="http://localhost:9000/realms/${keycloak.realm}"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
     <!--                                      -->
     <!-- COMMON WHITE-BOARD SETUP FOR OPENNMS -->
     <!--                                      -->
+    <bean id="userPropertiesRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.UserPropertiesRoleAssignmentProvider" init-method="init" />
 
-    <!-- JAAS Authentication -->
-    <bean id="jaasAuthenticationFeature" class="org.apache.cxf.interceptor.security.JAASAuthenticationFeature" scope="singleton">
-        <property name="contextName" value="${http.realm}" /> <!-- karaf later  _customize for opennms -->
-        <property name="reportFault" value="true" />
+    <bean id="keycloakJaxrsFeature" class="org.opennms.rest.jaxrs.jwt.KeycloakJaxrsFeature" init-method="init">
+        <property name="keycloakServerUrl" value="${keycloak.base-url}"/>
+        <property name="keycloakRealm" value="${keycloak.realm}"/>
+        <property name="roleAssignmentProvider" ref="userPropertiesRoleAssignmentProvider"/>
+
+        <property name="tokenSignatureUseStaticKey" value="${keycloak.use-static-pubkey}"/>
+        <property name="tokenSignaturePublicKeyPath" value="${keycloak.static-pubkey-path}"/>
+        <property name="issuerUrl" value="${keycloak.issuer-url}"/>
     </bean>
 
-    <service ref="jaasAuthenticationFeature" interface="org.apache.cxf.feature.Feature">
+    <service ref="keycloakJaxrsFeature" interface="javax.ws.rs.container.ContainerRequestFilter">
         <service-properties>
-            <entry key="cxf.extension" value="true"/>
+            <entry key="osgi.jaxrs.extension" value="true"/>
         </service-properties>
     </service>
 

@@ -250,6 +250,16 @@
                 <version>${drools.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-servlet-filter-adapter</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-jaxrs-oauth-client</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.kie</groupId>
                 <artifactId>kie-api</artifactId>
                 <version>${drools.version}</version>

@@ -58,6 +58,7 @@ import javax.annotation.security.RolesAllowed;
  * @author Paul Sandoz
  * @author Martin Matula
  */
+@Priority(20)   // Make sure to keep this priority > the one for KeycloakJaxrsFeature so that one runs first
 public class RolesAllowedDynamicFeature implements DynamicFeature {
 
     @Override
