@@ -48,6 +48,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-core</artifactId>
       <scope>test</scope>
@@ -204,6 +210,42 @@
               </run>
             </image>
 
+            <!--                -->
+            <!-- KEYCLOAK IMAGE -->
+            <!--                -->
+            <image>
+              <name>keycloak-it-image</name>
+              <alias>keycloak</alias>
+              <build>
+                <from>quay.io/keycloak/keycloak:17.0.0</from>
+              </build>
+              <run>
+                <cmd>start-dev</cmd>
+                <env>
+                  <KEYCLOAK_CREATE_ADMIN_USER>true</KEYCLOAK_CREATE_ADMIN_USER>
+                  <KEYCLOAK_ADMIN>keycloak-admin</KEYCLOAK_ADMIN>
+                  <KEYCLOAK_ADMIN_PASSWORD>admin</KEYCLOAK_ADMIN_PASSWORD>
+
+                  <KEYCLOAK_DATABASE_HOST>postgres-host</KEYCLOAK_DATABASE_HOST>
+                  <KEYCLOAK_DATABASE_USER>postgres</KEYCLOAK_DATABASE_USER>
+                  <KEYCLOAK_DATABASE_PASSWORD>unused</KEYCLOAK_DATABASE_PASSWORD>
+                </env>
+                <ports>
+                  <port>keycloak-http.port:8080</port>
+                  <port>keycloak-https.port:8443</port>
+                </ports>
+                <wait>
+                  <log>Keycloak .* on JVM .* started in .* Listening on: http.*</log>
+                  <time>120000</time>
+                </wait>
+                <network>
+                  <mode>custom</mode>
+                  <name>alarm-docker-it-network</name>
+                  <alias>keycloak-host</alias>
+                </network>
+              </run>
+            </image>
+
             <!--                    -->
             <!-- APPLICATION IMAGE  -->
             <!--                    -->
@@ -297,6 +339,10 @@
             <property>
               <name>database.url</name>
               <value>jdbc:postgresql://localhost:${postgresql.port}/opennms</value>
+            </property>
+            <property>
+              <name>keycloak.url</name>
+              <value>http://localhost:${keycloak-http.port}</value>
             </property>
             <property>
               <name>application.base-url</name>

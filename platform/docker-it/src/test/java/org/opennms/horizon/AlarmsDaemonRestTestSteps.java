@@ -28,6 +28,7 @@
 
 package org.opennms.horizon;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -51,10 +52,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -62,6 +68,8 @@ import static org.junit.Assert.assertTrue;
 public class AlarmsDaemonRestTestSteps {
 
     public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 15_000;
+    public static final String KEYCLOAK_ADMIN_CLIENT_ID = "admin-cli";
+    public static final String KEYCLOAK_ACCOUNT_CLIENT_ID = "account";
 
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(AlarmsDaemonRestTestSteps.class);
 
@@ -81,18 +89,24 @@ public class AlarmsDaemonRestTestSteps {
     private String dbPassword;
 
     private String applicationBaseUrl;
-    private String username;
-    private String password;
     private String acceptEncoding;
     private String contentType;
     private String postPayload;
 
+    private String keycloakUrl;
+    private String keycloakAdminUser;
+    private String keycloakAdminPassword;
+    private String keycloakTestUser;
+    private String keycloakTestPassword;
+    private String keycloakTestRealm;
 
     //
     // Test Runtime Data
     //
     private Response restAssuredResponse;
     private JsonPath parsedJsonResponse;
+    private String keycloakAdminToken;
+    private String keycloakTestUserToken;
 
 //========================================
 // Constructor
@@ -122,16 +136,135 @@ public class AlarmsDaemonRestTestSteps {
         this.log.info("Using DB URL {}", this.databaseUrl);
     }
 
+    @Given("keycloak server URL in system property {string}")
+    public void keycloakServerURLInSystemProperty(String systemProperty) {
+        this.keycloakUrl = System.getProperty(systemProperty);
+
+        this.log.info("Using KEYCLOAK URL {}", this.keycloakUrl);
+    }
+
+    @Given("keycloak admin user {string} with password {string}")
+    public void keycloakAdminUserWithPassword(String adminUsername, String adminPassword) {
+        this.keycloakAdminUser = adminUsername;
+        this.keycloakAdminPassword = adminPassword;
+    }
+
+    @Given("keycloak test user {string} with password {string}")
+    public void keycloakTestUserWithPassword(String testUsername, String testPassword) {
+        this.keycloakTestUser = testUsername;
+        this.keycloakTestPassword = testPassword;
+    }
+
+    @Given("keycloak test realm {string}")
+    public void keycloakTestRealm(String realm) {
+        this.keycloakTestRealm = realm;
+    }
+
+    @Then("login admin user with keycloak")
+    public void loginAdminUserToKeycloak() throws Exception {
+        this.keycloakAdminToken = this.loginToKeycloak(KEYCLOAK_ADMIN_CLIENT_ID, this.keycloakAdminUser, this.keycloakAdminPassword, "master");
+    }
+
+    @Then("login test user with keycloak")
+    public void loginTestUserToKeycloak() throws Exception {
+        this.keycloakTestUserToken = this.loginToKeycloak(KEYCLOAK_ADMIN_CLIENT_ID, this.keycloakTestUser, this.keycloakTestPassword, this.keycloakTestRealm);
+    }
+
+    @Then("add keycloak realm {string}")
+    public void addKeycloakRealm(String realmName) throws Exception {
+        //
+        // Format a JSON body using the helper. Structure => { "realm": <realmName> }
+        //
+        String jsonText = this.formatJsonObjectText(
+                (map) -> {
+                    map.put("realm", realmName);
+                    map.put("enabled", true);
+                }
+        );
+        // Map<String, String> requestObj = new HashMap<>();
+        // requestObj.put("realm", realmName);
+        //
+        // ObjectMapper objectMapper = new ObjectMapper();
+        // String jsonText = objectMapper.writeValueAsString(requestObj);
+
+        //
+        // Prepare and execute the RestAssured call
+        //
+        RestAssuredConfig restAssuredConfig = this.createRestAssuredTestConfig();
+
+        RequestSpecification requestSpecification =
+                RestAssured
+                        .given()
+                        .config(restAssuredConfig)
+                        .auth()
+                        .preemptive()
+                        .oauth2(this.keycloakAdminToken)
+                        .header("Content-Type", "application/json")
+                ;
+
+        URL requestUrl = new URL(new URL(this.keycloakUrl), "/admin/realms");
+
+        Response response =
+                requestSpecification
+                        .body(jsonText)
+                        .post(requestUrl)
+                        .thenReturn()
+                ;
+
+        // Verify the response
+        assertEquals("Failed to add realm: response-text=" + response.getBody().asString(), 201, response.getStatusCode());
+    }
+
+
+    @Then("add keycloak user {string} with password {string} in realm {string}")
+    public void addKeycloakUserWithPassword(String username, String password, String realm) throws Exception {
+        String jsonText =
+                this.formatJsonObjectText(
+                        (map) -> {
+                            map.put("username", username);
+
+                            Map<String, Object> credMap = new HashMap<>();
+                            credMap.put("type", "password");
+                            credMap.put("temporary", false);
+                            credMap.put("value", password);
+
+                            List<Map<String, Object>> credsList = new LinkedList<>();
+                            credsList.add(credMap);
+
+                            map.put("credentials", credsList);
+                            map.put("enabled", true);
+                        });
+
+        RestAssuredConfig restAssuredConfig = this.createRestAssuredTestConfig();
+
+        RequestSpecification requestSpecification =
+                RestAssured
+                        .given()
+                        .config(restAssuredConfig)
+                        .auth()
+                        .preemptive()
+                        .oauth2(this.keycloakAdminToken)
+                        .header("Content-Type", "application/json")
+                ;
+
+        URL requestUrl = new URL(new URL(this.keycloakUrl), "/admin/realms/" + realm + "/users");
+
+        Response response =
+                requestSpecification
+                        .body(jsonText)
+                        .post(requestUrl)
+                        .thenReturn()
+                ;
+
+        // Verify the response
+        assertEquals("Failed to add realm: response-text=" + response.getBody().asString(), 201, response.getStatusCode());
+    }
+
+
     @Given("DB username {string} and password {string}")
     public void dbUsernameAndPassword(String username, String password) {
         this.dbUsername = username;
         this.dbPassword = password;
-    }
-
-    @Given("^http username \"([^\"]*)\" password \"([^\"]*)\"$")
-    public void httpUsernamePassword(String username, String password) throws Throwable {
-        this.username = username;
-        this.password = password;
     }
 
     @Given("^JSON accept encoding$")
@@ -185,13 +318,13 @@ public class AlarmsDaemonRestTestSteps {
                         .config(restAssuredConfig)
                         ;
 
-        if (this.username != null) {
+        if (this.keycloakTestUserToken != null) {
             requestSpecification =
-                    requestSpecification
-                            .auth()
-                            .preemptive()
-                            .basic(this.username, this.password)
-                            ;
+                requestSpecification
+                        .auth()
+                        .preemptive()
+                        .oauth2(this.keycloakTestUserToken)
+                        ;
         }
 
         if (this.contentType!= null) {
@@ -216,6 +349,26 @@ public class AlarmsDaemonRestTestSteps {
             ;
 
         assertNotNull(this.restAssuredResponse);
+    }
+
+    @Then("request non-empty alarm list with retry timeout {int}")
+    public void requestAlarmListWithRetryTimeout(int retryTimeout) throws Throwable {
+        this.restAssuredResponse = this.sendGetRequestWithRetry("/alarms/list", retryTimeout,
+                //
+                // Retry the operation until response body has an alarm or timeout
+                //
+                (response) -> {
+                    if (response == null || response.getStatusCode() == 500 || response.getStatusCode() == 404) {
+                        return false;
+                    }
+
+                    if (response.getStatusCode() == 200) {
+                        JsonPath body = JsonPath.from(response.getBody().asString());
+                        return (int) body.get("totalCount") > 0;
+                    }
+
+                    return false;
+                });
     }
 
     @Then("^verify the response code (\\d+) was returned$")
@@ -260,6 +413,49 @@ public class AlarmsDaemonRestTestSteps {
 // Internals
 //========================================
 
+    private String loginToKeycloak(String keycloakClientId, String username, String password, String realm) throws Exception {
+
+//keycloak> 2022-03-25 21:24:58,952 WARN  [org.keycloak.events] (executor-thread-0) type=LOGIN_ERROR, realmId=master, clientId=admin-cli, userId=null, ipAddress=192.168.176.1, error=user_not_found, auth_method=openid-connect, grant_type=password, client_auth_method=client-secret, username=t>
+
+        URL requestUrl = new URL(new URL(this.keycloakUrl), "/realms/" + realm + "/protocol/openid-connect/token");
+
+        RestAssuredConfig restAssuredConfig = this.createRestAssuredTestConfig();
+
+        RequestSpecification requestSpecification =
+                RestAssured
+                        .given()
+                        .config(restAssuredConfig)
+                        // .auth()
+                        // .preemptive()
+                        // .basic(this.keycloakAdminUser, this.keycloakAdminPassword)
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .formParam("client_id", keycloakClientId)
+                        .formParam("username", username)
+                        .formParam("password", password)
+                        .formParam("grant_type", "password")
+                        .formParam("scope", "openid")
+                ;
+
+        Response response =
+                requestSpecification
+                        .post(requestUrl)
+                        .thenReturn()
+                ;
+
+        String adminTokenResponseText = response.getBody().asString();
+
+        log.info("Retrieve token for user {} response: {}", username, adminTokenResponseText);
+
+        JsonPath adminTokenJsonPath = JsonPath.from(adminTokenResponseText);
+
+        String token = adminTokenJsonPath.getString("access_token");
+
+        assertNotNull(token);
+        assertFalse(token.isBlank());
+
+        return token;
+    }
+
     private RestAssuredConfig createRestAssuredTestConfig() {
         return RestAssuredConfig.config()
                 .httpClient(HttpClientConfig.httpClientConfig()
@@ -293,26 +489,6 @@ public class AlarmsDaemonRestTestSteps {
         }
     }
 
-    @Then("request non-empty alarm list with retry timeout {int}")
-    public void requestAlarmListWithRetryTimeout(int retryTimeout) throws Throwable {
-        this.restAssuredResponse = this.sendGetRequestWithRetry("/alarms/list", retryTimeout,
-                //
-                // Retry the operation until response body has an alarm or timeout
-                //
-                (response) -> {
-                    if (response == null || response.getStatusCode() == 500 || response.getStatusCode() == 404) {
-                        return false;
-                    }
-
-                    if (response.getStatusCode() == 200) {
-                        JsonPath body = JsonPath.from(response.getBody().asString());
-                        return (int) body.get("totalCount") > 0;
-                    }
-
-                    return false;
-                });
-    }
-
     private Response sendGetRequestWithRetry(String path, int retryTimeout, Predicate<Response> completionPredicate) throws Throwable {
         URL requestUrl = new URL(new URL(this.applicationBaseUrl), path);
 
@@ -324,12 +500,12 @@ public class AlarmsDaemonRestTestSteps {
                         .config(restAssuredConfig)
                 ;
 
-        if (this.username != null) {
+        if (this.keycloakTestUserToken != null) {
             requestSpecification =
                     requestSpecification
                             .auth()
                             .preemptive()
-                            .basic(this.username, this.password)
+                            .oauth2(this.keycloakTestUserToken)
             ;
         }
 
@@ -353,5 +529,16 @@ public class AlarmsDaemonRestTestSteps {
                         1000,
                         retryTimeout,
                         null);
+    }
+
+    private String formatJsonObjectText(Consumer<Map<String, Object>> fieldAdder) throws Exception {
+        Map<String, Object> jsonObject = new HashMap<>();
+
+        fieldAdder.accept(jsonObject);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonText = objectMapper.writeValueAsString(jsonObject);
+
+        return jsonText;
     }
 }

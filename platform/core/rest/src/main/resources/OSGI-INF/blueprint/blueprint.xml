@@ -23,7 +23,6 @@
             <cm:property name="keycloak.static-pubkey-path" value="etc/keycloak-pubkey.pem"/>
             <cm:property name="keycloak.realm" value="opennms"/>
             <cm:property name="keycloak.base-url" value="http://localhost:9000"/>
-            <cm:property name="keycloak.issuer-url" value="http://localhost:9000/realms/${keycloak.realm}"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
@@ -39,7 +38,6 @@
 
         <property name="tokenSignatureUseStaticKey" value="${keycloak.use-static-pubkey}"/>
         <property name="tokenSignaturePublicKeyPath" value="${keycloak.static-pubkey-path}"/>
-        <property name="issuerUrl" value="${keycloak.issuer-url}"/>
     </bean>
 
     <service ref="keycloakJaxrsFeature" interface="javax.ws.rs.container.ContainerRequestFilter">

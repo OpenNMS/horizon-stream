@@ -59,7 +59,6 @@ public class KeycloakJaxrsFeature implements ContainerRequestFilter {
     private String keycloakRealm;
     private boolean keycloakRequireSsl = false;
     private RoleAssignmentProvider roleAssignmentProvider;
-    private String issuerUrl;
 
     // Runtime
     private KeycloakDeployment keycloakDeployment;
@@ -114,14 +113,6 @@ public class KeycloakJaxrsFeature implements ContainerRequestFilter {
 
     public void setRoleAssignmentProvider(RoleAssignmentProvider roleAssignmentProvider) {
         this.roleAssignmentProvider = roleAssignmentProvider;
-    }
-
-    public String getIssuerUrl() {
-        return issuerUrl;
-    }
-
-    public void setIssuerUrl(String issuerUrl) {
-        this.issuerUrl = issuerUrl;
     }
 
 
@@ -261,13 +252,13 @@ public class KeycloakJaxrsFeature implements ContainerRequestFilter {
     private AccessToken validateAndParseKeycloakToken(ContainerRequestContext containerRequestContext, String tokenString) {
         try {
             //
-            // Copied from withDefaultChecks, replacing the always-fails RealmUrlCheck(null) with one that will pass.
-            //  Note this is only necessary when avoiding connection to the Keycloak server - the code path when
-            //  connecting to the KC server populates the realm url (aka "iss", or issuer).
+            // Copied from withDefaultChecks, removing the always-fails RealmUrlCheck(null).  Did not replace it with
+            //  one that may pass because configuring the "Issuer URL" can be a challenge, and the value of this check
+            //  after already verifying the public key is likely low.
             //
-            // There's some unfortunate choices in the Keycloak library regarding API public and non-public methods
-            //  leading to more code here.  Without the Realm URL Check problem, the following line does all of the
-            //  same work:
+            // Note also that there are some unfortunate choices in the Keycloak library regarding API public and
+            //  non-public methods leading to more code here.  Without the Realm URL Check problem, the following line
+            //  does all of the same work:
             //
             //     AccessToken result = AdapterTokenVerifier.verifyToken(tokenString, keycloakDeployment);
             //
@@ -278,7 +269,7 @@ public class KeycloakJaxrsFeature implements ContainerRequestFilter {
 
             // Update the checks used by the verifier using the same verifiers as the defaults, with the fix mentioned above.
             verifier.withChecks(
-                    new TokenVerifier.RealmUrlCheck(issuerUrl),
+                    // new TokenVerifier.RealmUrlCheck(issuerUrl),
                     SUBJECT_EXISTS_CHECK,
                     new TokenVerifier.TokenTypeCheck(TokenUtil.TOKEN_TYPE_BEARER),
                     IS_ACTIVE
