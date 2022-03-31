@@ -13,7 +13,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
+import lombok.extern.slf4j.Slf4j;
+
 @SpringBootApplication
+@Slf4j
 public class RestServerApplication {
 
 	@Autowired
@@ -23,17 +26,11 @@ public class RestServerApplication {
 		SpringApplication.run(RestServerApplication.class, args);
 	}
 
-	/*@Bean
-	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
-		return args -> {
-			testNodeRepo(ctx);
-		};
-	}*/
-
 	@EventListener(ApplicationReadyEvent.class)
 	private void testNodeRepo() {
+		log.info("Application is ready");
 		//NodeRepository nodeRepo = ctx.getBean(NodeRepository.class);
-		MonitoringLocation location = new MonitoringLocation();
+		/*MonitoringLocation location = new MonitoringLocation();
 		location.setId("default");
 		location.setMonitoringArea("Kanata Office");
 		location.setGeolocation("Ottawa, Ontario Canada");
@@ -52,7 +49,7 @@ public class RestServerApplication {
 		Node node3 = new Node();
 		node3.setLabel("Company office");
 		node3.setLocation(location);
-		node3.setCreateTime(new Date());
+		node3.setCreateTime(new Date());*/
 	}
 
 

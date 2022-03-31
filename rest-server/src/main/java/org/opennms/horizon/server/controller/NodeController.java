@@ -28,9 +28,12 @@
 
 package org.opennms.horizon.server.controller;
 
+import java.util.Optional;
+
 import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.repository.NodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,8 +62,12 @@ public class NodeController {
     }
 
     @GetMapping("/{id}")
-    public Mono<Node> findById(@PathVariable Integer id) {
-        return Mono.just(nodeRepo.getById(id));
+    public ResponseEntity<Mono<Node>> findById(@PathVariable Integer id) {
+        Optional<Node> node = nodeRepo.findById(id);
+        if(node.isPresent()) {
+            return ResponseEntity.ok().body(Mono.just(node.get()));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
@@ -68,14 +75,24 @@ public class NodeController {
         return Mono.just(nodeRepo.save(node));
     }
 
-    @PutMapping
-    public Mono<Node> update(@RequestBody Node node) {
-        return Mono.just(nodeRepo.save(node));
+    @PutMapping("/{id}")
+    public ResponseEntity<Mono<Node>> update(@PathVariable Integer id, @RequestBody Node node) {
+        //TODO convert to DTO mapping
+        Optional<Node> dbnode = nodeRepo.findById(id);
+        if(dbnode.isPresent()) {
+            node.setId(id);
+            return ResponseEntity.ok().body(Mono.just(nodeRepo.save(node)));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public Mono<Void> delete(@PathVariable Integer id) {
-        nodeRepo.deleteById(id);
-        return Mono.just(null);
+    public ResponseEntity delete(@PathVariable Integer id) {
+        Optional<Node> dbNode = nodeRepo.findById(id);
+        if(dbNode.isPresent()) {
+            nodeRepo.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

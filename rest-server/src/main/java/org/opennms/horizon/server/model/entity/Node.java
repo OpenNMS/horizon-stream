@@ -89,7 +89,7 @@ public class Node {
     private String foreignSource;
     @Column(name = "foreignid")
     private String foreignId;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "location")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private MonitoringLocation location;
