@@ -28,9 +28,10 @@
 
 package org.opennms.horizon.server.repository;
 
-import org.opennms.horizon.server.model.Node;
+import org.opennms.horizon.server.model.entity.Node;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface NodeRepository extends JpaRepository<Node, Integer> {
-
+@Repository
+public interface NodeRepository extends JpaRepository<Node, Integer>, CustomizedRepository<Node> {
 }

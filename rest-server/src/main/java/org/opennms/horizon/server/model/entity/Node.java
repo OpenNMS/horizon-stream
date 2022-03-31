@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.model;
+package org.opennms.horizon.server.model.entity;
 
 import java.util.Date;
 
@@ -35,7 +35,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -43,8 +42,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
-import lombok.ToString;
 
 @Data
 @Entity
@@ -59,6 +59,7 @@ public class Node {
     private Date createTime;
     @OneToOne
     @JoinColumn(name = "nodeparentid")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Node parent;
     @Column(name = "nodetype")
     private String type;
@@ -90,6 +91,7 @@ public class Node {
     private String foreignId;
     @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "location")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private MonitoringLocation location;
     private Date lastIngressFlow;
     private Date lastEgressFlow;

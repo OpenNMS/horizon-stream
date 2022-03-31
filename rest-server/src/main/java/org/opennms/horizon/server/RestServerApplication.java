@@ -4,34 +4,35 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
-import org.opennms.horizon.server.model.MonitoringLocation;
-import org.opennms.horizon.server.model.Node;
+import org.opennms.horizon.server.model.entity.MonitoringLocation;
+import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.repository.NodeRepository;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 public class RestServerApplication {
+
+	@Autowired
+	private NodeRepository nodeRepo;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RestServerApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
 		return args -> {
 			testNodeRepo(ctx);
 		};
-	}
+	}*/
 
-	private void testNodeRepo(ApplicationContext ctx) {
-		NodeRepository nodeRepo = ctx.getBean(NodeRepository.class);
+	@EventListener(ApplicationReadyEvent.class)
+	private void testNodeRepo() {
+		//NodeRepository nodeRepo = ctx.getBean(NodeRepository.class);
 		MonitoringLocation location = new MonitoringLocation();
 		location.setId("default");
 		location.setMonitoringArea("Kanata Office");
@@ -47,8 +48,11 @@ public class RestServerApplication {
 		node2.setLabel("Home office");
 		node2.setCreateTime(new Date());
 		list.add(node2);
-		List<Node> savedList = nodeRepo.saveAll(list);
-		savedList.forEach(n -> System.out.println(n));
+		list.forEach(n -> nodeRepo.save(n));
+		Node node3 = new Node();
+		node3.setLabel("Company office");
+		node3.setLocation(location);
+		node3.setCreateTime(new Date());
 	}
 
 

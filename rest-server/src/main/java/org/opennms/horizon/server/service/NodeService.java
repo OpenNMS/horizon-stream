@@ -26,26 +26,23 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.model;
+package org.opennms.horizon.server.service;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.opennms.horizon.server.repository.MonitoringLocationRepository;
+import org.opennms.horizon.server.repository.NodeRepository;
+import org.springframework.stereotype.Service;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@NoArgsConstructor
-@Data
-@Entity
-@Table(name = "node_metadata")
-public class NodeMetaData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id; //TODO why this is integer in database?
-    private String context;
-    private String key;
-    private String value;
+@AllArgsConstructor
+@Service
+@Slf4j
+public class NodeService {
+    private final NodeRepository nodeRepo;
+    private final MonitoringLocationRepository locationRepo;
+
+    public void createSamples() {
+
+    }
 }

@@ -28,10 +28,23 @@
 
 package org.opennms.horizon.server.repository;
 
-import org.opennms.horizon.server.model.entity.IPInterface;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import javax.persistence.EntityManager;
 
-@Repository
-public interface IPInterFaceRepository extends JpaRepository<IPInterface, Integer>, CustomizedRepository<IPInterface>{
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class CustomizedRepositoryImpl<T> implements CustomizedRepository<T> {
+    private EntityManager em;
+
+    @Autowired
+    public CustomizedRepositoryImpl(EntityManager em) {
+        this.em = em;
+    }
+
+    @Override
+    public <S extends T> S save(S entity) {
+        Session session = em.unwrap(Session.class);
+        session.saveOrUpdate(entity);
+        return entity;
+    }
 }

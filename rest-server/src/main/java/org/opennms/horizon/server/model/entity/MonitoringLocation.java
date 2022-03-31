@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.model;
+package org.opennms.horizon.server.model.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

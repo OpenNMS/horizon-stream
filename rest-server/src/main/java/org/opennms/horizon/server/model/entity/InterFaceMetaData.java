@@ -26,12 +26,26 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.repository;
+package org.opennms.horizon.server.model.entity;
 
-import org.opennms.horizon.server.model.entity.IPInterface;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Repository
-public interface IPInterFaceRepository extends JpaRepository<IPInterface, Integer>, CustomizedRepository<IPInterface>{
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name = "ipinterface_metadata")
+public class InterFaceMetaData {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id; //TODO: why this is integer in database?
+    private String context;
+    private String key;
+    private String value;
 }

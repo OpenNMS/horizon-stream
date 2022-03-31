@@ -26,12 +26,39 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.repository;
+package org.opennms.horizon.server.model.entity;
 
-import org.opennms.horizon.server.model.entity.IPInterface;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Date;
 
-@Repository
-public interface IPInterFaceRepository extends JpaRepository<IPInterface, Integer>, CustomizedRepository<IPInterface>{
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "ipinterface")
+public class IPInterface {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(name = "ipaddr")
+    private String ipAddress;
+    private String netMask;
+    private String hostName;
+    private String isManaged;
+    private String status;
+    private Date lastPoll;
+    @ManyToOne
+    @JoinColumn(name = "nodeid")
+    private Node node;
+    private String isSnmpPrimary;
+    // todo
+    //private SNMPInterface snmpInterface;
 }
