@@ -30,7 +30,6 @@ package org.opennms.horizon.server.model.entity;
 
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,15 +37,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlEnumValue;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "node")
 public class Node {
@@ -57,12 +59,11 @@ public class Node {
     private int id;
     @Column(name = "nodecreatetime")
     private Date createTime;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nodeparentid")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Node parent;
     @Column(name = "nodetype")
-    private String type;
+    private NodeType type;
     @Column(name = "nodesysoid")
     private String sysOid;
     @Column(name = "nodesysname")
@@ -76,7 +77,7 @@ public class Node {
     @Column(name = "nodelabel")
     private String label;
     @Column(name = "nodelabelsource")
-    private String labelSource;
+    private NodeLabelSource labelSource;
     @Column(name = "nodenetbiosname")
     private String netBiosName;
     @Column(name = "nodedomainname")
@@ -90,9 +91,98 @@ public class Node {
     @Column(name = "foreignid")
     private String foreignId;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "location")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private MonitoringLocation location;
     private Date lastIngressFlow;
     private Date lastEgressFlow;
+
+    public enum NodeType {
+        ACTIVE('A'),
+        DELETED('D'),
+        UNKNOWN(' ');
+        private final char value;
+        NodeType(char c) {
+            value = c;
+        }
+
+        public char value() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        public static NodeType fromValueString(String s) {
+            if (s == null || s.length() == 0) return null;
+            for (NodeType nodeType: NodeType.values()) {
+                if (nodeType.value == s.charAt(0))
+                    return nodeType;
+            }
+            return null;
+        }
+    }
+
+    public enum NodeLabelSource {
+        /**
+         * Label source set by user
+         */
+
+        USER('U'),
+
+        /**
+         * Label source set by netbios
+         */
+
+        NETBIOS('N'),
+
+        /**
+         * Label source set by hostname
+         */
+
+        HOSTNAME('H'),
+
+        /**
+         * Label source set by SNMP sysname
+         */
+
+        SYSNAME('S'),
+
+        /**
+         * Label source set by IP Address
+         */
+
+        ADDRESS('A'),
+
+        /**
+         * Label source unset/unknown
+         */
+
+        UNKNOWN(' ');
+
+        private final char value;
+
+        NodeLabelSource(char c) {
+            value = c;
+        }
+
+        public char value() {
+            return value;
+        }
+
+        public static NodeLabelSource fromValueString(String s) {
+            if (s == null || s.length() == 0) return null;
+            for (NodeLabelSource src : NodeLabelSource.values()) {
+                if (src.value == s.charAt(0)) return src;
+            }
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+    }
 }

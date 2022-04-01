@@ -26,12 +26,25 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.repository;
+package org.opennms.horizon.server.dao;
 
-import org.opennms.horizon.server.model.entity.MonitoringLocation;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import javax.persistence.EntityManager;
 
-@Repository
-public interface MonitoringLocationRepository extends JpaRepository<MonitoringLocation, String>, CustomizedRepository<MonitoringLocation> {
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class CustomizedRepositoryImpl<T> implements CustomizedRepository<T> {
+    private final EntityManager em;
+
+    @Autowired
+    public CustomizedRepositoryImpl(EntityManager em) {
+        this.em = em;
+    }
+
+    @Override
+    public <S extends T> S save(S entity) {
+        Session session = em.unwrap(Session.class);
+        session.saveOrUpdate(entity);
+        return entity;
+    }
 }

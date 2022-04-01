@@ -26,25 +26,18 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.repository;
+package org.opennms.horizon.server.model.dto;
 
-import javax.persistence.EntityManager;
+import lombok.Getter;
+import lombok.Setter;
 
-import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
-
-public class CustomizedRepositoryImpl<T> implements CustomizedRepository<T> {
-    private EntityManager em;
-
-    @Autowired
-    public CustomizedRepositoryImpl(EntityManager em) {
-        this.em = em;
-    }
-
-    @Override
-    public <S extends T> S save(S entity) {
-        Session session = em.unwrap(Session.class);
-        session.saveOrUpdate(entity);
-        return entity;
-    }
+@Getter
+@Setter
+public class MonitoringLocationDto {
+    private String id;
+    private String monitoringArea;
+    private String geolocation;
+    private double latitude;
+    private double longitude;
+    private int priority;
 }

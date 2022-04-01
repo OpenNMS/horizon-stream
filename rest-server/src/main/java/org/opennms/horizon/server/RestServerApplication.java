@@ -1,12 +1,6 @@
 package org.opennms.horizon.server;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.opennms.horizon.server.model.entity.MonitoringLocation;
-import org.opennms.horizon.server.model.entity.Node;
-import org.opennms.horizon.server.repository.NodeRepository;
+import org.opennms.horizon.server.dao.NodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,7 +21,7 @@ public class RestServerApplication {
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
-	private void testNodeRepo() {
+	public void testNodeRepo() {
 		log.info("Application is ready");
 		//NodeRepository nodeRepo = ctx.getBean(NodeRepository.class);
 		/*MonitoringLocation location = new MonitoringLocation();

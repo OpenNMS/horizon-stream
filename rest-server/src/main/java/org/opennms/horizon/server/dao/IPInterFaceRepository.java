@@ -26,8 +26,12 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.repository;
+package org.opennms.horizon.server.dao;
 
-public interface CustomizedRepository<T> {
-    <S extends T> S save(S entity);
+import org.opennms.horizon.server.model.entity.IPInterface;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface IPInterFaceRepository extends JpaRepository<IPInterface, Integer>, CustomizedRepository<IPInterface>{
 }

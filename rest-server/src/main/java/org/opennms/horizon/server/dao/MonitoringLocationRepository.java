@@ -26,12 +26,12 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.repository;
+package org.opennms.horizon.server.dao;
 
-import org.opennms.horizon.server.model.entity.Node;
+import org.opennms.horizon.server.model.entity.MonitoringLocation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface NodeRepository extends JpaRepository<Node, Integer>, CustomizedRepository<Node> {
+public interface MonitoringLocationRepository extends JpaRepository<MonitoringLocation, String>, CustomizedRepository<MonitoringLocation> {
 }
