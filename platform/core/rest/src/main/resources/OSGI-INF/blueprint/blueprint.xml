@@ -22,19 +22,34 @@
             <cm:property name="keycloak.use-static-pubkey" value="false"/>
             <cm:property name="keycloak.static-pubkey-path" value="etc/keycloak-pubkey.pem"/>
             <cm:property name="keycloak.realm" value="opennms"/>
+            <cm:property name="keycloak.admin-realm" value="master"/>
             <cm:property name="keycloak.base-url" value="http://localhost:9000"/>
+
+            <cm:property name="keycloak.admin-username" value="admin" />
+            <cm:property name="keycloak.admin-password" value="admin" />
         </cm:default-properties>
     </cm:property-placeholder>
 
     <!--                                      -->
     <!-- COMMON WHITE-BOARD SETUP FOR OPENNMS -->
     <!--                                      -->
-    <bean id="userPropertiesRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.UserPropertiesRoleAssignmentProvider" init-method="init" />
+    <!--<bean id="userPropertiesRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.UserPropertiesRoleAssignmentProvider" init-method="init" />-->
+
+    <bean id="keycloakAdminClient" class="org.opennms.keycloak.admin.client.impl.KeycloakAdminClientImpl" init-method="init">
+        <property name="baseUrl" value="${keycloak.base-url}" />
+    </bean>
+    <bean id="keycloakRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.KeycloakRoleAssignmentProvider">
+        <property name="keycloakAdminClient" ref="keycloakAdminClient" />
+        <property name="keycloakRealm" value="${keycloak.realm}" />
+        <property name="keycloakAdminRealm" value="${keycloak.admin-realm}" />
+        <property name="keycloakAdminUsername" value="${keycloak.admin-username}" />
+        <property name="keycloakAdminPassword" value="${keycloak.admin-password}" />
+    </bean>
 
     <bean id="keycloakJaxrsFeature" class="org.opennms.rest.jaxrs.jwt.KeycloakJaxrsFeature" init-method="init">
         <property name="keycloakServerUrl" value="${keycloak.base-url}"/>
         <property name="keycloakRealm" value="${keycloak.realm}"/>
-        <property name="roleAssignmentProvider" ref="userPropertiesRoleAssignmentProvider"/>
+        <property name="roleAssignmentProvider" ref="keycloakRoleAssignmentProvider"/>
 
         <property name="tokenSignatureUseStaticKey" value="${keycloak.use-static-pubkey}"/>
         <property name="tokenSignaturePublicKeyPath" value="${keycloak.static-pubkey-path}"/>
@@ -49,7 +64,7 @@
 
     <!-- @RolesAllowed Support -->
     <bean id="rolesAllowedDynamicFeature" class="org.opennms.rest.jaxrs.RolesAllowedDynamicFeature" />
-    
+
     <service ref="rolesAllowedDynamicFeature" interface="javax.ws.rs.container.DynamicFeature">
         <service-properties>
             <entry key="osgi.jaxrs.extension" value="true"/>
@@ -76,4 +91,13 @@
         <property name="info" ref="openApiInfo"/>
     </bean>
     <service ref="openApi" auto-export="all-classes"/>
+
+    <!-- Dummy "marker" service that can be used to ensure this bundle is functional before dependent bundles    -->
+    <!--  activate.  This is important to avoid REST endpoints being accessible without the security wired here. -->
+    <bean id="coreRestReadyMarkerService" class="org.opennms.impl.ReadyMarkerServiceImpl"/>
+    <service interface="org.opennms.ReadyMarkerService" ref="coreRestReadyMarkerService">
+        <service-properties>
+            <entry key="name" value="coreRestReadyMarkerService"/>
+        </service-properties>
+    </service>
 </blueprint>

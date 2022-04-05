@@ -31,6 +31,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.opennms.horizon.3rdparty</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
         </dependency>
@@ -82,9 +88,7 @@
                     <instructions>
                         <Bundle-RequiredExecutionEnvironment>JavaSE-${java.version}</Bundle-RequiredExecutionEnvironment>
                         <Karaf-Commands>*</Karaf-Commands>
-                        <!--<Fragment-Host>org.apache.aries.jax.rs.whiteboard</Fragment-Host>-->
                         <Require-Capability>osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)";resolution:=optional</Require-Capability>
-                        <Provide-Capability>osgi.serviceloader; osgi.serviceloader=javax.servlet.ServletContainerInitializer</Provide-Capability>
                     </instructions>
                 </configuration>
             </plugin>

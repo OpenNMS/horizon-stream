@@ -48,6 +48,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.opennms.horizon.3rdparty</groupId>
+      <artifactId>keycloak-admin-client</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson.version}</version>
@@ -220,6 +227,7 @@
                 <from>quay.io/keycloak/keycloak:17.0.0</from>
               </build>
               <run>
+                <!--<cmd>start-dev &#45;&#45;log-level=DEBUG,org.hibernate:INFO</cmd>-->
                 <cmd>start-dev</cmd>
                 <env>
                   <KEYCLOAK_CREATE_ADMIN_USER>true</KEYCLOAK_CREATE_ADMIN_USER>

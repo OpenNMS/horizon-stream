@@ -17,8 +17,10 @@ Feature: OpenNMS Alarm Daemon Rest
     Then add keycloak realm "opennms"
     Then add keycloak user "test-user" with password "passw0rd" in realm "opennms"
     Then add keycloak user "noperm-user" with password "passw0rd" in realm "opennms"
+    Then create role "admin" in realm "opennms"
+    Then assign role "admin" to keycloak user "test-user" in realm "opennms"
 
-  Scenario: Login the test user
+#  Scenario: Login the test user
 
 # TODO: enable once events API is available
   Scenario: Ensure Events endpoints are reachable

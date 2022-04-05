@@ -187,6 +187,11 @@
     </feature>
 
     <feature name="horizon-keycloak" version="${project.version}" description="Horizon :: Keycloak">
+        <!-- Explicitly list the framework bundle to get pax-logging-api to resolve      -->
+        <!--  Without this, expect to get java.lang.ClassNotFoundException from keycloak -->
+        <!--  missing org.jboss.logging.Logger.                                          -->
+        <feature>framework</feature>
+
         <!--<feature>keycloak-servlet-filter-adapter</feature>-->
         <feature>keycloak-jaas</feature>
         <feature>jaas-deployer</feature>
@@ -197,6 +202,8 @@
         <bundle>mvn:org.keycloak/keycloak-jetty-core/${keycloak.version}</bundle>
         <bundle>mvn:org.keycloak/keycloak-jetty-adapter-spi/${keycloak.version}</bundle>
         <bundle>mvn:org.keycloak/keycloak-servlet-filter-adapter/${keycloak.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.3rdparty/keycloak-admin-client/${project.version}</bundle>
     </feature>
 
 

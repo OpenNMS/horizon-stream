@@ -20,6 +20,9 @@
 
 package org.opennms.rest.jaxrs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 
 import javax.ws.rs.ForbiddenException;
@@ -61,8 +64,15 @@ import javax.annotation.security.RolesAllowed;
 @Priority(20)   // Make sure to keep this priority > the one for KeycloakJaxrsFeature so that one runs first
 public class RolesAllowedDynamicFeature implements DynamicFeature {
 
+    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(RolesAllowedDynamicFeature.class);
+
+    private Logger log = DEFAULT_LOGGER;
+
     @Override
     public void configure(final ResourceInfo resourceInfo, final FeatureContext configuration) {
+        log.debug("Configuring RolesAllowedRequestFilter, if needed, for resource method: class={}; method={}",
+                resourceInfo.getResourceClass().getName(), resourceInfo.getResourceMethod().getName());
+
         final AnnotatedMethod am = new AnnotatedMethod(resourceInfo.getResourceMethod());
 
         // DenyAll on the method take precedence over RolesAllowed and PermitAll
@@ -84,11 +94,12 @@ public class RolesAllowedDynamicFeature implements DynamicFeature {
             return;
         }
 
-        // DenyAll can't be attached to classes
-
         // RolesAllowed on the class takes precedence over PermitAll
         ra = resourceInfo.getResourceClass().getAnnotation(RolesAllowed.class);
         if (ra != null) {
+            log.debug("Registering RolesAllowedRequestFilter for resource class: class={}; method={}",
+                    resourceInfo.getResourceClass().getName(), am.getMethod().getName());
+
             configuration.register(new RolesAllowedRequestFilter(ra.value()));
         }
     }
