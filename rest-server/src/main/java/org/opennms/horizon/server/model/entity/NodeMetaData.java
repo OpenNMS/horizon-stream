@@ -39,8 +39,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-@Entity
-@Table(name = "node_metadata")
+//@Entity
+//@Table(name = "node_metadata")
 public class NodeMetaData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

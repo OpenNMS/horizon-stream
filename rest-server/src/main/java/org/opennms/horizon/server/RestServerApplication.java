@@ -45,6 +45,4 @@ public class RestServerApplication {
 		node3.setLocation(location);
 		node3.setCreateTime(new Date());*/
 	}
-
-
 }

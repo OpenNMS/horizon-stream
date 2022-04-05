@@ -30,7 +30,9 @@ package org.opennms.horizon.server.model.entity;
 
 import java.util.Date;
 
+import javax.persistence.AttributeConverter;
 import javax.persistence.Column;
+import javax.persistence.Converter;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -39,16 +41,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlEnumValue;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+
+@Data
 @Entity
 @Table(name = "node")
 public class Node {
@@ -125,6 +125,20 @@ public class Node {
         }
     }
 
+    @Converter(autoApply = true)
+    public static class NodeTypeConverter implements AttributeConverter<NodeType, Character> {
+
+        @Override
+        public Character convertToDatabaseColumn(NodeType nodeType) {
+            return nodeType == null? ' ': nodeType.value();
+        }
+
+        @Override
+        public NodeType convertToEntityAttribute(Character character) {
+            return NodeType.fromValueString(String.valueOf(character));
+        }
+    }
+
     public enum NodeLabelSource {
         /**
          * Label source set by user
@@ -185,4 +199,19 @@ public class Node {
             return String.valueOf(value);
         }
     }
+
+    @Converter(autoApply = true)
+    public static class NodeLabelSourceConverter implements AttributeConverter<NodeLabelSource, Character> {
+
+        @Override
+        public Character convertToDatabaseColumn(NodeLabelSource labelSource) {
+            return labelSource == null? ' ': labelSource.value();
+        }
+
+        @Override
+        public NodeLabelSource convertToEntityAttribute(Character character) {
+            return NodeLabelSource.fromValueString(String.valueOf(character));
+        }
+    }
+
 }

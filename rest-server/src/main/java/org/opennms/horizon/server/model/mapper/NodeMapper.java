@@ -67,7 +67,7 @@ public abstract class NodeMapper {
     public abstract List<NodeDto> toDtoList(Collection<Node> list);
 
     String typeToString(NodeType type) {
-       return type.toString();
+        return (type == null) ? null: type.toString();
     }
 
     NodeType stringToType(String s){

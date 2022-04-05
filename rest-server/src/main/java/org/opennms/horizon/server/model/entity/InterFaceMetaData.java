@@ -39,8 +39,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "ipinterface_metadata")
+//@Entity
+//@Table(name = "ipinterface_metadata")
 public class InterFaceMetaData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

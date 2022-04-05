@@ -44,8 +44,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "ipinterface")
+//@Entity
+//@Table(name = "ipinterface")
 public class IPInterface {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
