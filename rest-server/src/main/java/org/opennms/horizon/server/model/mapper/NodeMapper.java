@@ -42,7 +42,6 @@ import org.opennms.horizon.server.model.dto.NodeDto;
 import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.model.entity.Node.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 
 @Mapper(componentModel = "spring", uses = {MonitoringLocationMapper.class})

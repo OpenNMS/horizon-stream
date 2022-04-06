@@ -36,6 +36,7 @@ import org.opennms.horizon.server.dao.NodeRepository;
 import org.opennms.horizon.server.model.dto.NodeDto;
 import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.model.mapper.NodeMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
