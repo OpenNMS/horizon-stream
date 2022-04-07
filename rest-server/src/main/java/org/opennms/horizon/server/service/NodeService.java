@@ -29,8 +29,6 @@
 package org.opennms.horizon.server.service;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 import org.opennms.horizon.server.dao.NodeRepository;
 import org.opennms.horizon.server.model.dto.NodeDto;
@@ -39,52 +37,19 @@ import org.opennms.horizon.server.model.mapper.NodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
 @Service
 @Slf4j
-public class NodeService {
-    private final NodeRepository nodeRepo;
-    private final NodeMapper mapper;
+public class NodeService extends AbstractService<Node, NodeDto, Integer> {
 
-    public NodeDto createNode(NodeDto dtoData) {
-        Node node = mapper.fromDto(dtoData);
-        node.setCreateTime(new Date());
-        nodeRepo.save(node);
-        return mapper.toDto(node);
+    @Autowired
+    public NodeService(NodeRepository repository, NodeMapper mapper) {
+        super(repository, mapper);
     }
 
-    public NodeDto findById(int id) {
-        Optional<Node> node = nodeRepo.findById(id);
-        if(node.isPresent()) {
-            return mapper.toDto(node.get());
-        }
-        return null;
-    }
-
-    public List<NodeDto> findAll() {
-        return mapper.toDtoList(nodeRepo.findAll());
-    }
-
-    public NodeDto update(int id, NodeDto nodeDto) {
-        nodeDto.setId(id);
-        Optional<Node> optional = nodeRepo.findById(nodeDto.getId());
-        if(optional.isPresent()) {
-            Node node = optional.get();
-            mapper.updateNodeFromDto(nodeDto, node);
-            return mapper.toDto(nodeRepo.save(node));
-        }
-        return null;
-    }
-
-    public boolean delete(int id){
-        Optional<Node> node = nodeRepo.findById(id);
-        if(node.isPresent()) {
-            nodeRepo.deleteById(id);
-            return true;
-        }
-        return false;
+    @Override
+    void prePersistent(Node entity) {
+        entity.setCreateTime(new Date());
     }
 }

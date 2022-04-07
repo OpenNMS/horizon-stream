@@ -30,7 +30,6 @@ package org.opennms.horizon.server.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.floatThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -45,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -59,7 +57,7 @@ public class NodeControllerTest {
     private NodeService nodeService;
 
     private static final String URL_PATH = "/nodes";
-    private int nodeId = 1;
+    private final int nodeId = 1;
     private NodeDto node1;
     private NodeDto node2;
 
@@ -118,7 +116,7 @@ public class NodeControllerTest {
     @Test
     public void testCreat() {
         NodeDto nodeDto = new NodeDto();
-        doReturn(node1).when(nodeService).createNode(any(NodeDto.class));
+        doReturn(node1).when(nodeService).create(any(NodeDto.class));
         webClient.post().uri(URL_PATH).bodyValue(nodeDto)
                 .exchange()
                 .expectStatus().isOk()
@@ -126,7 +124,7 @@ public class NodeControllerTest {
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(nodeId)
                 .jsonPath("$.label").isEqualTo(node1.getLabel());
-        verify(nodeService).createNode(any(NodeDto.class));
+        verify(nodeService).create(any(NodeDto.class));
     }
 
     @Test

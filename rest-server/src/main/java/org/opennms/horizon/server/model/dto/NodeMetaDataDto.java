@@ -26,27 +26,16 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.model.entity;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+package org.opennms.horizon.server.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "node_metadata")
-public class NodeMetaData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class NodeMetaDataDto {
     private int id;
     private String context;
     private String key;
     private String value;
-    //TODO tags
 }

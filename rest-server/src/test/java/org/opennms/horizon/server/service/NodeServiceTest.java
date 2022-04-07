@@ -59,7 +59,7 @@ public class NodeServiceTest {
     @MockBean
     private NodeRepository nodeRepo;
     private NodeDto nodeDto;
-    private int nodeId = 1;
+    private final int nodeId = 1;
 
     @BeforeEach
     public void setUP() {
@@ -71,7 +71,7 @@ public class NodeServiceTest {
         Node node = new Node();
         node.setLabel("test label");
         doReturn(node).when(nodeRepo).save(any(Node.class));
-        NodeDto result = nodeService.createNode(nodeDto);
+        NodeDto result = nodeService.create(nodeDto);
         assertThat(result).isNotNull();
         assertThat(result.getLabel()).isEqualTo(nodeDto.getLabel());
         assertThat(result.getCreateTime()).isNotNull();
@@ -83,12 +83,19 @@ public class NodeServiceTest {
     @Test
     public void testFindAll() {
         Node node = new Node();
-        node.setLabel("test label");
-        doReturn(Arrays.asList(node)).when(nodeRepo).findAll();
+        node.setId(nodeId);
+        node.setLabel("test label1");
+        Node node2 = new Node();
+        node2.setId(nodeId + 1);
+        node2.setLabel("test label2");
+        doReturn(Arrays.asList(node, node2)).when(nodeRepo).findAll();
         List<NodeDto> result = nodeService.findAll();
         assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getLabel()).isEqualTo(node.getLabel());
+        assertThat(result.get(0).getId()).isEqualTo(nodeId);
+        assertThat(result.get(1).getId()).isEqualTo(nodeId + 1);
+        assertThat(result.get(1).getLabel()).isEqualTo(node2.getLabel());
         verify(nodeRepo).findAll();
         verifyNoMoreInteractions(nodeRepo);
     }

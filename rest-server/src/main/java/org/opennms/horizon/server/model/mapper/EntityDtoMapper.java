@@ -26,27 +26,19 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.model.entity;
+package org.opennms.horizon.server.model.mapper;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Getter
-@Setter
-@Entity
-@Table(name = "node_metadata")
-public class NodeMetaData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String context;
-    private String key;
-    private String value;
-    //TODO tags
+public interface EntityDtoMapper<T, D> {
+    T fromDto(D dto);
+    D toDto(T entity);
+    List<D> listToDto(List<T> entityList);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromDto(D dto, @MappingTarget T entity);
 }

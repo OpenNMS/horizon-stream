@@ -26,27 +26,12 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.model.entity;
+package org.opennms.horizon.server.model.mapper;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.mapstruct.Mapper;
+import org.opennms.horizon.server.model.dto.NodeMetaDataDto;
+import org.opennms.horizon.server.model.entity.NodeMetaData;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@Entity
-@Table(name = "node_metadata")
-public class NodeMetaData {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private String context;
-    private String key;
-    private String value;
-    //TODO tags
+@Mapper(componentModel = "spring")
+public interface NodeMetaDataMapper extends EntityDtoMapper<NodeMetaData, NodeMetaDataDto>{
 }

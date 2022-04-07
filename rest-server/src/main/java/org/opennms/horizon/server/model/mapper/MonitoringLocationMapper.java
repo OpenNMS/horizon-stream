@@ -29,13 +29,9 @@
 package org.opennms.horizon.server.model.mapper;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.opennms.horizon.server.model.dto.MonitoringLocationDto;
 import org.opennms.horizon.server.model.entity.MonitoringLocation;
 
 @Mapper(componentModel = "spring")
-public interface MonitoringLocationMapper {
-    //MonitoringLocationMapper INSTANCE = Mappers.getMapper(MonitoringLocationMapper.class);
-    MonitoringLocation fromDto(MonitoringLocationDto dto);
-    MonitoringLocationDto toDto(MonitoringLocation location);
+public interface MonitoringLocationMapper extends EntityDtoMapper<MonitoringLocation, MonitoringLocationDto> {
 }
