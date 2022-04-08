@@ -35,6 +35,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.opennms.horizon.server.model.entity.MonitoringLocation;
 import org.opennms.horizon.server.model.entity.Node;
@@ -67,8 +69,8 @@ public class NodeRepositoryTest {
         nodeRepository.save(node1);
         Node dbNode1 = nodeRepository.findById(node1.getId()).orElse(null);
         assertThat(dbNode1).isNotNull();
-        assertThat(dbNode1).isEqualTo(node1);
-        assertThat(dbNode1.getLocation()).isEqualTo(location);
+        assertThat(dbNode1.getLabel()).isEqualTo(node1.getLabel());
+        assertThat(dbNode1.getLocation().getId()).isEqualTo(location.getId());
         Node node2 = createNode();
         node2.setParent(node1);
         node2.setLocation(location);

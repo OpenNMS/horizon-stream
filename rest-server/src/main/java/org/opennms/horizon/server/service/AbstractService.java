@@ -43,7 +43,6 @@ public abstract class AbstractService<T, D, ID> {
 
     public D create(D dto){
         T entity = mapper.fromDto(dto);
-        prePersistent(entity);
         repository.save(entity);
         return mapper.toDto(entity);
     }
@@ -72,5 +71,4 @@ public abstract class AbstractService<T, D, ID> {
             return true;
         }).orElse(false);
     }
-    abstract void prePersistent(T entity);
 }

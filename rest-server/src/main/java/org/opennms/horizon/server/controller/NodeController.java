@@ -30,12 +30,14 @@ package org.opennms.horizon.server.controller;
 
 import org.opennms.horizon.server.model.dto.NodeDto;
 import org.opennms.horizon.server.service.NodeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/nodes")
 public class NodeController extends AbstractController<NodeDto, Integer> {
+    @Autowired
     public NodeController(NodeService service) {
         super(service);
     }

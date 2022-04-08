@@ -28,29 +28,17 @@
 
 package org.opennms.horizon.server.service;
 
-import java.util.Date;
-
-import org.opennms.horizon.server.dao.NodeRepository;
-import org.opennms.horizon.server.model.dto.NodeDto;
-import org.opennms.horizon.server.model.entity.Node;
-import org.opennms.horizon.server.model.mapper.NodeMapper;
+import org.opennms.horizon.server.dao.MonitoringLocationRepository;
+import org.opennms.horizon.server.model.dto.MonitoringLocationDto;
+import org.opennms.horizon.server.model.entity.MonitoringLocation;
+import org.opennms.horizon.server.model.mapper.MonitoringLocationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
-public class NodeService extends AbstractService<Node, NodeDto, Integer> {
-
+public class MonitoringLocationService extends AbstractService<MonitoringLocation, MonitoringLocationDto, String> {
     @Autowired
-    public NodeService(NodeRepository repository, NodeMapper mapper) {
+    public MonitoringLocationService(MonitoringLocationRepository repository, MonitoringLocationMapper mapper) {
         super(repository, mapper);
-    }
-
-    @Override
-    public NodeDto create(NodeDto dto) {
-        dto.setCreateTime(new Date());
-        return super.create(dto);
     }
 }

@@ -28,6 +28,8 @@
 
 package org.opennms.horizon.server.model.dto;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,4 +42,5 @@ public class MonitoringLocationDto {
     private double latitude;
     private double longitude;
     private int priority;
+    private List<String> tags;
 }

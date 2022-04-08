@@ -26,31 +26,20 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.service;
+package org.opennms.horizon.server.controller;
 
-import java.util.Date;
-
-import org.opennms.horizon.server.dao.NodeRepository;
-import org.opennms.horizon.server.model.dto.NodeDto;
-import org.opennms.horizon.server.model.entity.Node;
-import org.opennms.horizon.server.model.mapper.NodeMapper;
+import org.opennms.horizon.server.model.dto.MonitoringLocationDto;
+import org.opennms.horizon.server.service.MonitoringLocationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Service
-@Slf4j
-public class NodeService extends AbstractService<Node, NodeDto, Integer> {
-
+@RestController
+@RequestMapping("/locations")
+public class MonitorLocationController extends AbstractController<MonitoringLocationDto, String> {
     @Autowired
-    public NodeService(NodeRepository repository, NodeMapper mapper) {
-        super(repository, mapper);
-    }
-
-    @Override
-    public NodeDto create(NodeDto dto) {
-        dto.setCreateTime(new Date());
-        return super.create(dto);
+    public MonitorLocationController (MonitoringLocationService service) {
+        super(service);
     }
 }
+

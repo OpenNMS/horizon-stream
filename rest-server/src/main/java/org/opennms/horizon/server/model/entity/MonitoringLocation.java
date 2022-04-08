@@ -31,10 +31,13 @@ package org.opennms.horizon.server.model.entity;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -54,7 +57,7 @@ public class MonitoringLocation {
     private double latitude;
     private double longitude;
     private int priority;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    private List<Node> nodes;
+    @ElementCollection
+    @CollectionTable(name = "monitoringlocationstags", joinColumns = @JoinColumn(name = "monitoringlocationid"))
+    private List<String> tags;
 }
