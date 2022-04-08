@@ -59,21 +59,18 @@ public abstract class AbstractService<T, D, ID> {
 
     public D update(ID id, D dto) {
         Optional<T> optional = repository.findById(id);
-        if(optional.isPresent()) {
-            T entity = optional.get();
-            mapper.updateEntityFromDto(dto, entity);
-            return mapper.toDto(repository.save(entity));
-        }
-        return null;
+        return optional.map(t -> {
+            mapper.updateEntityFromDto(dto, t);
+            return mapper.toDto(repository.save(t));
+        }).orElse(null);
     }
 
     public boolean delete(ID id) {
         Optional<T> optional = repository.findById(id);
-        if(optional.isPresent()) {
+        return optional.map(t -> {
             repository.deleteById(id);
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
     abstract void prePersistent(T entity);
 }
