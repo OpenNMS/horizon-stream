@@ -29,21 +29,29 @@
 package org.opennms.horizon.server.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.opennms.horizon.server.dao.MonitoringLocationRepository;
 import org.opennms.horizon.server.dao.NodeRepository;
 import org.opennms.horizon.server.model.dto.NodeDto;
+import org.opennms.horizon.server.model.entity.MonitoringLocation;
 import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.model.mapper.NodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,25 +66,96 @@ public class NodeServiceTest {
     private NodeMapper mapper;
     @MockBean
     private NodeRepository nodeRepo;
+    @MockBean
+    private MonitoringLocationRepository locationRepo;
     private NodeDto nodeDto;
     private final int nodeId = 1;
+    private final String locationId = "new_location";
 
     @BeforeEach
     public void setUP() {
+
         nodeDto = new NodeDto();
+        nodeDto.setLocation(locationId);
+        nodeDto.setForeignId("test_foreign_");
+        nodeDto.setForeignSource("test_foreign_source");
+        nodeDto.setLabel("test label");
     }
 
     @Test
-    public void testCreateNode() {
-        Node node = new Node();
-        node.setLabel("test label");
-        doReturn(node).when(nodeRepo).save(any(Node.class));
+    public void testCreateNodeWithNewLocation() {
+
+        MonitoringLocation location = new MonitoringLocation();
+        nodeDto.setCreateTime(new Date());
+        Node node = mapper.fromDto(nodeDto);
+        location.addNode(node);
+        when(locationRepo.save(any(MonitoringLocation.class))).thenReturn(location);
         NodeDto result = nodeService.create(nodeDto);
-        assertThat(result).isNotNull();
-        assertThat(result.getLabel()).isEqualTo(nodeDto.getLabel());
-        assertThat(result.getCreateTime()).isNotNull();
-        verify(nodeRepo).findById(anyInt());
+        assertNodeDto(result, nodeDto);
+        verify(locationRepo, times(2)).existsById(locationId);
+        verify(locationRepo).save(any(MonitoringLocation.class));
+        verifyNoMoreInteractions(locationRepo);
+        verify(nodeRepo, times(2)).existsById(null);
+        verifyNoMoreInteractions(nodeRepo);
+    }
+
+    @Test
+    public void testCreateNodeWithLocationExist() {
+
+        MonitoringLocation location = new MonitoringLocation();
+        when(locationRepo.existsById(locationId)).thenReturn(true);
+        when(locationRepo.getById(locationId)).thenReturn(location);
+        nodeDto.setCreateTime(new Date());
+        Node node = mapper.fromDto(nodeDto);
+        when(nodeRepo.save(any(Node.class))).thenReturn(node);
+        //location.addNode(node);
+        //when(locationRepo.save(any(MonitoringLocation.class))).thenReturn(location);
+        NodeDto result = nodeService.create(nodeDto);
+        assertNodeDto(result, nodeDto);
+        verify(locationRepo, times(2)).existsById(locationId);
+        verify(locationRepo, times(2)).getById(locationId);
+        verifyNoMoreInteractions(locationRepo);
+        verify(nodeRepo, times(2)).existsById(null);
         verify(nodeRepo).save(any(Node.class));
+        verifyNoMoreInteractions(nodeRepo);
+    }
+
+    @Test
+    public void testCreateNodeLocationNotSet() {
+
+        MonitoringLocation location = new MonitoringLocation();
+        nodeDto.setLocation(null);
+        nodeDto.setCreateTime(new Date());
+        Node node = mapper.fromDto(nodeDto);
+        location.addNode(node);
+        when(locationRepo.save(any(MonitoringLocation.class))).thenReturn(location);
+        NodeDto result = nodeService.create(nodeDto);
+        assertNodeDto(result, nodeDto);
+        verify(locationRepo).existsById(MonitoringLocation.DEFAULT_LOCATION);
+        verify(locationRepo).save(any(MonitoringLocation.class));
+        verifyNoMoreInteractions(locationRepo);
+        verify(nodeRepo, times(2)).existsById(null);
+        verifyNoMoreInteractions(nodeRepo);
+    }
+
+    @Test
+    public void testCreateNodeLocationNotSetDefaultLocationExist() {
+
+        MonitoringLocation location = new MonitoringLocation();
+        when(locationRepo.existsById(MonitoringLocation.DEFAULT_LOCATION)).thenReturn(true);
+        when(locationRepo.getById(MonitoringLocation.DEFAULT_LOCATION)).thenReturn(location);
+        nodeDto.setLocation(null);
+        nodeDto.setCreateTime(new Date());
+        Node node = mapper.fromDto(nodeDto);
+        location.addNode(node);
+        when(nodeRepo.save(any(Node.class))).thenReturn(node);
+        NodeDto result = nodeService.create(nodeDto);
+        assertNodeDto(result, nodeDto);
+        verify(locationRepo).existsById(MonitoringLocation.DEFAULT_LOCATION);
+        verify(locationRepo).getById(MonitoringLocation.DEFAULT_LOCATION);
+        verifyNoMoreInteractions(locationRepo);
+        verify(nodeRepo).save(any(Node.class));
+        verify(nodeRepo, times(2)).existsById(null);
         verifyNoMoreInteractions(nodeRepo);
     }
 
@@ -164,5 +243,14 @@ public class NodeServiceTest {
         assertThat(deleted).isEqualTo(false);
         verify(nodeRepo).findById(nodeId);
         verifyNoMoreInteractions(nodeRepo);
+    }
+
+    private void assertNodeDto(NodeDto actual, NodeDto expected) {
+        assertThat(actual).isNotNull();
+        assertThat(actual.getCreateTime()).isNotNull();
+        assertThat(actual.getId()).isEqualTo(expected.getId());
+        assertThat(actual.getLabel()).isEqualTo(expected.getLabel());
+        assertThat(actual.getForeignSource()).isEqualTo(expected.getForeignSource());
+        assertThat(actual.getForeignId()).isEqualTo(expected.getForeignId());
     }
 }

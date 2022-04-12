@@ -76,10 +76,10 @@ public class NodeService extends AbstractService<Node, NodeDto, Integer> {
         if(locationExist) {
             return mapper.toDto(repository.save(node));
         } else {
-            locationRepo.save(node.getLocation());
+            MonitoringLocation savedLocation = locationRepo.save(node.getLocation());
             final String foreignId = node.getForeignId();
             final String foreignSource = node.getForeignSource();
-            node = node.getLocation().getNodes().stream().filter(n -> n.getForeignId().equals(foreignId) && n.getForeignSource().equals(foreignSource)).findFirst().orElse(null);
+            node = savedLocation.getNodes().stream().filter(n -> n.getForeignId().equals(foreignId) && n.getForeignSource().equals(foreignSource)).findFirst().orElse(null);
             return mapper.toDto(node);
         }
     }

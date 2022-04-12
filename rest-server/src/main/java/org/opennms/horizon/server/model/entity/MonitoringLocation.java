@@ -50,7 +50,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "monitoringlocations")
 public class MonitoringLocation {
-    private static String DEFAULT_LOCATION = "Default";
+    public static String DEFAULT_LOCATION = "Default";
     @Id
     private String id;
     @Column(name = "monitoringarea")
