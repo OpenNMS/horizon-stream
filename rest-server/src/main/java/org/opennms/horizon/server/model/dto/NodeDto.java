@@ -37,9 +37,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class NodeDto {
-    private int id;
+    private Integer id;
     private Date createTime;
-    private int parentId;
+    private Integer parentId;
     private String type;
     private String sysOid;
     private String sysName;
@@ -54,7 +54,7 @@ public class NodeDto {
     private Date lastPoll;
     private String foreignSource;
     private String foreignId;
-    private MonitoringLocationDto location;
+    private String location;
     private Date lastIngressFlow;
     private Date lastEgressFlow;
 }

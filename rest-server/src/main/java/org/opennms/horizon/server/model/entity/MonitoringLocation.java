@@ -28,6 +28,7 @@
 
 package org.opennms.horizon.server.model.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -49,15 +50,34 @@ import lombok.Setter;
 @Entity
 @Table(name = "monitoringlocations")
 public class MonitoringLocation {
+    private static String DEFAULT_LOCATION = "Default";
     @Id
     private String id;
     @Column(name = "monitoringarea")
-    private String monitoringArea;
+    private String monitoringArea = "localhost";
     private String geolocation;
     private double latitude;
     private double longitude;
-    private int priority;
+    private int priority = 100;
     @ElementCollection
     @CollectionTable(name = "monitoringlocationstags", joinColumns = @JoinColumn(name = "monitoringlocationid"))
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();
+    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Node> nodes = new ArrayList<>();
+
+    public void addTag(String tag) {
+        tags.add(tag);
+    }
+
+    public void addNode(Node node) {
+        nodes.add(node);
+    }
+
+    public static MonitoringLocation defaultLocation(){
+        MonitoringLocation defaultLocation = new MonitoringLocation();
+        defaultLocation.setId(DEFAULT_LOCATION);
+        return defaultLocation;
+    }
+
+
 }

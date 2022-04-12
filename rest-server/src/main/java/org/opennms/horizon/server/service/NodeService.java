@@ -30,27 +30,57 @@ package org.opennms.horizon.server.service;
 
 import java.util.Date;
 
+import javax.transaction.Transactional;
+
+import org.opennms.horizon.server.dao.MonitoringLocationRepository;
 import org.opennms.horizon.server.dao.NodeRepository;
 import org.opennms.horizon.server.model.dto.NodeDto;
+import org.opennms.horizon.server.model.entity.MonitoringLocation;
 import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.model.mapper.NodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import liquibase.pro.packaged.M;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class NodeService extends AbstractService<Node, NodeDto, Integer> {
 
+    private final MonitoringLocationRepository locationRepo;
+
     @Autowired
-    public NodeService(NodeRepository repository, NodeMapper mapper) {
+    public NodeService(NodeRepository repository, NodeMapper mapper, MonitoringLocationRepository locationRepository) {
         super(repository, mapper);
+        locationRepo = locationRepository;
     }
 
     @Override
     public NodeDto create(NodeDto dto) {
         dto.setCreateTime(new Date());
-        return super.create(dto);
+        Node node = mapper.fromDto(dto);
+        boolean locationExist = node.getLocation() != null;
+        if(!locationExist) {
+            MonitoringLocation location = MonitoringLocation.defaultLocation();
+            if(StringUtils.hasLength(dto.getLocation())) {
+                location.setId(dto.getLocation());
+            } else if (locationRepo.existsById(location.getId())){ //check if default location exists
+                locationExist = true;
+                location = locationRepo.getById(location.getId());
+            }
+            location.addNode(node);
+            node.setLocation(location);
+        }
+        if(locationExist) {
+            return mapper.toDto(repository.save(node));
+        } else {
+            locationRepo.save(node.getLocation());
+            final String foreignId = node.getForeignId();
+            final String foreignSource = node.getForeignSource();
+            node = node.getLocation().getNodes().stream().filter(n -> n.getForeignId().equals(foreignId) && n.getForeignSource().equals(foreignSource)).findFirst().orElse(null);
+            return mapper.toDto(node);
+        }
     }
 }

@@ -43,8 +43,7 @@ public abstract class AbstractService<T, D, ID> {
 
     public D create(D dto){
         T entity = mapper.fromDto(dto);
-        repository.save(entity);
-        return mapper.toDto(entity);
+        return mapper.toDto(repository.save(entity));
     }
 
     public D findById(ID id) {

@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import javax.transaction.Transactional;
+import javax.persistence.EntityNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.opennms.horizon.server.model.entity.MonitoringLocation;
@@ -43,11 +43,15 @@ import org.opennms.horizon.server.model.entity.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @DataJpaTest
 public class NodeRepositoryTest {
     @Autowired
     private NodeRepository nodeRepository;
+    @Autowired
+    private MonitoringLocationRepository locationRepository;
 
     @Test
     public void testEnvironmentIsReady() {
@@ -62,11 +66,27 @@ public class NodeRepositoryTest {
     }
 
     @Test
-    public void testCreateNode() {
-        MonitoringLocation location = createLocation();
+    public void testSaveNodesInLocation() {
+        MonitoringLocation location = findLocation("Default");
         Node node1 = createNode();
         node1.setLocation(location);
-        nodeRepository.save(node1);
+        Node node2 = createNode();
+        node2.setLocation(location);
+        location.addNode(node1);
+        location.addNode(node2);
+        locationRepository.save(location);
+        MonitoringLocation dbLocation = locationRepository.findById("Default").orElse(null);
+        assertThat(dbLocation).isNotNull();
+        assertThat(dbLocation.getNodes().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void testCreateNode() {
+        MonitoringLocation location = findLocation("Default");
+        Node node1 = createNode();
+        node1.setLocation(location);
+        location.addNode(node1);
+        nodeRepository.saveAndFlush(node1);
         Node dbNode1 = nodeRepository.findById(node1.getId()).orElse(null);
         assertThat(dbNode1).isNotNull();
         assertThat(dbNode1.getLabel()).isEqualTo(node1.getLabel());
@@ -74,17 +94,21 @@ public class NodeRepositoryTest {
         Node node2 = createNode();
         node2.setParent(node1);
         node2.setLocation(location);
+        location.addNode(node2);
         nodeRepository.save(node2);
         Node dbNode2 = nodeRepository.findById(node2.getId()).orElse(null);
         assertThat(dbNode2).isEqualTo(node2);
         assertThat(dbNode2.getParent()).isEqualTo(node1);
         List<Node> nodes = nodeRepository.findAll();
         assertThat(nodes.size()).isEqualTo(2);
+        MonitoringLocation dbLocation = locationRepository.findById("Default").orElse(null);
+        assertThat(dbLocation).isNotNull();
+        assertThat(dbLocation.getNodes().size()).isEqualTo(2);
     }
 
     @Test
     public void testUpdatedNode() {
-        MonitoringLocation location = createLocation();
+        MonitoringLocation location = findLocation("Default");
         Node node = createNode();
         String label = node.getLabel();
         node.setLocation(location);
@@ -100,7 +124,7 @@ public class NodeRepositoryTest {
 
     @Test
     public void testDeleteNode() {
-        MonitoringLocation location = createLocation();
+        MonitoringLocation location = findLocation("Default");
         Node node = createNode();
         node.setLocation(location);
         Node savedNode = nodeRepository.save(node);
@@ -133,14 +157,13 @@ public class NodeRepositoryTest {
         return node;
     }
 
-    private MonitoringLocation createLocation() {
-        MonitoringLocation location = new MonitoringLocation();
-        location.setId("Default");
-        location.setGeolocation("Ottawa");
-        location.setPriority(1);
-        location.setLatitude(45.33611420265182);
-        location.setLongitude(-75.90572391984264);
-        return location;
+    private MonitoringLocation findLocation(String locationID) {
+        if(locationRepository.existsById(locationID)) {
+            return locationRepository.getById(locationID);
+        }
+        MonitoringLocation location =  new MonitoringLocation();
+        location.setId(locationID);
+        return locationRepository.save(location);
     }
 }
 

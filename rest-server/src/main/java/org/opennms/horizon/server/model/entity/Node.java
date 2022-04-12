@@ -31,6 +31,7 @@ package org.opennms.horizon.server.model.entity;
 import java.util.Date;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Converter;
 import javax.persistence.Entity;
@@ -41,9 +42,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -58,7 +56,7 @@ public class Node {
     @GeneratedValue(generator = "node_seq")
     @SequenceGenerator(name = "node_seq", sequenceName = "nodenxtid", allocationSize = 1)
     @Column(name = "nodeid")
-    private int id;
+    private Integer id;
     @Column(name = "nodecreatetime")
     private Date createTime;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -93,7 +91,6 @@ public class Node {
     @Column(name = "foreignid")
     private String foreignId;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "location")
     private MonitoringLocation location;
     private Date lastIngressFlow;

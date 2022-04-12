@@ -31,30 +31,41 @@ package org.opennms.horizon.server.model.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.opennms.horizon.server.dao.MonitoringLocationRepository;
 import org.opennms.horizon.server.dao.NodeRepository;
 import org.opennms.horizon.server.model.dto.NodeDto;
+import org.opennms.horizon.server.model.entity.MonitoringLocation;
 import org.opennms.horizon.server.model.entity.Node;
 import org.opennms.horizon.server.model.entity.Node.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 
-@Mapper(componentModel = "spring", uses = {MonitoringLocationMapper.class})
+@Mapper(componentModel = "spring")
 public abstract class NodeMapper implements EntityDtoMapper<Node, NodeDto> {
     @Autowired
     protected NodeRepository nodeRepo;
+    @Autowired
+    protected MonitoringLocationRepository locationRepo;
 
-    @Mappings({
-            @Mapping(target = "parent", expression = "java(nodeRepo.findById(dto.getParentId()).orElse(null))"),
-            //@Mapping(target = "type", expression = "java(NodeType.getNodeTypeFromChar(dto.getType()))")
-    })
+    @Mapping(target = "parent", expression = "java(nodeRepo.existsById(dto.getParentId())? nodeRepo.getById(dto.getParentId()): null)")
     @Override
     public abstract Node fromDto(NodeDto dto);
-    @Mappings({
-            @Mapping(source = "parent.id", target = "parentId"),
-            //@Mapping(target = "type", expression = "java(typeToChar(node.getType()))")
-    })
+
+    @Mapping(source = "parent.id", target = "parentId")
     @Override
     public abstract NodeDto toDto(Node node);
+
+    String locationToString(MonitoringLocation location) {
+        return (location == null)? null: location.getId();
+    }
+
+    MonitoringLocation locationIDToLocation(String locationID) {
+        if(StringUtils.hasLength(locationID)) {
+            return locationRepo.existsById(locationID)? locationRepo.getById(locationID): null;
+        }
+        return null;
+    }
 
     String typeToString(NodeType type) {
         return (type == null) ? null: type.toString();
