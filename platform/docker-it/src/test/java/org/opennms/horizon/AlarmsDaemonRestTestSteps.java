@@ -265,7 +265,7 @@ public class AlarmsDaemonRestTestSteps {
                         .config(restAssuredConfig)
                         ;
 
-        String accessToken = this.keycloakUserSession.getAccessToken();
+        String accessToken = this.keycloakUserSession.getInitialAccessToken();
 
         if (accessToken != null) {
             requestSpecification =
@@ -421,7 +421,7 @@ public class AlarmsDaemonRestTestSteps {
         String accessToken = null;
 
         if( this.keycloakUserSession != null) {
-            accessToken = this.keycloakUserSession.getAccessToken();
+            accessToken = this.keycloakUserSession.getInitialAccessToken();
         }
 
         if (accessToken != null) {

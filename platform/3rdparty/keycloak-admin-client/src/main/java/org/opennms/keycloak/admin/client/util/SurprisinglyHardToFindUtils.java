@@ -1,6 +1,5 @@
 package org.opennms.keycloak.admin.client.util;
 
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**

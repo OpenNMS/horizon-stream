@@ -5,7 +5,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.IOException;
-import java.util.function.BiFunction;
 
 public class HttpClientRetryUtil {
 

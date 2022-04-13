@@ -12,8 +12,8 @@ import java.net.URISyntaxException;
 import java.util.function.Consumer;
 
 public interface KeycloakAdminClientSession {
-    String getAccessToken();
-    String getRefreshToken();
+    String getInitialAccessToken();
+    String getInitialRefreshToken();
 
     UserRepresentation getUserByUsername(String realm, String username) throws IOException, URISyntaxException, KeycloakBaseException;
     UserRepresentation getUserById(String realm, String userId) throws IOException, URISyntaxException, KeycloakBaseException;

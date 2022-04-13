@@ -28,6 +28,11 @@
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
@@ -460,9 +465,15 @@
                 <artifactId>rest-assured</artifactId>
                 <version>${rest-assured.version}</version>
             </dependency>
+            <!-- TODO: use slf4j18-impl -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j18-impl</artifactId>
                 <version>${log4j2.version}</version>
             </dependency>
             <dependency>

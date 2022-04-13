@@ -84,6 +84,30 @@ public class KeycloakAdminClientImpl implements KeycloakAdminClient {
         this.objectMapper = objectMapper;
     }
 
+    public HttpClient getHttpClient() {
+        return httpClient;
+    }
+
+    public void setHttpClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public KeycloakResponseUtil getKeycloakResponseUtil() {
+        return keycloakResponseUtil;
+    }
+
+    public void setKeycloakResponseUtil(KeycloakResponseUtil keycloakResponseUtil) {
+        this.keycloakResponseUtil = keycloakResponseUtil;
+    }
+
+    public SurprisinglyHardToFindUtils getSurprisinglyHardToFindUtils() {
+        return surprisinglyHardToFindUtils;
+    }
+
+    public void setSurprisinglyHardToFindUtils(SurprisinglyHardToFindUtils surprisinglyHardToFindUtils) {
+        this.surprisinglyHardToFindUtils = surprisinglyHardToFindUtils;
+    }
+
     public String getScope() {
         return scope;
     }
@@ -132,8 +156,9 @@ public class KeycloakAdminClientImpl implements KeycloakAdminClient {
         result.setObjectMapper(objectMapper);
         result.setBaseUrl(baseUrl);
         result.setAdminRealm(realm);
-        result.setAccessToken(accessTokenResponse.getToken());
-        result.setRefreshToken(accessTokenResponse.getRefreshToken());
+        result.setInitialAccessToken(accessTokenResponse.getToken());
+        result.setInitialRefreshToken(accessTokenResponse.getRefreshToken());
+        result.init();
 
         return result;
     }

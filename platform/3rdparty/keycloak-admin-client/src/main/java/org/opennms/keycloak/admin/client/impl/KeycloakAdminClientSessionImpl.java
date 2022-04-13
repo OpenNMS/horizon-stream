@@ -24,6 +24,7 @@ import org.opennms.keycloak.admin.client.KeycloakAdminClientSession;
 import org.opennms.keycloak.admin.client.exc.KeycloakAuthenticationException;
 import org.opennms.keycloak.admin.client.exc.KeycloakBaseException;
 import org.opennms.keycloak.admin.client.exc.KeycloakOperationException;
+import org.opennms.keycloak.admin.client.refresh.RefreshTokenResponse;
 import org.opennms.keycloak.admin.client.util.SurprisinglyHardToFindUtils;
 import org.slf4j.Logger;
 
@@ -36,7 +37,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 /**
@@ -66,19 +66,26 @@ public class KeycloakAdminClientSessionImpl implements KeycloakAdminClientSessio
 
     private String baseUrl;
     private String adminRealm;
-    private String accessToken;
-    private String refreshToken;
-
-    private CountDownLatch refreshLatch;
+    private String initialAccessToken;
+    private String initialRefreshToken;
 
     private SurprisinglyHardToFindUtils surprisinglyHardToFindUtils = SurprisinglyHardToFindUtils.INSTANCE;
     private HttpClientRetryUtil httpClientRetryUtil = HttpClientRetryUtil.INSTANCE;
     private KeycloakResponseUtil keycloakResponseUtil = KeycloakResponseUtil.INSTANCE;
+    private KeycloakSessionTokenManager keycloakSessionTokenManager;
 
 
 //========================================
 // Getters and Setters
 //----------------------------------------
+
+    public Logger getLog() {
+        return log;
+    }
+
+    public void setLog(Logger log) {
+        this.log = log;
+    }
 
     public HttpClient getHttpClient() {
         return httpClient;
@@ -128,20 +135,62 @@ public class KeycloakAdminClientSessionImpl implements KeycloakAdminClientSessio
         this.adminRealm = adminRealm;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public String getInitialAccessToken() {
+        return initialAccessToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setInitialAccessToken(String initialAccessToken) {
+        this.initialAccessToken = initialAccessToken;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
+    public String getInitialRefreshToken() {
+        return initialRefreshToken;
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public void setInitialRefreshToken(String initialRefreshToken) {
+        this.initialRefreshToken = initialRefreshToken;
+    }
+
+    public SurprisinglyHardToFindUtils getSurprisinglyHardToFindUtils() {
+        return surprisinglyHardToFindUtils;
+    }
+
+    public void setSurprisinglyHardToFindUtils(SurprisinglyHardToFindUtils surprisinglyHardToFindUtils) {
+        this.surprisinglyHardToFindUtils = surprisinglyHardToFindUtils;
+    }
+
+    public HttpClientRetryUtil getHttpClientRetryUtil() {
+        return httpClientRetryUtil;
+    }
+
+    public void setHttpClientRetryUtil(HttpClientRetryUtil httpClientRetryUtil) {
+        this.httpClientRetryUtil = httpClientRetryUtil;
+    }
+
+    public KeycloakResponseUtil getKeycloakResponseUtil() {
+        return keycloakResponseUtil;
+    }
+
+    public void setKeycloakResponseUtil(KeycloakResponseUtil keycloakResponseUtil) {
+        this.keycloakResponseUtil = keycloakResponseUtil;
+    }
+
+    public KeycloakSessionTokenManager getKeycloakSessionTokenManager() {
+        return keycloakSessionTokenManager;
+    }
+
+    public void setKeycloakSessionTokenManager(KeycloakSessionTokenManager keycloakSessionTokenManager) {
+        this.keycloakSessionTokenManager = keycloakSessionTokenManager;
+    }
+
+//========================================
+// Lifecycle
+//----------------------------------------
+
+    public void init() {
+        if (keycloakSessionTokenManager == null) {
+            keycloakSessionTokenManager = new KeycloakSessionTokenManager(initialAccessToken, initialRefreshToken);
+        }
     }
 
 //========================================
@@ -299,7 +348,7 @@ public class KeycloakAdminClientSessionImpl implements KeycloakAdminClientSessio
         HttpGet httpGet = new HttpGet();
         httpGet.setURI(fullUrl.toURI());
         httpGet.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
-        httpGet.setHeader(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_HEADER_SCHEME + accessToken);
+        httpGet.setHeader(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_HEADER_SCHEME + keycloakSessionTokenManager.getAccessToken());
 
         // Don't retry - if the access token is already expired, there is no need to logout
         HttpResponse httpResponse = httpClient.execute(httpGet);
@@ -334,76 +383,47 @@ public class KeycloakAdminClientSessionImpl implements KeycloakAdminClientSessio
         return urlEncodedFormEntity;
     }
 
-    private void refreshToken() throws IOException, URISyntaxException, KeycloakAuthenticationException {
-        //
-        // Format the URL
-        //
-        String encodedRealm = surprisinglyHardToFindUtils.encodeUrlPathSegment(adminRealm);
-        String path = "/realms/" + encodedRealm + "/protocol/openid-connect/token";
-        URL fullUrl = this.formatUrl(path);
+    private RefreshTokenResponse refreshToken() {
+        try {
+            //
+            // Format the URL
+            //
+            String encodedRealm = surprisinglyHardToFindUtils.encodeUrlPathSegment(adminRealm);
+            String path = "/realms/" + encodedRealm + "/protocol/openid-connect/token";
+            URL fullUrl = this.formatUrl(path);
 
-        HttpEntity httpEntity = prepareRefreshRequestEntity(refreshToken);
+            HttpEntity httpEntity = prepareRefreshRequestEntity(initialRefreshToken);
 
-        HttpPost tokenPostRequest = new HttpPost();
-        tokenPostRequest.setHeader(HTTP.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.getMimeType());
-        tokenPostRequest.setURI(fullUrl.toURI());
-        tokenPostRequest.setEntity(httpEntity);
+            HttpPost tokenPostRequest = new HttpPost();
+            tokenPostRequest.setHeader(HTTP.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.getMimeType());
+            tokenPostRequest.setURI(fullUrl.toURI());
+            tokenPostRequest.setEntity(httpEntity);
 
-        // NOTE: this is the token refresh, so directly execute it.  The retry utility does not apply here because it
-        //  retries by calling this method.
-        HttpResponse httpResponse = httpClient.execute(tokenPostRequest);
+            // NOTE: this is the token refresh, so directly execute it.  The retry utility does not apply here because it
+            //  retries by calling this method.
+            HttpResponse httpResponse = httpClient.execute(tokenPostRequest);
 
-        AccessTokenResponse accessTokenResponse = keycloakResponseUtil.parseAccessTokenResponse(httpResponse);
+            AccessTokenResponse accessTokenResponse = keycloakResponseUtil.parseAccessTokenResponse(httpResponse);
 
-        //
-        // Update the tokens
-        //
-        accessToken = accessTokenResponse.getToken();
-        refreshToken = accessTokenResponse.getRefreshToken();
+            //
+            // Update the tokens
+            //
+            return new RefreshTokenResponse(
+                    accessTokenResponse.getToken(),
+                    accessTokenResponse.getRefreshToken());
+        } catch (Exception exc) {
+            throw new RuntimeException("failed callout to keycloak in order to refresh the token", exc);
+        }
     }
 
     private boolean refreshTokenOn401(HttpUriRequest originalRequest, HttpResponse httpResponse, String usedAccessToken) {
         if (httpResponse.getStatusLine().getStatusCode() == 401) {
+
             try {
-                boolean initiateRefresh = false;
-                CountDownLatch latch;
-
-                //
-                // Critical section - keep it short and light
-                //
-                synchronized (lock) {
-                    //
-                    // Is there an active refresh request ongoing?  If so, just wait for it to complete and use its
-                    //  result, even if the Access Token we used doesn't match the current one.
-                    //
-                    if (refreshLatch == null) {
-                        if (usedAccessToken.equals(accessToken)) {
-                            // No ongoing refresh, and no new token available.  Initiate a token refresh.
-                            initiateRefresh = true;
-                            refreshLatch = new CountDownLatch(1);
-                        } else {
-                            // Nothing to do - a new access token is available and there's no ongoing refresh
-                            return true;
-                        }
-                    }
-
-                    latch = refreshLatch;
-                }
-
-                // If we need to request
-                if (initiateRefresh) {
-                    try {
-                        refreshToken();
-                    } finally {
-                        // Make sure to countdown even on exceptions to ensure no threads end up stuck
-                        latch.countDown();
-                    }
-                } else {
-                    latch.await();
-                }
+                String updatedAccessToken = keycloakSessionTokenManager.refreshToken(usedAccessToken, this::refreshToken);
 
                 // Update the request with the new access token.
-                originalRequest.setHeader(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_HEADER_SCHEME + accessToken);
+                originalRequest.setHeader(HttpHeaders.AUTHORIZATION, BEARER_TOKEN_HEADER_SCHEME + updatedAccessToken);
 
                 return true;
             } catch (Exception exc) {
@@ -416,7 +436,7 @@ public class KeycloakAdminClientSessionImpl implements KeycloakAdminClientSessio
 
     private HttpResponse sendJsonGetWithAuth(URL fullUrl) throws URISyntaxException, IOException {
         // Take a snapshot of the Access Token in case it changes due to concurrency
-        String usedAccessToken = accessToken;
+        String usedAccessToken = keycloakSessionTokenManager.getAccessToken();
 
         HttpGet httpGet = new HttpGet();
         httpGet.setURI(fullUrl.toURI());
@@ -436,7 +456,7 @@ public class KeycloakAdminClientSessionImpl implements KeycloakAdminClientSessio
         String bodyJson = objectMapper.writeValueAsString(body);
 
         // Take a snapshot of the Access Token in case it changes due to concurrency
-        String usedAccessToken = accessToken;
+        String usedAccessToken = keycloakSessionTokenManager.getAccessToken();
 
         HttpPost httpPost = new HttpPost();
         httpPost.setURI(url.toURI());
