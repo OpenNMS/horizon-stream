@@ -16,6 +16,8 @@
             http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
         ">
 
+    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+
     <cm:property-placeholder persistent-id="org.opennms.core.rest">
         <cm:default-properties>
             <cm:property name="http.realm" value="karaf"/>
@@ -23,10 +25,10 @@
             <cm:property name="keycloak.static-pubkey-path" value="etc/keycloak-pubkey.pem"/>
             <cm:property name="keycloak.realm" value="opennms"/>
             <cm:property name="keycloak.admin-realm" value="master"/>
-            <cm:property name="keycloak.base-url" value="http://localhost:9000"/>
+            <cm:property name="keycloak.base-url" value="$[env:KEYCLOAK_BASE_URL]"/>
 
-            <cm:property name="keycloak.admin-username" value="admin" />
-            <cm:property name="keycloak.admin-password" value="admin" />
+            <cm:property name="keycloak.admin-username" value="$[env:KEYCLOAK_ADMIN_USERNAME]" />
+            <cm:property name="keycloak.admin-password" value="$[env:KEYCLOAK_ADMIN_PASSWORD]" />
         </cm:default-properties>
     </cm:property-placeholder>
 
