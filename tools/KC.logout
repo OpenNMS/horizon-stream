@@ -1,0 +1,43 @@
+#!/bin/bash
+
+REALM="opennms"
+CLIENT_ID=admin-cli
+
+usage()
+{
+	echo "Usage: $0 [-hv] [-R <realm>] [-t <access-token>]"
+	echo
+	echo "  -h  Display this help"
+	echo "  -v  Verbose curl output"
+}
+
+while getopts "hRt:v" arg
+do
+	case "$arg" in
+		h)
+			usage
+			exit 0
+			;;
+
+		R)
+			REALM="${OPTARG}"
+			;;
+
+		t)
+			TOKEN="${OPTARG}"
+			CURL_OPTS=("${CURL_OPTS[@]}" "-H" "Authorization: Bearer ${OPTARG}")
+			;;
+
+		v)
+			CURL_OPTS=("${CURL_OPTS[@]}" -v)
+			;;
+	esac
+done
+
+URL="http://localhost:9000/realms/${REALM}/protocol/openid-connect/logout"
+
+{
+	curl "${CURL_OPTS[@]}" -X GET \
+		-H 'Content-Type: application/json' \
+		"${URL}"
+}
