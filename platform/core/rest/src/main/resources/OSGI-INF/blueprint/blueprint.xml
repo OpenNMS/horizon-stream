@@ -40,7 +40,7 @@
     <bean id="keycloakAdminClient" class="org.opennms.keycloak.admin.client.impl.KeycloakAdminClientImpl" init-method="init">
         <property name="baseUrl" value="${keycloak.base-url}" />
     </bean>
-    <bean id="keycloakRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.KeycloakRoleAssignmentProvider">
+    <bean id="keycloakRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.KeycloakRoleAssignmentProvider" init-method="init">
         <property name="keycloakAdminClient" ref="keycloakAdminClient" />
         <property name="keycloakRealm" value="${keycloak.realm}" />
         <property name="keycloakAdminRealm" value="${keycloak.admin-realm}" />

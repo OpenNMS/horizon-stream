@@ -1,5 +1,8 @@
 package org.opennms.rest.jaxrs.jwt.impl;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.keycloak.representations.idm.MappingsRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -11,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +26,8 @@ import java.util.stream.Collectors;
  */
 public class KeycloakRoleAssignmentProvider implements RoleAssignmentProvider {
 
+    public static final long DEFAULT_CACHE_STALE_TIME = 300_000;        // 5 minutes
+
     private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(KeycloakRoleAssignmentProvider.class);
 
     private Logger log = DEFAULT_LOGGER;
@@ -30,6 +37,9 @@ public class KeycloakRoleAssignmentProvider implements RoleAssignmentProvider {
     private String keycloakAdminRealm;
     private String keycloakAdminUsername;
     private String keycloakAdminPassword;
+    private long cacheStaleTime = DEFAULT_CACHE_STALE_TIME;
+
+    private LoadingCache<CacheKey, List<String>> mappingsRepresentationCache;
 
 //========================================
 // Getters and Setters
@@ -75,6 +85,31 @@ public class KeycloakRoleAssignmentProvider implements RoleAssignmentProvider {
         this.keycloakAdminPassword = keycloakAdminPassword;
     }
 
+    public long getCacheStaleTime() {
+        return cacheStaleTime;
+    }
+
+    public void setCacheStaleTime(long cacheStaleTime) {
+        this.cacheStaleTime = cacheStaleTime;
+    }
+
+//========================================
+// Lifecycle
+//----------------------------------------
+
+    public void init() {
+        /**
+         * Use refreshAfterWrite() to allow continued operations using old cache values until a refresh operation
+         *  completes successfully.
+         */
+        mappingsRepresentationCache =
+                CacheBuilder.newBuilder()
+                        .refreshAfterWrite(cacheStaleTime, TimeUnit.MILLISECONDS)
+                        .build(
+                                new MyCacheLoader()
+                        );
+    }
+
 //========================================
 // RoleAssignmentProvider API
 //----------------------------------------
@@ -85,7 +120,7 @@ public class KeycloakRoleAssignmentProvider implements RoleAssignmentProvider {
     }
 
 //========================================
-//
+// Internals
 //----------------------------------------
 
     /**
@@ -114,7 +149,6 @@ public class KeycloakRoleAssignmentProvider implements RoleAssignmentProvider {
                 result = Collections.EMPTY_LIST;
             }
 
-
             return result;
         } catch (Exception exc) {
             throw new RuntimeException("failed to load user roles from keycloak", exc);
@@ -124,6 +158,49 @@ public class KeycloakRoleAssignmentProvider implements RoleAssignmentProvider {
             } catch (Exception exc) {
                 log.warn("failed to logout Keycloak session", exc);
             }
+        }
+    }
+
+//========================================
+// Internals Classes
+//----------------------------------------
+
+    private static class CacheKey {
+        private final String realm;
+        private final String username;
+
+        public CacheKey(String realm, String username) {
+            this.realm = realm;
+            this.username = username;
+        }
+
+        public String getRealm() {
+            return realm;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CacheKey cacheKey = (CacheKey) o;
+            return Objects.equals(realm, cacheKey.realm) &&
+                    Objects.equals(username, cacheKey.username);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(realm, username);
+        }
+    }
+
+    private class MyCacheLoader extends CacheLoader<CacheKey, List<String>> {
+        @Override
+        public List<String> load(CacheKey cacheKey) throws Exception {
+            return loadFromKeycloak(cacheKey.getRealm(), cacheKey.getUsername());
         }
     }
 }
