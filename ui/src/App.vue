@@ -2,23 +2,25 @@
 <template>
   <FeatherAppLayout content-layout="full">
     <template v-slot:header>
-      <Menubar />
+      <TheMenubar />
     </template>
 
     <template v-slot:rail>
-      <NavigationRail />
+      <TheNavigationRail />
     </template>
 
-    <Spinner />
+    <TheSpinner />
+    <TheSnackbar />
     <router-view />
   </FeatherAppLayout>
 </template>
   
 <script setup lang="ts">
 import { FeatherAppLayout } from '@featherds/app-layout'
-import Menubar from '@/components/Layout/Menubar.vue'
-import Spinner from '@/components/Common/Spinner.vue'
-import NavigationRail from '@/components/Layout/NavigationRail.vue'
+import TheMenubar from '@/components/Layout/TheMenubar.vue'
+import TheSpinner from '@/components/Common/TheSpinner.vue'
+import TheSnackbar from './components/Common/TheSnackbar.vue'
+import TheNavigationRail from '@/components/Layout/TheNavigationRail.vue'
 </script>
   
 <style lang="scss">
@@ -29,5 +31,9 @@ import NavigationRail from '@/components/Layout/NavigationRail.vue'
 a {
   text-decoration: none;
   color: var($primary);
+}
+
+.pointer {
+  cursor: pointer;
 }
 </style>
