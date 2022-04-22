@@ -23,7 +23,8 @@
     "src/**/*.vue",
     "vite.config.ts",
     "auto-imports.d.ts",
-    "tests",
+    "components.d.ts",
+    "tests"
   ],
   "exclude": [
     "node_modules"

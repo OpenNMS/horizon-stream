@@ -2,25 +2,20 @@
 <template>
   <FeatherAppLayout content-layout="full">
     <template v-slot:header>
-      <TheMenubar />
+      <Menubar />
     </template>
 
     <template v-slot:rail>
-      <TheNavigationRail />
+      <NavigationRail />
     </template>
 
-    <TheSpinner />
-    <TheSnackbar />
+    <Spinner />
+    <Snackbar />
     <router-view />
   </FeatherAppLayout>
 </template>
   
 <script setup lang="ts">
-import { FeatherAppLayout } from '@featherds/app-layout'
-import TheMenubar from '@/components/Layout/TheMenubar.vue'
-import TheSpinner from '@/components/Common/TheSpinner.vue'
-import TheSnackbar from './components/Common/TheSnackbar.vue'
-import TheNavigationRail from '@/components/Layout/TheNavigationRail.vue'
 </script>
   
 <style lang="scss">

@@ -7,10 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { FeatherSpinner } from '@featherds/progress'
 import useSpinner from '@/composables/useSpinner'
 const { isActive } = useSpinner()
-
 </script>
 
 <style scoped lang="scss">

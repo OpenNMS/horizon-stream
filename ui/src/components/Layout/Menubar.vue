@@ -1,4 +1,3 @@
-  
 <template>
   <FeatherAppBar :labels="{ skip: 'main' }" content="app">
     <template v-slot:left>
@@ -16,8 +15,6 @@
 </template>
     
 <script setup lang="ts">
-import { FeatherAppBar, FeatherAppBarLink } from '@featherds/app-bar'
-import { FeatherIcon } from '@featherds/icon'
 import LightDarkMode from '@featherds/icon/action/LightDarkMode'
 import Logo from '@/assets/TheLogo.vue'
 
