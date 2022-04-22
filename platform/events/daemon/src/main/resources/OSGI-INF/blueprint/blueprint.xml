@@ -87,7 +87,9 @@
 
     <cm:property-placeholder id="eventProducerProperties" persistent-id="org.opennms.horizon.eventd.camel" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="useKafka" value="true"/>
+            <cm:property name="useSeda" value="true"/>
+
+            <cm:property name="useKafka" value="false"/>
             <cm:property name="kafkaBrokers" value="$[env:KAFKA_BROKER_HOST]:$[env:KAFKA_BROKER_PORT]"/>
             <cm:property name="kafkaTopic" value="events"/>
 
@@ -105,6 +107,13 @@
 
     <camelContext autoStartup="true" id="eventForwarderCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
         <propertyPlaceholder id="properties" location="blueprint:eventProducerProperties" />
+
+        <!-- TODO: queue size -->
+        <route id="produceEventSeda" autoStartup="{{useSeda}}">
+            <from uri="direct:forwardEvent"/>
+            <marshal><jaxb contextPath="org.opennms.horizon.events.xml"/></marshal>
+            <to uri="vm:events" />
+        </route>
 
         <route id="produceEventKafka" autoStartup="{{useKafka}}">
             <from uri="direct:forwardEvent"/>
