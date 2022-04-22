@@ -8,8 +8,6 @@
 </template>
 
 <script setup lang="ts">
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { FeatherSnackbar } from '@featherds/snackbar'
 import { FeatherButton } from '@featherds/button'
 import useSnackbar from '@/composables/useSnackbar'
