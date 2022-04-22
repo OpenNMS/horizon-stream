@@ -21,6 +21,9 @@ RUN groupadd --gid 10001 horizon-stream && \
     chgrp -R 0 /opt/horizon-stream && \
     chmod -R g=u /opt/horizon-stream
 
+# Set karaf.clean.cache = true in system.properties
+RUN sed -i 's/^karaf.clean.cache *=.*/karaf.clean.cache = true/' /opt/horizon-stream/etc/system.properties
+
 ##
 # Prod image with minimal image size
 ##
