@@ -1,5 +1,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0"
         xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.5.0"
         xmlns:cxf="http://cxf.apache.org/blueprint/core"
         xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
@@ -8,32 +9,64 @@
             http://www.osgi.org/xmlns/blueprint/v1.0.0
             http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
             http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+            http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0
+            http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.3.0.xsd
             http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.5.0 http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.5.xsd
             http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
             http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
-            http://aries.apache.org/schemas/blueprint-ext/blueprint-ext-1.5.xsd
         ">
+
+    <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+
+    <cm:property-placeholder persistent-id="org.opennms.core.rest">
+        <cm:default-properties>
+            <cm:property name="http.realm" value="karaf"/>
+            <cm:property name="keycloak.use-static-pubkey" value="false"/>
+            <cm:property name="keycloak.static-pubkey-path" value="etc/keycloak-pubkey.pem"/>
+            <cm:property name="keycloak.realm" value="opennms"/>
+            <cm:property name="keycloak.admin-realm" value="master"/>
+            <cm:property name="keycloak.base-url" value="$[env:KEYCLOAK_BASE_URL]"/>
+
+            <cm:property name="keycloak.admin-username" value="$[env:KEYCLOAK_ADMIN_USERNAME]" />
+            <cm:property name="keycloak.admin-password" value="$[env:KEYCLOAK_ADMIN_PASSWORD]" />
+        </cm:default-properties>
+    </cm:property-placeholder>
 
     <!--                                      -->
     <!-- COMMON WHITE-BOARD SETUP FOR OPENNMS -->
     <!--                                      -->
+    <!--<bean id="userPropertiesRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.UserPropertiesRoleAssignmentProvider" init-method="init" />-->
 
-    <!-- JAAS Authentication -->
-    <bean id="jaasAuthenticationFeature" class="org.apache.cxf.interceptor.security.JAASAuthenticationFeature" scope="singleton">
-        <property name="contextName" value="karaf" /> <!-- karaf later  _customize for opennms -->
-        <property name="reportFault" value="true" />
+    <bean id="keycloakAdminClient" class="org.opennms.keycloak.admin.client.impl.KeycloakAdminClientImpl" init-method="init">
+        <property name="baseUrl" value="${keycloak.base-url}" />
+    </bean>
+    <bean id="keycloakRoleAssignmentProvider" class="org.opennms.rest.jaxrs.jwt.impl.KeycloakRoleAssignmentProvider" init-method="init">
+        <property name="keycloakAdminClient" ref="keycloakAdminClient" />
+        <property name="keycloakRealm" value="${keycloak.realm}" />
+        <property name="keycloakAdminRealm" value="${keycloak.admin-realm}" />
+        <property name="keycloakAdminUsername" value="${keycloak.admin-username}" />
+        <property name="keycloakAdminPassword" value="${keycloak.admin-password}" />
     </bean>
 
-    <service ref="jaasAuthenticationFeature" interface="org.apache.cxf.feature.Feature">
+    <bean id="keycloakJaxrsFeature" class="org.opennms.rest.jaxrs.jwt.KeycloakJaxrsFeature" init-method="init">
+        <property name="keycloakServerUrl" value="${keycloak.base-url}"/>
+        <property name="keycloakRealm" value="${keycloak.realm}"/>
+        <property name="roleAssignmentProvider" ref="keycloakRoleAssignmentProvider"/>
+
+        <property name="tokenSignatureUseStaticKey" value="${keycloak.use-static-pubkey}"/>
+        <property name="tokenSignaturePublicKeyPath" value="${keycloak.static-pubkey-path}"/>
+    </bean>
+
+    <service ref="keycloakJaxrsFeature" interface="javax.ws.rs.container.ContainerRequestFilter">
         <service-properties>
-            <entry key="cxf.extension" value="true"/>
+            <entry key="osgi.jaxrs.extension" value="true"/>
         </service-properties>
     </service>
 
 
     <!-- @RolesAllowed Support -->
     <bean id="rolesAllowedDynamicFeature" class="org.opennms.rest.jaxrs.RolesAllowedDynamicFeature" />
-    
+
     <service ref="rolesAllowedDynamicFeature" interface="javax.ws.rs.container.DynamicFeature">
         <service-properties>
             <entry key="osgi.jaxrs.extension" value="true"/>
@@ -60,4 +93,13 @@
         <property name="info" ref="openApiInfo"/>
     </bean>
     <service ref="openApi" auto-export="all-classes"/>
+
+    <!-- Dummy "marker" service that can be used to ensure this bundle is functional before dependent bundles    -->
+    <!--  activate.  This is important to avoid REST endpoints being accessible without the security wired here. -->
+    <bean id="coreRestReadyMarkerService" class="org.opennms.impl.ReadyMarkerServiceImpl"/>
+    <service interface="org.opennms.ReadyMarkerService" ref="coreRestReadyMarkerService">
+        <service-properties>
+            <entry key="name" value="coreRestReadyMarkerService"/>
+        </service-properties>
+    </service>
 </blueprint>

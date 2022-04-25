@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.JoinType;
@@ -171,6 +172,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
     @GET
     @Path("list")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML})
+    @RolesAllowed({ "admin" })
     @ApiResponse(
             description = "Retrieve the list of alarms"
     )
@@ -201,6 +203,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
     @PUT
     @Path("{id}/memo")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @RolesAllowed({ "admin" })
     @ApiResponse(
             description = "Update the memo for an Alarm"
     )
@@ -222,6 +225,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
     @PUT
     @Path("{id}/journal")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @RolesAllowed({ "admin" })
     @ApiResponse(
             description = "Update the journal for an Alarm"
     )
@@ -238,6 +242,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     @DELETE
     @Path("{id}/memo")
+    @RolesAllowed({ "admin" })
     @ApiResponse(
             description = "Remove the memo for an Alarm"
     )

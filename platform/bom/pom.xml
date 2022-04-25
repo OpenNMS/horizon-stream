@@ -27,6 +27,16 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.swrve</groupId>
                 <artifactId>rate-limited-logger</artifactId>
                 <version>${rate.limitted.logger.version}</version>
@@ -182,6 +192,11 @@
                 <version>${cxf.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.karaf.jaas</groupId>
                 <artifactId>org.apache.karaf.jaas.modules</artifactId>
                 <version>${karaf.version}</version>
@@ -248,6 +263,27 @@
                 <groupId>org.drools</groupId>
                 <artifactId>drools-compiler</artifactId>
                 <version>${drools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-core</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-servlet-filter-adapter</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-jaxrs-oauth-client</artifactId>
+                <version>${keycloak.version}</version>
+            </dependency>
+            <!-- JBOSS Logging required by Keycloak model objects -->
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>${jboss-logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.kie</groupId>
@@ -429,9 +465,15 @@
                 <artifactId>rest-assured</artifactId>
                 <version>${rest-assured.version}</version>
             </dependency>
+            <!-- TODO: use slf4j18-impl -->
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j18-impl</artifactId>
                 <version>${log4j2.version}</version>
             </dependency>
             <dependency>

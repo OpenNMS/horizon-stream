@@ -79,7 +79,9 @@
 
     <cm:property-placeholder id="alarmdListenerProperties" persistent-id="org.opennms.horizon.alarmd.camel" update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="useKafka" value="true"/>
+            <cm:property name="useSeda" value="true"/>
+
+            <cm:property name="useKafka" value="false"/>
             <cm:property name="kafkaBrokers" value="$[env:KAFKA_BROKER_HOST]:$[env:KAFKA_BROKER_PORT]"/>
             <cm:property name="kafkaTopic" value="events"/>
 
@@ -106,15 +108,24 @@
     <camelContext autoStartup="true" id="alarmCamelContext" xmlns="http://camel.apache.org/schema/blueprint" allowUseOriginalMessage="false">
         <propertyPlaceholder id="properties" location="blueprint:alarmdListenerProperties" />
 
+        <!-- TODO: queue size -->
+        <route id="receiveEventSeda" autoStartup="{{useSeda}}">
+            <from uri="vm:events"/>
+            <to uri="direct:receiveEventCommon"/>
+        </route>
+
         <route id="receiveEventKafka" autoStartup="{{useKafka}}">
             <from uri="kafka:{{kafkaTopic}}?brokers={{kafkaBrokers}}&amp;offsetRepository=#offsetRepo&amp;autoOffsetReset=earliest"/>
-            <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
-            <log message="Received Event: ${body}"/>
-            <to uri="bean:daemon?method=onEvent"/>
+            <to uri="direct:receiveEventCommon"/>
         </route>
 
         <route id="receiveEventActiveMq" autoStartup="{{useActiveMq}}">
             <from uri="customamq:{{activeMqQueueName}}"/>
+            <to uri="direct:receiveEventCommon"/>
+        </route>
+
+        <route id="receiveEventCommon">
+            <from uri="direct:receiveEventCommon"/>
             <unmarshal><jaxb contextPath="org.opennms.horizon.events.xml"/></unmarshal>
             <log message="Received Event: ${body}"/>
             <to uri="bean:daemon?method=onEvent"/>

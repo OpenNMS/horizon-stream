@@ -72,3 +72,106 @@ config:update
     # Full build, the old way
     $ mvn -DskipITs=false clean install docker:build
 
+
+## Keycloak
+
+Covered below:
+* Configuration
+* Server Quick Start
+
+### Configuration
+
+**File `etc/keycloak-direct-access.json`**
+
+```
+{
+  "auth-server-url":"http://localhost:9000",
+  "credentials": {
+    "secret":"passw0rd"
+  },
+  "realm":"opennms",
+  "resource":"ssh-jmx-admin-client",
+  "ssl-required":"none"
+}
+```
+
+**File `etc/org.opennms.core.rest`**
+
+```
+http.realm=keycloak
+```
+
+
+### Server Quick Start Guide
+
+* Download keycloak from https://github.com/keycloak/keycloak/releases/download/17.0.0/keycloak-17.0.0.zip
+
+      $ curl -L -O https://github.com/keycloak/keycloak/releases/download/17.0.0/keycloak-17.0.0.zip
+
+* Install
+
+      $ unzip keycloak-17.0.0.zip
+
+* Configure
+
+**File `conf/keycloak.conf`**
+
+      http-port=9000
+      https-port=9443
+
+* Start the server
+
+      $ cd keycloak-17.0.0
+      $ bin/kc.sh start-dev
+
+* Open the Keycloak console
+
+      $ open http://localhost:9000
+
+* Follow the on-screen instructions to configure the admin password and open the Admin Console
+
+* Add a Realm (Hover over the "Master" realm name in the top-left and click "Add Realm")
+
+  * Name the realm `opennms`
+
+* Add a Client
+
+  * Click "Clients" on the left-hand navigation panel
+  * Click the "Create" button on the top right-hand side of the "Clients" panel
+  * Use client ID `ssh-jmx-admin-client`
+  * On the "ssh-jmx-admin-client" page, click the "Keys" tab
+  * Add a key
+    * Click "Generate new keys and certificate"
+    * Enter key and store passwords (recommend `passw0rd` for dev)
+    * Click "Generate and Download"
+    * Note this will download a `keystore.jks` file. Save this file for possible later use.
+  * Add the `ssh` role
+    * Click "Roles" on the left-hand Navigation panel
+    * Click "Add Role" button in the top right-hand side of the "Roles" panel.
+    * Enter `ssh` for the "Role Name"
+    * Enter a description, such as `User can access the SSH server`
+  * Add the user `admin`
+    * NOTE: this user is separate from the Administrator account, also named `admin`, used to login to keycloak
+    * Click "Users" on the left-hand Navigation panel
+    * Click "Add User" on the top right-hand side of the "Users" panel
+    * Enter `admin` for the Username
+    * Click the "Save" button
+    * Set the password
+      * On the "Users > admin" panel which opens, click the "Credentials" tab
+      * Enter a password (recommend `admin`)
+      * Uncheck the Temporary setting
+      * Click "Set Password"
+    * Add role mappings
+      * Click the "Role Mappings" tab
+      * Click `ssh` under "Available Roles"
+      * Click the "Add Selected >" button
+  * Add the user `user001`
+    * Click "Users" on the left-hand Navigation panel
+    * Click "Add User" on the top right-hand side of the "Users" panel
+    * Enter `user001` for the Username
+    * Click the "Save" button
+    * Set the password
+      * On the "Users > admin" panel which opens, click the "Credentials" tab
+      * Enter a password (recommend `passw0rd`)
+      * Uncheck the Temporary setting
+      * Click "Set Password"
