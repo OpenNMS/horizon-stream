@@ -18,6 +18,7 @@
     <modules>
         <module>grpc</module>
         <module>jaeger</module>
+        <module>keycloak-admin-client</module>
     </modules>
 
 </project>

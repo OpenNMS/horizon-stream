@@ -1,9 +1,10 @@
 This dir is for building local dev envs.
 
-Requirements:
+Pre-requisites:
 * Install Kind. Mac, there is brew install. 
 * ```$ run.sh``` - Builds some components in dir.
 * Make sure Docker is running. 
+* Install Skaffold: https://skaffold.dev/docs/install/
 
 Process:
 1. ``` kind create cluster``` 

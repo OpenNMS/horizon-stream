@@ -21,6 +21,10 @@
     <reference id="sessionUtils" interface="org.opennms.horizon.db.dao.api.SessionUtils" />
     <reference id="eventConfDao" interface="org.opennms.horizon.events.api.EventConfDao" />
 
+    <!-- Make sure that the Core Rest bundle is functional.  Otherwise, the endpoints end up completely open with -->
+    <!--  no security.  Note the dummy "marker" service to enforce the runtime dependency.                        -->
+    <reference id="coreRestReadyMarkerService" interface="org.opennms.ReadyMarkerService" filter="(name=coreRestReadyMarkerService)" />
+
     <!-- TODO: provide a service via the Rest Mapper module? -->
     <bean id="eventMapper" class="org.opennms.horizon.db.model.mapper.EventMapperImpl">
         <property name="eventConfDao" ref="eventConfDao" />

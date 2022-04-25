@@ -1,0 +1,60 @@
+#!/bin/bash
+
+REALM="opennms"
+CLIENT_ID=admin-cli
+TOKEN=""
+
+usage()
+{
+	echo "Usage: $0 [-hv] [-c <client-id>] [-R <realm>] [-t <refresh-token>]"
+	echo
+	echo "  -h  Display this help"
+	echo "  -v  Verbose curl output"
+}
+
+while getopts "c:hR:t:v" arg
+do
+	case "$arg" in
+		c)
+			CLIENT_ID="${OPTARG}"
+			;;
+
+		h)
+			usage
+			exit 0
+			;;
+
+		R)
+			REALM="${OPTARG}"
+			;;
+
+		t)
+			TOKEN="${OPTARG}"
+			;;
+
+		v)
+			CURL_OPTS=("${CURL_OPTS[@]}" -v)
+			;;
+
+		*)
+			usage >&2
+			exit 1
+			;;
+	esac
+done
+
+URL="http://localhost:9000/realms/${REALM}/protocol/openid-connect/token"
+
+{
+	curl "${CURL_OPTS[@]}" -X POST \
+		-H 'Content-Type: application/x-www-form-urlencoded' \
+		-d "refresh_token=${TOKEN}" \
+		-d 'grant_type=refresh_token' \
+		-d "client_id=${CLIENT_ID}" \
+		-d 'scope=openid' \
+		"${URL}"
+} | \
+	tee data/TOKEN.txt
+
+jq -r .access_token data/TOKEN.txt | tee data/ACCESS_TOKEN.txt
+jq -r .refresh_token data/TOKEN.txt | tee data/REFRESH_TOKEN.txt

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+REALM="opennms"
+TOKEN=""
+
+usage()
+{
+	echo "Usage: $0 [-hv] [-R <realm>] [-t <access-token>]"
+	echo
+	echo "  -h  Display this help"
+	echo "  -v  Verbose curl output"
+}
+
+while getopts "hR:t:v" arg
+do
+	case "$arg" in
+		h)
+			usage
+			exit 0
+			;;
+
+		R)
+			REALM="${OPTARG}"
+			;;
+
+		t)
+			TOKEN="${OPTARG}"
+			;;
+
+		v)
+			CURL_OPTS=("${CURL_OPTS[@]}" -v)
+			;;
+
+		*)
+			usage >&2
+			exit 1
+			;;
+	esac
+done
+
+URL="http://localhost:9000/admin/realms/${REALM}/roles"
+
+{
+	curl "${CURL_OPTS[@]}" -X GET \
+		-H "Authorization: Bearer ${TOKEN}" \
+		-H 'Content-Type: application/json' \
+		"${URL}"
+}

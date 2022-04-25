@@ -1,0 +1,14 @@
+#!/bin/bash
+##
+## PURPOSE: Simplified curl request to login to Keycloak.  All values are hard-coded.
+##
+
+curl -X POST \
+	-H 'Content-Type: application/x-www-form-urlencoded' \
+	-d 'username=admin' \
+	-d 'password=admin' \
+	-d 'grant_type=password' \
+	-d 'scope=openid' \
+	-d 'client_id=admin-cli' \
+	http://localhost:9000/realms/master/protocol/openid-connect/token
+
