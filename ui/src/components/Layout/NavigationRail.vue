@@ -1,7 +1,7 @@
 <template>
   <FeatherNavigationRail>
     <template v-slot:main>
-      <FeatherRailItem :class="{ selected: isSelected('/') }" href="#/" :icon="Home" title="Home" />
+      <FeatherRailItem :class="{ selected: isSelected('/') }" href="#/" :icon="Home" title="Dashboard" />
     </template>
   </FeatherNavigationRail>
 </template>

@@ -5,12 +5,15 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AlarmsTable: typeof import('./src/components/Alarms/AlarmsTable.vue')['default']
     FeatherAppBar: typeof import('@featherds/app-bar')['FeatherAppBar']
     FeatherAppBarLink: typeof import('@featherds/app-bar')['FeatherAppBarLink']
     FeatherAppLayout: typeof import('@featherds/app-layout')['FeatherAppLayout']
     FeatherButton: typeof import('@featherds/button')['FeatherButton']
     FeatherIcon: typeof import('@featherds/icon')['FeatherIcon']
+    FeatherInput: typeof import('@featherds/input')['FeatherInput']
     FeatherNavigationRail: typeof import('@featherds/navigation-rail')['FeatherNavigationRail']
+    FeatherProtectedInput: typeof import('@featherds/protected-input')['FeatherProtectedInput']
     FeatherRailItem: typeof import('@featherds/navigation-rail')['FeatherRailItem']
     FeatherSnackbar: typeof import('@featherds/snackbar')['FeatherSnackbar']
     FeatherSpinner: typeof import('@featherds/progress')['FeatherSpinner']
