@@ -1,7 +1,13 @@
 <template>
   <FeatherAppBar :labels="{ skip: 'main' }" content="app">
     <template v-slot:left>
-      <FeatherAppBarLink :icon="Logo" title="Home" type="home" url="/" />
+      <FeatherAppBarLink 
+        class="app-bar" 
+        :icon="Logo" 
+        title="Home" 
+        type="home" 
+        url="/" 
+      />
     </template>
 
     <template v-slot:right>
@@ -16,7 +22,7 @@
     
 <script setup lang="ts">
 import LightDarkMode from '@featherds/icon/action/LightDarkMode'
-import Logo from '@/assets/TheLogo.vue'
+import Logo from '@/assets/Logo.vue'
 
 const isDark = useDark({
   selector: 'body',
@@ -36,6 +42,12 @@ const toggleDark = useToggle(isDark)
 @import "@featherds/styles/themes/open-mixins";
 body {
   background: var($background);
+
+  .app-bar {
+    .logo {
+      width: 8em !important;
+    }
+  }
 }
 .open-light {
   @include open-light;

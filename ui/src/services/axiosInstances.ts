@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/url',
+  baseURL: import.meta.env.VITE_BASE_URL?.toString() || '/opennms/api',
   withCredentials: true
 })
 

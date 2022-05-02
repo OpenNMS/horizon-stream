@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import Login from '@/containers/Login.vue'
 import Dashboard from '@/containers/Dashboard.vue'
 
 const router = createRouter({
@@ -12,7 +13,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'Login',
-      component: () => import('@/containers/Login.vue')
+      component: Login
     },
     {
       path: '/:pathMatch(.*)*', // catch other paths and redirect

@@ -11,7 +11,6 @@ import Logo from './OpenNMS_Horizontal-Logo_Light-BG.svg'
 <style scoped lang="scss">
 @import "@featherds/styles/themes/variables";
 .logo {
-  width: 8em !important;
   color: var($primary-text-on-color) !important;
 }
 </style>
