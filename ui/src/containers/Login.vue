@@ -7,16 +7,18 @@
           <form autocomplete="off">
             <!-- Username -->
             <FeatherInput 
+              autocomplete="new-username"
               label="Username" 
               v-model="username"  
-              autocomplete="new-username"
+              :error="usernameError"
             />
 
             <!-- Password -->
             <FeatherProtectedInput
-              label="Password" 
-              v-model="password" 
               autocomplete="new-password"
+              label="Password" 
+              v-model="password"
+              :error="passwordError"
             />
           </form>
 
@@ -37,9 +39,28 @@ const loginStore = useLoginStore()
 
 const username = ref('')
 const password = ref('')
+const usernameError = ref()
+const passwordError = ref()
 
 const onLoginBtnClick = () => {
-  loginStore.login(username.value, password.value)
+  // check for valid username
+  if (!username.value) {
+    usernameError.value = 'Username is required.'
+  } else {
+    usernameError.value = undefined
+  }
+
+  // check for valid password
+  if (!password.value) {
+    passwordError.value = 'Password is required.'
+  } else {
+    passwordError.value = undefined
+  }
+
+  // submit if form is valid
+  if (!usernameError.value && !passwordError.value) {
+    loginStore.login(username.value, password.value)
+  }
 }
 </script>
 
@@ -56,9 +77,9 @@ const onLoginBtnClick = () => {
     display: flex;
     flex-direction: column;
     margin: auto;
-    width: 350px;
+    width: 400px;
     position: absolute;
-    top: 25%;
+    top: 150px;
     left: 50%;
     transform: translateX(-50%);
     background: var($surface);

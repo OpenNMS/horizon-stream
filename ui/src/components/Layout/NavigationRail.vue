@@ -1,5 +1,5 @@
 <template>
-  <FeatherNavigationRail>
+  <FeatherNavigationRail v-if="false">
     <template v-slot:main>
       <FeatherRailItem :class="{ selected: isSelected('/') }" href="#/" :icon="Home" title="Dashboard" />
     </template>

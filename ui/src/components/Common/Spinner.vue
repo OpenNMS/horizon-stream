@@ -15,12 +15,11 @@ const { isActive } = useSpinner()
 .spinner {
   z-index: 2;
   position: absolute;
-  width: 95%;
-  height: 90%;
+  width: 100%;
   background: transparent;
 }
 .spinner-container {
-  height: 75%;
+  height: 78vh;
 }
 .fade-enter-active,
 .fade-leave-active {

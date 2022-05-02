@@ -1,9 +1,10 @@
 <template>
-  <div class="card">
+  <div class="container">
+    <p>Alarms</p>
     <div class="feather-row">
       <div class="feather-col-12">
-        <FeatherButton class="send-btn" @click="onSend({})">Send Trigger</FeatherButton>
-        <FeatherButton class="clear-btn" @click="onClear({})">Send Clear</FeatherButton>
+        <FeatherButton primary @click="onSend({})">Send Alarm</FeatherButton>
+        <FeatherButton secondary @click="onClear({})">Clear Alarms</FeatherButton>
       </div>
     </div>
     <div class="feather-row">
@@ -43,25 +44,22 @@ const onClear = (alarm: any) => alarmStore.clearAlarm(alarm)
 <style lang="scss" scoped>
 @import "@featherds/table/scss/table";
 @import "@featherds/styles/mixins/typography";
-
-.send-btn {
-  background: var($error);
-  color: var($primary-text-on-color);
-}
-
-.clear-btn {
-  background: var($success);
-  color: var($primary-text-on-color);
-
-}
-
-.card {
+@import "@featherds/styles/mixins/elevation";
+.container {
+  @include elevation(1);
   background: var($surface);
-  padding: 15px;
-}
+  padding: 10px 30px 30px 30px;
+  width: 700px;
+  margin: auto;
+  margin-top: 150px;
 
-table {
-  width: 100%;
-  @include table;
+  p {
+    @include headline1;
+    margin-bottom: 24px;
+  }
+
+  table {
+    @include table;
+  }
 }
 </style>
