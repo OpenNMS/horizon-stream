@@ -7,13 +7,19 @@ import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.HttpHeaders;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.keycloak.OAuth2Constants.PASSWORD;
 
 public class HorizonStreamTestSteps {
 
@@ -22,7 +28,14 @@ public class HorizonStreamTestSteps {
     private static final Logger log = LoggerFactory.getLogger(HorizonStreamTestSteps.class);
 
     private String horizonStreamBaseUrl;
+    private String keycloakBaseUrl;
+    private String keycloakRealm;
+    private String keycloakUsername;
+    private String keycloakPassword;
+
+    private Keycloak keycloakClient;
     private Response restResponse;
+    private String keycloakToken;
 
 //========================================
 // Test Step Definitions
@@ -30,11 +43,54 @@ public class HorizonStreamTestSteps {
 
     @Given("horizon stream server base url in environment variable {string}")
     public void horizonStreamServerBaseUrlInEnvironmentVariable(String variableName) {
-        String value = System.getenv(variableName);
-
-        horizonStreamBaseUrl = value;
+        horizonStreamBaseUrl = System.getenv(variableName);
 
         log.info("HORIZON STREAM BASE URL: {}", horizonStreamBaseUrl);
+    }
+
+    @Given("Keycloak server base url in environment variable {string}")
+    public void keycloakServerBaseUrlInEnvironmentVariable(String variableName) {
+        keycloakBaseUrl = System.getenv(variableName);
+
+        log.info("KEYCLOAK BASE URL: {}", keycloakBaseUrl);
+    }
+
+    @Given("Keycloak realm in environment variable {string}")
+    public void keycloakRealmInEnvironmentVariable(String variableName) {
+        keycloakRealm = System.getenv(variableName);
+
+        log.info("KEYCLOAK REALM: {}", keycloakRealm);
+    }
+
+    @Given("Keycloak username in environment variable {string}")
+    public void keycloakUsernameInEnvironmentVariable(String variableName) {
+        keycloakUsername = System.getenv(variableName);
+
+        log.info("KEYCLOAK USERNAME: {}", keycloakUsername);
+    }
+
+    @Given("Keycloak password in environment variable {string}")
+    public void keycloakPasswordInEnvironmentVariable(String variableName) {
+        keycloakPassword = System.getenv(variableName);
+    }
+
+    @Then("login to Keycloak")
+    public void loginToKeycloak() {
+        keycloakClient =
+                KeycloakBuilder.builder()
+                    .serverUrl(keycloakBaseUrl)
+                    .grantType(PASSWORD)
+                    .realm(keycloakRealm)
+                    .username(keycloakUsername)
+                    .password(keycloakPassword)
+                    .clientId("admin-cli") // TBD
+                    .build()
+        ;
+
+        AccessTokenResponse accessTokenResponse = keycloakClient.tokenManager().getAccessToken();
+        keycloakToken = accessTokenResponse.getToken();
+
+        assertNotNull(keycloakToken);
     }
 
     @Then("send GET request to horizon-stream at path {string}")
@@ -48,6 +104,10 @@ public class HorizonStreamTestSteps {
                     .given()
                     .config(restAssuredConfig)
                     ;
+
+        if (keycloakToken != null) {
+            requestSpecification.header(HttpHeaders.AUTHORIZATION, "Bearer " + keycloakToken);
+        }
 
         restResponse =
                 requestSpecification

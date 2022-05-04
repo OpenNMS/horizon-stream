@@ -74,6 +74,12 @@
             <artifactId>cucumber-picocontainer</artifactId>
         </dependency>
 
+        <!-- KEYCLOAK -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+        </dependency>
+
         <!-- REST ASSURED -->
         <dependency>
             <groupId>io.rest-assured</groupId>
