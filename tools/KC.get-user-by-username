@@ -4,6 +4,7 @@ REALM="opennms"
 HOST_PORT=localhost:9000
 USERNAME=""
 TOKEN=""
+CONTEXT=""
 
 usage()
 {
@@ -13,9 +14,13 @@ usage()
 	echo "  -v  Verbose curl output"
 }
 
-while getopts "hH:R:t:u:v" arg
+while getopts "C:hH:R:t:u:v" arg
 do
 	case "$arg" in
+		C)
+			CONTEXT="${OPTARG}"
+			;;
+
 		h)
 			usage
 			exit 0
@@ -48,7 +53,7 @@ do
 	esac
 done
 
-URL="http://${HOST_PORT}/admin/realms/${REALM}/users?username=${USERNAME}"
+URL="http://${HOST_PORT}/${CONTEXT}admin/realms/${REALM}/users?username=${USERNAME}"
 
 {
 	curl "${CURL_OPTS[@]}" -X GET \

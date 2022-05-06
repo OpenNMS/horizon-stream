@@ -3,6 +3,7 @@
 HOST_PORT=localhost:9000
 REALM="opennms"
 TOKEN=""
+CONTEXT=""
 
 usage()
 {
@@ -12,9 +13,13 @@ usage()
 	echo "  -v  Verbose curl output"
 }
 
-while getopts "hH:R:t:v" arg
+while getopts "C:hH:R:t:v" arg
 do
 	case "$arg" in
+		C)
+			CONTEXT="${OPTARG}"
+			;;
+
 		h)
 			usage
 			exit 0
@@ -45,7 +50,7 @@ done
 
 REQUEST="$(printf '{"realm":"%s","enabled":true}' "${REALM}")"
 
-URL="http://${HOST_PORT}/admin/realms"
+URL="http://${HOST_PORT}/${CONTEXT}admin/realms"
 
 
 {
