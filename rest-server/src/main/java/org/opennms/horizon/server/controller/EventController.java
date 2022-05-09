@@ -46,9 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/events")
 public class EventController {
-    private PlatformGateway gateway;
+    private final PlatformGateway gateway;
 
-    @Autowired
     public EventController(PlatformGateway gateway) {
         this.gateway = gateway;
     }
