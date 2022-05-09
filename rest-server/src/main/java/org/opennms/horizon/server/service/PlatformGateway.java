@@ -39,8 +39,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class PlatformGateway {
     public static final String URL_PATH_EVENTS = "/events";
@@ -59,6 +60,7 @@ public class PlatformGateway {
                 return response.getStatusLine().getStatusCode() == HttpStatus.SC_ACCEPTED;
             }
         }catch (Exception e) {
+            log.error("Error happened when posting {} at {} on platform", data, path, e);
             return false;
         }
     }

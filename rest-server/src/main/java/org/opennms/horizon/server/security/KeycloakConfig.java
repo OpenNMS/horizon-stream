@@ -43,7 +43,7 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 
 @Configuration
-public class keycloakConfig {
+public class KeycloakConfig {
     private final String masterRealm = "master";
     @Value("${keycloak.auth-server-url}")
     private String serverURl;
@@ -51,15 +51,15 @@ public class keycloakConfig {
     private String appRealm;
 
     //keycloak admin clients properties for role provider
-    @Value("${horizon-stream.keycloak.admin.client-id}")
+    @Value("${horizon_stream.keycloak.admin.client-id}")
     private String adminClientId;
-    @Value("${horizon-stream.keycloak.admin.username}")
+    @Value("${horizon_stream.keycloak.admin.username}")
     private String adminUsername;
-    @Value("${horizon-stream.keycloak.admin.password}")
+    @Value("${horizon_stream.keycloak.admin.password}")
     private String adminPassword;
-    @Value("${horizon-stream.keycloak.admin.client-pool-size}")
+    @Value("${horizon_stream.keycloak.admin.client-pool-size}")
     private int adminClientPoolSize;
-    @Value("${horizon-stream.keycloak.admin.client-pool-timeout}")
+    @Value("${horizon_stream.keycloak.admin.client-pool-timeout}")
     private int adminClientPoolTimeOut;
 
     @Bean

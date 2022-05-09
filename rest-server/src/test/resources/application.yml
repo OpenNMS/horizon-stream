@@ -25,13 +25,16 @@ keycloak:
   use-resource-role-mappings: true
 
 # keycloak admin client properties
-horizon-keycloak:
-  admin:
-    client-id: admin-cli
-    username: admin
-    password: admin
-    client-pool-size: 3
-    client-pool-timeout: 5
+horizon_stream:
+  keycloak:
+    admin:
+      client-id: admin-cli
+      username: keycloak-admin
+      password: admin
+      client-pool-size: 3
+      client-pool-timeout: 5
+  core:
+    url: http://localhost:8181
 
 logging:
   level:
