@@ -268,7 +268,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: quay.io/keycloak/keycloak:17.0.0
+          image: quay.io/keycloak/keycloak:18.0.0 #version 18 and 17.0.1 works on M1 MacBook
           args: [ "start-dev" ]
           env:
             - name: KEYCLOAK_CREATE_ADMIN_USER
@@ -370,10 +370,12 @@ spec:
               value: "http://keycloak:8080"
             - name: KEYCLOAK_REALM
               value: "opennms"
-            - name: KEYCLOAK_ADMIN_USERNAME
+            - name: HORIZON-STREAM_KEYCLOAK_ADMIN_USERNAME
               value: "keycloak-admin"
-            - name: KEYCLOAK_ADMIN_PASSWORD
+            - name: HORIZON-STREAM_KEYCLOAK_ADMIN_USERNAME
               value: "admin"
+            - name: HORIZON-STREAM_CORE_URL
+              value: "http://horizon-stream-core:8181"
           ports:
             - containerPort: 9090
 ---
