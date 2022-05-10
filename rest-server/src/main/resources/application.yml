@@ -36,7 +36,7 @@ keycloak:
   use-resource-role-mappings: true
 
 # keycloak admin client properties
-horizon_stream:
+horizon-stream:
   keycloak:
     admin:
       client-id: admin-cli

@@ -51,15 +51,15 @@ public class KeycloakConfig {
     private String appRealm;
 
     //keycloak admin clients properties for role provider
-    @Value("${horizon_stream.keycloak.admin.client-id}")
+    @Value("${horizon-stream.keycloak.admin.client-id}")
     private String adminClientId;
-    @Value("${horizon_stream.keycloak.admin.username}")
+    @Value("${horizon-stream.keycloak.admin.username}")
     private String adminUsername;
-    @Value("${horizon_stream.keycloak.admin.password}")
+    @Value("${horizon-stream.keycloak.admin.password}")
     private String adminPassword;
-    @Value("${horizon_stream.keycloak.admin.client-pool-size}")
+    @Value("${horizon-stream.keycloak.admin.client-pool-size}")
     private int adminClientPoolSize;
-    @Value("${horizon_stream.keycloak.admin.client-pool-timeout}")
+    @Value("${horizon-stream.keycloak.admin.client-pool-timeout}")
     private int adminClientPoolTimeOut;
 
     @Bean
