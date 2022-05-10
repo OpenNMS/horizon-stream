@@ -268,7 +268,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: quay.io/keycloak/keycloak:18.0.0 #After testing, version 18 and 17.0.1 works on M1 MacBook, for more information https://github.com/keycloak/keycloak/issues/8825
+          image: quay.io/keycloak/keycloak:17.0.1 #After testing, version 18 and 17.0.1 works on M1 MacBook, for more information https://github.com/keycloak/keycloak/issues/8825
           args: [ "start-dev" ]
           env:
             - name: KEYCLOAK_CREATE_ADMIN_USER

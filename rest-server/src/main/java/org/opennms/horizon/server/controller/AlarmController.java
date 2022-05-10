@@ -29,6 +29,7 @@
 package org.opennms.horizon.server.controller;
 
 import org.opennms.horizon.server.service.PlatformGateway;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,8 +47,13 @@ public class AlarmController {
     }
 
     @GetMapping
-    public JsonNode listAlarms(@RequestHeader("Authorization") String authToken) {
-        return gateway.get(PlatformGateway.URL_PATH_ALARMS, authToken);
+    public ResponseEntity<String> listAlarms(@RequestHeader("Authorization") String authToken) {
+        String result = gateway.get(PlatformGateway.URL_PATH_ALARMS, authToken);
+        if(result != null) {
+            return ResponseEntity.ok(result);
+        } else {
+           return ResponseEntity.badRequest().build();
+        }
     }
 
     //TODO clear alarms

@@ -74,18 +74,22 @@ public class PlatformGateway {
         }
     }
 
-    public JsonNode get(String path, String authToken) {
+    public String get(String path, String authToken) {
         try {
             HttpGet getRequest = new HttpGet(platformUrl + path);
             getRequest.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
             getRequest.setHeader(HttpHeaders.AUTHORIZATION, authToken);
             try (CloseableHttpClient client = HttpClients.createDefault();
                  CloseableHttpResponse response = client.execute(getRequest)) {
-                 return strToJsonNode(response.getEntity().toString());
+                if(response.getStatusLine().getStatusCode()!=200) {
+                    log.info("Response from platform with status {} and content {}", response.getStatusLine().getStatusCode(), response);
+                    return "{}";
+                }
+                return response.getEntity().toString();
             }
         } catch (IOException e) {
             log.error("Error happened when execute get request at {} on platform", path, e);
-            return jsonMapper.createObjectNode();
+            return null;
         }
     }
 
