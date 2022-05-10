@@ -30,29 +30,31 @@ Types of development & testing:
 1. Start from the project's root directory.
 2. ``` kind create cluster```
    * There are options to create multiple clusters with different names and switch between them. 
-3. Confirm connection to cluster:
+1. Confirm connection to cluster:
    * ``` kubectl config get-contexts```
    * ``` kubectl get all```
-4. Deploy the project into the cluster.
+
+   **NOTE**: if you get the error `The connection to the server localhost:8080 was refused - did you specify the right host or port?`, run the following:
+   * `kubectl config use-context kind-kind`
+1. Install the Keycloak Operator
+    ```shell
+    $ kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/18.0.0/kubernetes/keycloaks.k8s.keycloak.org-v1.yml
+    $ kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/18.0.0/kubernetes/keycloakrealmimports.k8s.keycloak.org-v1.yml
+    $ kubectl apply -f https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/18.0.0/kubernetes/kubernetes.yml
+    # Verify (should get keycloaks and keycloakrealmiiimports)
+    $ kubectl api-resources | grep keycloak
+    ```
+1. Deploy the project into the cluster.
    1. Dev mode with file watching and port forwarding: `skaffold dev`
    2. Build and deploy once without enabling the dev loop: `skaffold run`
       * Forward ports automatically: `skaffold run --port-forward`
    3. Debug mode with automatic debug ports into containers: `skaffold debug`
       * Most of the dev loop is disabled in debug mode to prevent interfering with debug sessions. Reenable these features with `skaffold debug --auto-build --auto-sync --auto-deploy`
-5. Wait for all services to come up.
-6. Visit the front end in a web browser: http://localhost:3000/
-7. Run the Keycloak scripts to test that the build was successful:
+1. Wait for all services to come up.
+1. Visit the front end in a web browser: http://localhost:3000/
+1. Run the Keycloak scripts to test that the build was successful:
    ```shell
    cd tools
-   ./KC.login -H localhost:28080 -u keycloak-admin -p admin -R master
-   ./KC.add-realm -H localhost:28080 -t "$(< data/ACCESS_TOKEN.txt)" -R opennms
-   ./KC.create-user -H localhost:28080 -t "$(< data/ACCESS_TOKEN.txt)" -u user001 -p passw0rd -R opennms
-   ./KC.get-user-by-username -H localhost:28080 -t "$(< data/ACCESS_TOKEN.txt)" -u user001 -R opennms | tee data/user.out
-   jq -r '.[] | .id' data/user.out  | tee data/user-id.txt
-   ./KC.create-role -H localhost:28080 -t "$(< data/ACCESS_TOKEN.txt)" -R opennms -r admin
-   ./KC.get-realm-roles -H localhost:28080 -t "$(< data/ACCESS_TOKEN.txt)" -R opennms | tee data/role.out
-   jq -r '.[] | select(.["name"] == "admin") | .id' data/role.out | tee data/role-id.txt
-   ./KC.assign-user-role -H localhost:28080 -r admin -i "$(< data/role-id.txt)" -t "$(< data/ACCESS_TOKEN.txt)" -U "$(< data/user-id.txt)" -R opennms
    ./KC.login -H localhost:28080 -u user001 -p passw0rd -R opennms
    ./events.list -H localhost:18181 -t "$(< data/ACCESS_TOKEN.txt)"
    ./events.publish -H localhost:18181 -t "$(< data/ACCESS_TOKEN.txt)"
