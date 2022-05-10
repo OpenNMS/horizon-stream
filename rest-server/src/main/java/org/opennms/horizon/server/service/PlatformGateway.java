@@ -39,6 +39,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PlatformGateway {
     public static final String URL_PATH_EVENTS = "/events";
-    public static final String URL_PATH_ALARMS = "/alarms";
+    public static final String URL_PATH_ALARMS = "/alarms/list";
     private ObjectMapper jsonMapper = new ObjectMapper();
     @Value("${horizon-stream.core.url}")
     private String platformUrl;
@@ -85,15 +86,11 @@ public class PlatformGateway {
                     log.info("Response from platform with status {} and content {}", response.getStatusLine().getStatusCode(), response);
                     return "{}";
                 }
-                return response.getEntity().toString();
+                return EntityUtils.toString(response.getEntity());
             }
         } catch (IOException e) {
             log.error("Error happened when execute get request at {} on platform", path, e);
             return null;
         }
-    }
-
-    private JsonNode strToJsonNode(String data) throws JsonProcessingException {
-        return jsonMapper.readTree(data);
     }
 }
