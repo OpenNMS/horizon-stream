@@ -488,6 +488,15 @@ spec:
     id: opennms
     realm: opennms
     enabled: true
+    clients:
+      - id: b67dfe9a-36c2-42bc-bd23-b380023d4238
+        clientId: horizon-stream
+        standardFlowEnabled: false
+        enabled: true
+        webOrigins:
+          - "*"
+        publicClient: true
+        directAccessGrantsEnabled: true
     roles:
       realm:
       - id: 50e6b594-e01b-426b-873d-873f632355b4
