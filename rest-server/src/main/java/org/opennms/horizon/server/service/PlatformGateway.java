@@ -28,9 +28,12 @@
 
 package org.opennms.horizon.server.service;
 
+import java.io.IOException;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -39,12 +42,18 @@ import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class PlatformGateway {
     public static final String URL_PATH_EVENTS = "/events";
+    public static final String URL_PATH_ALARMS = "/alarms";
+    private ObjectMapper jsonMapper = new ObjectMapper();
     @Value("${horizon-stream.core.url}")
     private String platformUrl;
 
@@ -63,5 +72,24 @@ public class PlatformGateway {
             log.error("Error happened when posting {} at {} on platform", data, path, e);
             return false;
         }
+    }
+
+    public JsonNode get(String path, String authToken) {
+        try {
+            HttpGet getRequest = new HttpGet(platformUrl + path);
+            getRequest.setHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+            getRequest.setHeader(HttpHeaders.AUTHORIZATION, authToken);
+            try (CloseableHttpClient client = HttpClients.createDefault();
+                 CloseableHttpResponse response = client.execute(getRequest)) {
+                 return strToJsonNode(response.getEntity().toString());
+            }
+        } catch (IOException e) {
+            log.error("Error happened when execute get request at {} on platform", path, e);
+            return jsonMapper.createObjectNode();
+        }
+    }
+
+    private JsonNode strToJsonNode(String data) throws JsonProcessingException {
+        return jsonMapper.readTree(data);
     }
 }
