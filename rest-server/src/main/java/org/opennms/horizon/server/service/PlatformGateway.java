@@ -82,10 +82,6 @@ public class PlatformGateway {
             getRequest.setHeader(HttpHeaders.AUTHORIZATION, authToken);
             try (CloseableHttpClient client = HttpClients.createDefault();
                  CloseableHttpResponse response = client.execute(getRequest)) {
-                if(response.getStatusLine().getStatusCode()!=200) {
-                    log.info("Response from platform with status {} and content {}", response.getStatusLine().getStatusCode(), response);
-                    return "{}";
-                }
                 return EntityUtils.toString(response.getEntity());
             }
         } catch (IOException e) {
