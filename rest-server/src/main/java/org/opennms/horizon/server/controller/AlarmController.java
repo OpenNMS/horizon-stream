@@ -28,6 +28,8 @@
 
 package org.opennms.horizon.server.controller;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.opennms.horizon.server.service.PlatformGateway;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,10 +53,9 @@ public class AlarmController extends AbstractPlatformController {
 
 
     @GetMapping
-    public ResponseEntity<String> listAlarms(@RequestHeader("Authorization") String authToken) {
-        ResponseEntity<String> response =  get(PlatformGateway.URL_PATH_ALARMS_LIST, authToken);
-        response.getHeaders().add(HttpHeaders.REFERRER_POLICY, "unsafe-url");
-        return response;
+    public ResponseEntity<String> listAlarms(HttpServletResponse response, @RequestHeader("Authorization") String authToken) {
+        response.setHeader(HttpHeaders.REFERRER_POLICY, "unsafe-url");
+        return get(PlatformGateway.URL_PATH_ALARMS_LIST, authToken);
     }
 
     //TODO need to test
