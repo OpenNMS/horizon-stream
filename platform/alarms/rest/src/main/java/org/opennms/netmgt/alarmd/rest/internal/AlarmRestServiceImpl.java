@@ -29,6 +29,7 @@
 package org.opennms.netmgt.alarmd.rest.internal;
 
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -42,6 +43,7 @@ import javax.persistence.criteria.Root;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -55,10 +57,18 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.opennms.horizon.alarms.api.AlarmAckDTO;
 import org.opennms.horizon.core.lib.SystemProperties;
+import org.opennms.horizon.db.dao.api.AcknowledgmentDao;
 import org.opennms.horizon.db.dao.api.AlarmDao;
 import org.opennms.horizon.db.dao.api.SessionUtils;
+import org.opennms.horizon.db.model.AckAction;
+import org.opennms.horizon.db.model.AckType;
+import org.opennms.horizon.db.model.OnmsAcknowledgment;
 import org.opennms.horizon.db.model.OnmsAlarm;
+import org.opennms.horizon.db.model.TroubleTicketState;
 import org.opennms.horizon.db.model.dto.AlarmCollectionDTO;
 import org.opennms.horizon.db.model.dto.AlarmDTO;
 import org.opennms.horizon.db.model.mapper.AlarmMapper;
@@ -84,6 +94,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     private AlarmMapper m_alarmMapper;
 
+    private AcknowledgmentDao acknowledgmentDao;
     //private AlarmRepository alarmRepository;
 
     //private TroubleTicketProxy troubleTicketProxy;
@@ -109,6 +120,10 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     public void setAlarmMapper(AlarmMapper m_alarmMapper) {
         this.m_alarmMapper = m_alarmMapper;
+    }
+
+    public void setAcknowledgmentDao(AcknowledgmentDao acknowledgmentDao) {
+        this.acknowledgmentDao = acknowledgmentDao;
     }
 
 //========================================
@@ -200,6 +215,38 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     }
 
+    @POST
+    @Path("{id}/ack")
+    public String ackAlarm(@PathParam("id") int id, AlarmAckDTO alarmAck) {
+        return sessionUtils.withTransaction(() -> {
+            OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), alarmAck.getUser());
+            acknowledgment.setRefId(id);
+            acknowledgment.setAckAction(AckAction.ACKNOWLEDGE);
+            acknowledgment.setAckType(AckType.ALARM);
+            acknowledgmentDao.processAck(acknowledgment);
+
+            updateAlarmTicket(id, alarmAck);
+
+            return "acknowledged";
+        });
+    }
+
+    @DELETE
+    @Path("{id}/ack")
+    public String unackAlarm(@PathParam("id") int id, AlarmAckDTO alarmAck) {
+        return sessionUtils.withTransaction(() -> {
+            OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), alarmAck.getUser());
+            acknowledgment.setRefId(id);
+            acknowledgment.setAckAction(AckAction.UNACKNOWLEDGE);
+            acknowledgment.setAckType(AckType.ALARM);
+            acknowledgmentDao.processAck(acknowledgment);
+
+            updateAlarmTicket(id, alarmAck);
+
+            return "unacknowledged";
+        });
+    }
+
     @PUT
     @Path("{id}/memo")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -261,4 +308,24 @@ public class AlarmRestServiceImpl implements AlarmRestService {
         return null;
     }
 
+//========================================
+// Internals
+//----------------------------------------
+
+    private void updateAlarmTicket(int id, AlarmAckDTO alarmAck) {
+        OnmsAlarm alarm = alarmDao.get(id);
+
+        boolean alarmUpdated = false;
+        if (StringUtils.isNotBlank(alarmAck.getTicketId())) {
+            alarmUpdated = true;
+            alarm.setTTicketId(alarmAck.getTicketId());
+        }
+        if (EnumUtils.isValidEnum(TroubleTicketState.class, alarmAck.getTicketState())) {
+            alarmUpdated = true;
+            alarm.setTTicketState(TroubleTicketState.valueOf(alarmAck.getTicketState()));
+        }
+        if (alarmUpdated) {
+            alarmDao.saveOrUpdate(alarm);
+        }
+    }
 }

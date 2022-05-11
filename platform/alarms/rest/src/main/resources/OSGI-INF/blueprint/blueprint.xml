@@ -20,6 +20,7 @@
     <!--  <reference id="troubleTicketProxy" interface="org.opennms.web.svclayer.TroubleTicketProxy" /> -->
     <reference id="sessionUtils" interface="org.opennms.horizon.db.dao.api.SessionUtils" />
     <reference id="eventConfDao" interface="org.opennms.horizon.events.api.EventConfDao" />
+    <reference id="acknowledgmentDao" interface="org.opennms.horizon.db.dao.api.AcknowledgmentDao" />
 
     <!-- Make sure that the Core Rest bundle is functional.  Otherwise, the endpoints end up completely open with -->
     <!--  no security.  Note the dummy "marker" service to enforce the runtime dependency.                        -->
@@ -42,6 +43,7 @@
         <!-- <property name="troubleTicketProxy" ref="troubleTicketProxy" /> --> <!-- Exanble after working up TicketD -->
         <property name="sessionUtils" ref="sessionUtils" />
         <property name="alarmMapper" ref="alarmMapper" />
+        <property name="acknowledgmentDao" ref="acknowledgmentDao"/>
     </bean>
 
 
