@@ -56,6 +56,7 @@ public class AlarmController extends AbstractPlatformController {
     public ResponseEntity<String> listAlarms(HttpServletResponse response, @RequestHeader("Authorization") String authToken) {
         response.setHeader(HttpHeaders.REFERRER_POLICY, "unsafe-url");
         response.setHeader(HttpHeaders.CROSS_ORIGIN_RESOURCE_POLICY, "same-site | same-origin | cross-origin");
+        response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
         return get(PlatformGateway.URL_PATH_ALARMS_LIST, authToken);
     }
 
