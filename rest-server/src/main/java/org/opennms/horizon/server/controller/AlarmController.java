@@ -31,30 +31,40 @@ package org.opennms.horizon.server.controller;
 import org.opennms.horizon.server.service.PlatformGateway;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.HttpHeaders;
 
 @RestController
 @RequestMapping("/alarms")
-public class AlarmController {
-    private final PlatformGateway gateway;
+public class AlarmController extends AbstractPlatformController {
 
     public AlarmController(PlatformGateway gateway) {
-        this.gateway = gateway;
+        super(gateway);
     }
+
+
 
     @GetMapping
     public ResponseEntity<String> listAlarms(@RequestHeader("Authorization") String authToken) {
-        String result = gateway.get(PlatformGateway.URL_PATH_ALARMS, authToken);
-        if(result != null) {
-            return ResponseEntity.ok(result);
-        } else {
-           return ResponseEntity.badRequest().build();
-        }
+        ResponseEntity<String> response =  get(PlatformGateway.URL_PATH_ALARMS_LIST, authToken);
+        response.getHeaders().add(HttpHeaders.REFERRER_POLICY, "unsafe-url");
+        return response;
     }
 
-    //TODO clear alarms
+    //TODO need to test
+    @PutMapping("{id}")
+    public ResponseEntity clearAlarmById(@PathVariable Long id, @RequestHeader("Authorization") String authToken, JsonNode data) {
+        return put(PlatformGateway.URL_PATH_ALARMS + "/" + id, authToken, data);
+    }
+
+    @PutMapping
+    public ResponseEntity clearAlarms(@RequestHeader("Authorization") String authToken, JsonNode data) {
+        return put(PlatformGateway.URL_PATH_ALARMS, authToken, data);
+    }
 }

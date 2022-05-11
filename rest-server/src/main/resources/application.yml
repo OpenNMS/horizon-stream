@@ -31,7 +31,7 @@ graphql:
 keycloak:
   realm: opennms
   auth-server-url: http://localhost:8080
-  resource: admin-cli
+  resource: horizon-stream
   public-client: true
   use-resource-role-mappings: true
 

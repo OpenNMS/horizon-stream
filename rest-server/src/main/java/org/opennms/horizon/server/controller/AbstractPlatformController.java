@@ -29,36 +29,36 @@
 package org.opennms.horizon.server.controller;
 
 import org.opennms.horizon.server.service.PlatformGateway;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import lombok.extern.slf4j.Slf4j;
+public class AbstractPlatformController {
+    private final PlatformGateway gateway;
 
-@Slf4j
-@RestController
-@RequestMapping("/events")
-public class EventController extends AbstractPlatformController {
-    public EventController(PlatformGateway gateway) {
-        super(gateway);
+    protected AbstractPlatformController(PlatformGateway gateway) {
+        this.gateway = gateway;
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity create(@RequestBody JsonNode data, @RequestHeader("Authorization") String authToken) {
-        log.info("received data {}", data);
-        return post(PlatformGateway.URL_PATH_EVENTS, authToken, data.toString());
+    protected ResponseEntity post(String url, String authToken, String data){
+        if(gateway.post(url, authToken, data)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<String> getEventById(@PathVariable Long id, @RequestHeader("Authorization") String authToken) {
-        return get(PlatformGateway.URL_PATH_EVENTS+"/"+id, authToken);
+    protected ResponseEntity<String> get(String url, String authToken) {
+        String result = gateway.get(url, authToken);
+        if(result != null){
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    protected ResponseEntity put(String url, String authToken, JsonNode data) {
+        if(gateway.put(url, authToken, data)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 }
