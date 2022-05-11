@@ -64,3 +64,24 @@ Feature: OpenNMS Alarm Daemon Rest
     Then send GET request at path "/events" with retry timeout 20000
     Then verify the response code 403 was returned
 
+  Scenario: Acknowledge an Alarm
+    Given JSON accept encoding
+    Given XML content type
+    Then login test user with keycloak
+    Then request non-empty alarm list with retry timeout 20000
+    Then verify the response code 200 was returned
+    Then parse the JSON response
+    Then extract ID of the first alarm
+    Given TEXT accept encoding
+    Given JSON content type
+    Given POST request body in resource "test-data/ack001.json"
+    Then send POST request at path "/alarms/${alarmId}/ack"
+    Then verify the response code 200 was returned
+    Given JSON accept encoding
+    Then request non-empty alarm list with retry timeout 3000
+    Then DEBUG dump the response body
+    Then parse the JSON response
+    Then verify JSON path expressions match
+      | alarm[0].ackUser == x-user-001-x         |
+      | alarm[0].troubleTicket == x-ticket-001-x |
+      | alarm[0].troubleTicketState == 8         |

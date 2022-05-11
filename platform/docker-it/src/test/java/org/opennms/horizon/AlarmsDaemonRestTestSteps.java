@@ -63,6 +63,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -110,6 +111,7 @@ public class AlarmsDaemonRestTestSteps {
     private JsonPath parsedJsonResponse;
     private KeycloakAdminClientSession keycloakUserSession;
     private KeycloakAdminClientSession keycloakAdminSession;
+    private int alarmId;
 
 //========================================
 // Constructor
@@ -219,6 +221,11 @@ public class AlarmsDaemonRestTestSteps {
         this.acceptEncoding = "application/json";
     }
 
+    @Given("^TEXT accept encoding$")
+    public void textAcceptEncoding() throws Throwable {
+        this.acceptEncoding = "text/plain";
+    }
+
     @Given("^JSON content type$")
     public void jsonContentType() throws Throwable {
         this.contentType = "application/json";
@@ -255,7 +262,9 @@ public class AlarmsDaemonRestTestSteps {
 
     @Then("^send POST request at path \"([^\"]*)\"$")
     public void sendPOSTRequestAtPath(String path) throws Throwable {
-        URL requestUrl = new URL(new URL(this.applicationBaseUrl), path);
+        String resolvedPath = this.resolvePathVariables(path);
+
+        URL requestUrl = new URL(new URL(this.applicationBaseUrl), resolvedPath);
 
         RestAssuredConfig restAssuredConfig = this.createRestAssuredTestConfig();
 
@@ -330,6 +339,16 @@ public class AlarmsDaemonRestTestSteps {
         this.parsedJsonResponse = JsonPath.from((this.restAssuredResponse.getBody().asString()));
     }
 
+    @Then("extract ID of the first alarm")
+    public void extractIDOfTheFirstAlarm() {
+        this.alarmId = this.parsedJsonResponse.getInt("alarm[0].id");
+    }
+
+    @Then("acknowledge alarm")
+    public void acknowledgeAlarm() {
+
+    }
+
     @Then("^verify JSON path expressions match$")
     public void verifyJsonPathExpressionsMatch(List<String> pathExpressions) {
         for (String onePathExpression : pathExpressions) {
@@ -388,11 +407,17 @@ public class AlarmsDaemonRestTestSteps {
         if (parts.length == 2) {
             // Expression and value to match - evaluate as a string and compare
             String actualValue = jsonPath.getString(parts[0]);
-            String actualTrimmed = actualValue.trim();
+            String actualTrimmed;
+
+            if (actualValue != null) {
+                actualTrimmed = actualValue.trim();
+            }  else {
+                actualTrimmed = null;
+            }
 
             String expectedTrimmed = parts[1].trim();
 
-            assertEquals("matching to JSON path " + jsonPath, expectedTrimmed, actualTrimmed);
+            assertEquals("matching to JSON path " + parts[0], expectedTrimmed, actualTrimmed);
         } else {
             // Just an expression - evaluate as a boolean
             assertTrue("verifying JSON path expression " + pathExpression, jsonPath.getBoolean(pathExpression));
@@ -469,5 +494,9 @@ public class AlarmsDaemonRestTestSteps {
         String jsonText = objectMapper.writeValueAsString(jsonObject);
 
         return jsonText;
+    }
+
+    private String resolvePathVariables(String path) {
+        return path.replaceAll(Pattern.quote("${alarmId}"), String.valueOf(this.alarmId));
     }
 }
