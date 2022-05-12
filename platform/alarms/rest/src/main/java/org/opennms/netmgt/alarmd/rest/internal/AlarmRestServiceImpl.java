@@ -235,15 +235,13 @@ public class AlarmRestServiceImpl implements AlarmRestService {
     @DELETE
     @Path("{id}/ack")
     @Produces(MediaType.TEXT_PLAIN)
-    public String unackAlarm(@PathParam("id") int id, AlarmAckDTO alarmAck) {
+    public String unackAlarm(@PathParam("id") int id) {
         return sessionUtils.withTransaction(() -> {
-            OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), alarmAck.getUser());
+            OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), "DELETE_USER__TODO_CLEAN_THIS_UP");
             acknowledgment.setRefId(id);
             acknowledgment.setAckAction(AckAction.UNACKNOWLEDGE);
             acknowledgment.setAckType(AckType.ALARM);
             acknowledgmentDao.processAck(acknowledgment);
-
-            updateAlarmTicket(id, alarmAck);
 
             return "unacknowledged";
         });
