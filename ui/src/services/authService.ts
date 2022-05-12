@@ -1,10 +1,11 @@
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import useSpinner from '@/composables/useSpinner'
 import useSnackbar from '@/composables/useSnackbar'
 import keycloakConfig from '../../keycloak.config'
-import { TokenResponse, UserInfo } from '@/types'
+import { UserInfo } from '@/types'
 import useToken from '@/composables/useToken'
 import router from '@/router'
+import { getMsgFromError } from './errorService'
 
 const { startSpinner, stopSpinner } = useSpinner()
 const { showSnackbar } = useSnackbar()
@@ -39,10 +40,8 @@ const login = async (username: string, password: string): Promise<void> => {
     const resp = await auth.post('/token', params)
     setToken(resp.data)
     router.push('/')
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      showSnackbar({ error: true, msg: err.response.data.error_description })
-    }
+  } catch (err: unknown) {
+    showSnackbar({ error: true, msg: getMsgFromError(err) })
   } finally {
     stopSpinner()
   }
@@ -58,7 +57,7 @@ const refreshToken = async (): Promise<boolean> => {
     const resp = await auth.post('/token', params)
     setToken(resp.data)
     return true
-  } catch (err: any) {
+  } catch (err: unknown) {
     setToken(null)
     router.push('/login')
     return false
@@ -87,7 +86,7 @@ const getUserInfo = async (): Promise<UserInfo | null> => {
   try {
     const resp = await auth.post('/userinfo')
     return resp.data
-  } catch (err: any) {
+  } catch (err: unknown) {
     return null
   } finally {
     stopSpinner()

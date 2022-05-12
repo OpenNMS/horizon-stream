@@ -34,6 +34,7 @@ keycloak:
   resource: horizon-stream
   public-client: true
   use-resource-role-mappings: true
+  cors: true
 
 # keycloak admin client properties
 horizon-stream:

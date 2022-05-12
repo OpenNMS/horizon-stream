@@ -1,33 +1,45 @@
+import { AlarmResponseList } from '@/types/alarms'
 import { api } from './axiosInstances'
-import { Alarm } from '@/types/alarms'
+import useSpinner from '@/composables/useSpinner'
+import useSnackbar from '@/composables/useSnackbar'
+import { getMsgFromError } from './errorService'
+
+const { startSpinner, stopSpinner } = useSpinner()
+const { showSnackbar } = useSnackbar()
 
 const endpoint = '/alarms'
 
-const getAlarms = async (): Promise<Alarm[]> => {
+const getAlarms = async (): Promise<AlarmResponseList> => {
+  startSpinner()
+
   try {
     const resp = await api.get(endpoint)
     return resp.data
-  } catch (err) {
-    return []
+  } catch (err: unknown) {
+    showSnackbar({ error: true, msg: getMsgFromError(err) })
+    return {
+      alarm: [],
+      count: 0,
+      offset: 0,
+      totalCount: 0
+    }
+  } finally {
+    stopSpinner()
   }
 }
 
-const sendAlarm = async (alarm: Alarm): Promise<Alarm[]> => {
+const deleteAlarmById = async (id: number): Promise<boolean> => {
+  startSpinner()
+
   try {
-    const resp = await api.post(endpoint, alarm)
-    return resp.data
-  } catch (err) {
-    return []
+    await api.delete(`${endpoint}/${id}/ack`)
+    return true
+  } catch (err: unknown) {
+    showSnackbar({ error: true, msg: getMsgFromError(err) })
+    return false
+  } finally {
+    stopSpinner()
   }
 }
 
-const clearAlarm = async (alarm: Alarm): Promise<Alarm[]> => {
-  try {
-    const resp = await api.delete(`${endpoint}/${alarm.id}`)
-    return resp.data
-  } catch (err) {
-    return []
-  }
-}
-
-export { getAlarms, sendAlarm, clearAlarm }
+export { getAlarms, deleteAlarmById }

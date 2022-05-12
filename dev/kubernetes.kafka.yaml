@@ -489,6 +489,8 @@ spec:
     id: opennms
     realm: opennms
     enabled: true
+    attributes:
+      frontendUrl: "http://localhost:28080"
     clients:
       - id: b67dfe9a-36c2-42bc-bd23-b380023d4238
         clientId: horizon-stream

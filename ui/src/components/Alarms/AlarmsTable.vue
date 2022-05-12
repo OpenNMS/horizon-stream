@@ -3,8 +3,8 @@
     <p>Alarms</p>
     <div class="feather-row">
       <div class="feather-col-12">
-        <FeatherButton primary @click="onSend({})">Send Alarm</FeatherButton>
-        <FeatherButton secondary @click="onClear({})">Clear Alarms</FeatherButton>
+        <FeatherButton primary @click="trigger">Send Alarm</FeatherButton>
+        <FeatherButton secondary @click="clear">Clear Alarms</FeatherButton>
       </div>
     </div>
     <div class="feather-row">
@@ -21,7 +21,7 @@
             <tr v-for="alarm in alarms" :key="alarm.id">
               <td>{{ alarm.severity }}</td>
               <td>{{ alarm.description }}</td>
-              <td>{{ alarm.lastEventTime }}</td>
+              <td v-date>{{ alarm.lastEventTime }}</td>
             </tr>
           </tbody>
         </table>
@@ -31,14 +31,28 @@
 </template>
 
 <script setup lang="ts">
+import { getMockEvent } from '@/types/mocks'
 import { useAlarmStore } from '@/store/alarmStore'
-// import { Alarm } from '@/types/alarms.js'
+import { useEventStore } from '@/store/eventStore'
 
 const alarmStore = useAlarmStore()
+const eventStore = useEventStore()
+
 const alarms = computed(() => alarmStore.alarms)
 
-const onSend = (alarm: any) => alarmStore.sendAlarm(alarm)
-const onClear = (alarm: any) => alarmStore.clearAlarm(alarm)
+const trigger = () => {
+  eventStore.sendEvent(getMockEvent())
+  alarmStore.getAlarms()
+}
+
+const clear = () => {
+  for (const alarm of alarms.value) {
+    alarmStore.deleteAlarmById(alarm.id)
+  }
+  alarmStore.getAlarms()
+}
+
+onMounted(() => alarmStore.getAlarms())
 </script>
 
 <style lang="scss" scoped>
