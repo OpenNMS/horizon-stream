@@ -500,6 +500,16 @@ spec:
           - "*"
         publicClient: true
         directAccessGrantsEnabled: true
+        defaultClientScopes:
+          - "web-origins"
+          - "roles"
+          - "profile"
+          - "email"
+        optionalClientScopes:
+          - "address"
+          - "phone"
+          - "offline_access"
+          - "microprofile-jwt"
     roles:
       realm:
       - id: 50e6b594-e01b-426b-873d-873f632355b4
