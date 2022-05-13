@@ -40,23 +40,30 @@ public class AbstractPlatformController {
         this.gateway = gateway;
     }
 
-    protected ResponseEntity post(String url, String authToken, String data){
-        if(gateway.post(url, authToken, data)) {
+    protected ResponseEntity post(String path, String authToken, String data){
+        if(gateway.post(path, authToken, data)) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.badRequest().build();
     }
 
-    protected ResponseEntity<String> get(String url, String authToken) {
-        String result = gateway.get(url, authToken);
+    protected ResponseEntity<String> get(String path, String authToken) {
+        String result = gateway.get(path, authToken);
         if(result != null){
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.badRequest().build();
     }
 
-    protected ResponseEntity put(String url, String authToken, JsonNode data) {
-        if(gateway.put(url, authToken, data)) {
+    protected ResponseEntity put(String path, String authToken, JsonNode data) {
+        if(gateway.put(path, authToken, data)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    protected ResponseEntity delete(String path, String authToken) {
+        if(gateway.delete(path, authToken)) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.badRequest().build();

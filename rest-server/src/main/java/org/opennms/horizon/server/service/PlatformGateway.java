@@ -30,10 +30,10 @@ package org.opennms.horizon.server.service;
 
 import java.io.IOException;
 
-import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -56,6 +56,7 @@ public class PlatformGateway {
     public static final String URL_PATH_EVENTS = "/events";
     public static final String URL_PATH_ALARMS = "/alarms";
     public static final String URL_PATH_ALARMS_LIST = URL_PATH_ALARMS + "/list";
+    public static final String URL_PATH_ALARMS_ACK = URL_PATH_ALARMS + "/{%d}/ack";
     private ObjectMapper jsonMapper = new ObjectMapper();
     @Value("${horizon-stream.core.url}")
     private String platformUrl;
@@ -106,6 +107,23 @@ public class PlatformGateway {
             }
         } catch (IOException e) {
             log.error("Error happened when put {} at {}", data, path);
+            return false;
+        }
+    }
+
+    public boolean delete(String path, String authToken) {
+        try {
+            HttpDelete deleteRequest = new HttpDelete(platformUrl + path);
+            deleteRequest.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
+            deleteRequest.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+            deleteRequest.addHeader(HttpHeaders.AUTHORIZATION, authToken);
+            try(CloseableHttpClient client = HttpClients.createDefault();
+                CloseableHttpResponse response = client.execute(deleteRequest)) {
+                log.info("un-ack alarm with url path {}", path);
+                return true;
+            }
+
+        } catch (IOException e) {
             return false;
         }
     }
