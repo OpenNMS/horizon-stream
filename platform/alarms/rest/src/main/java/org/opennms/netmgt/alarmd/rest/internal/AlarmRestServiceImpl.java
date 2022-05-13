@@ -247,6 +247,23 @@ public class AlarmRestServiceImpl implements AlarmRestService {
         });
     }
 
+    @POST
+    @Path("{id}/clear")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String clearAlarm(@PathParam("id") int id, AlarmAckDTO alarmAck) {
+        return sessionUtils.withTransaction(() -> {
+            OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), alarmAck.getUser());
+            acknowledgment.setRefId(id);
+            acknowledgment.setAckAction(AckAction.CLEAR);
+            acknowledgment.setAckType(AckType.ALARM);
+            acknowledgmentDao.processAck(acknowledgment);
+
+            updateAlarmTicket(id, alarmAck);
+
+            return "acknowledged";
+        });
+    }
+
     @PUT
     @Path("{id}/memo")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
