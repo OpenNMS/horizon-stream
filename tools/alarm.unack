@@ -5,15 +5,6 @@ ROOT_PATH=""
 JSON="application/json"
 XML="application/xml"
 
-BODY_TEMPLATE='{
-  "user": "%s",
-  "ticketId": "%s",
-  "ticketState": "%s"
-}'
-
-ACK_USER="user001"
-ACK_TICKET_ID="ticket001"
-ACK_TICKET_STATE="RESOLVED"
 ALARM_ID=1
 CURL_OPTS=()
 TOKEN=""
@@ -48,6 +39,4 @@ do
 	esac
 done
 
-BODY="$(printf "${BODY_TEMPLATE}" "${ACK_USER}" "${ACK_TICKET_ID}" "${ACK_TICKET_STATE}")"
-
-curl "${CURL_OPTS[@]}" -X DELETE --data-ascii "${BODY}" -H "Content-Type: ${JSON}" -s "http://${HOST_PORT}/${ROOT_PATH}alarms/${ALARM_ID}/ack"
+curl "${CURL_OPTS[@]}" -X DELETE -H "Content-Type: ${JSON}" -s "http://${HOST_PORT}/${ROOT_PATH}alarms/${ALARM_ID}/ack"
