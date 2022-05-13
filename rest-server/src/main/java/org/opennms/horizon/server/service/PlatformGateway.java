@@ -56,7 +56,8 @@ public class PlatformGateway {
     public static final String URL_PATH_EVENTS = "/events";
     public static final String URL_PATH_ALARMS = "/alarms";
     public static final String URL_PATH_ALARMS_LIST = URL_PATH_ALARMS + "/list";
-    public static final String URL_PATH_ALARMS_ACK = URL_PATH_ALARMS + "/{%d}/ack";
+    public static final String URL_PATH_ALARMS_ACK = URL_PATH_ALARMS + "/%d/ack";
+    public static final String URL_PATH_ALARMS_CLEAR = URL_PATH_ALARMS + "/%d/clear";
     private ObjectMapper jsonMapper = new ObjectMapper();
     @Value("${horizon-stream.core.url}")
     private String platformUrl;
@@ -93,7 +94,7 @@ public class PlatformGateway {
         }
     }
 
-    public boolean put(String path, String authToken, JsonNode data) {
+    public boolean put(String path, String authToken, String data) {
         try {
             HttpPut putRequest = new HttpPut(platformUrl + path);
             putRequest.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());

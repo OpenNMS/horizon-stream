@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,12 +55,17 @@ public class AlarmController extends AbstractPlatformController {
     }
 
     @PostMapping("/{id}/ack")
-    public ResponseEntity ackAlarm(@PathVariable Long id, @RequestHeader("Authorization") String authToken, JsonNode data) {
-        return post(String.format(PlatformGateway.URL_PATH_ALARMS_ACK, id), authToken, data.toString());
+    public ResponseEntity ackAlarm(@PathVariable Long id, @RequestHeader("Authorization") String authToken, @RequestBody String data) {
+        return post(String.format(PlatformGateway.URL_PATH_ALARMS_ACK, id), authToken, data);
     }
 
    @DeleteMapping("/{id}/ack")
     public ResponseEntity unAckAlarm(@PathVariable Long id, @RequestHeader("Authorization") String autToken) {
         return delete(String.format(PlatformGateway.URL_PATH_ALARMS_ACK, id), autToken);
+    }
+
+    @PostMapping("/{id}/clear")
+    public ResponseEntity clearAlarm(@PathVariable Long id, @RequestHeader("Authorization") String authToken, @RequestBody String data) {
+        return post(String.format(PlatformGateway.URL_PATH_ALARMS_CLEAR, id), authToken, data);
     }
 }

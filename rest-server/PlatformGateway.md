@@ -115,3 +115,35 @@ sample result
   "offset": 0
 }
 ```
+
+* Ack alarm
+```
+POST http://localhost:9090/alarms/5/ack
+accept: application/json
+content-type: application/json
+Authorization: Bearer
+
+{
+  "user": "admin"
+}
+
+repoonse noncontent
+```
+
+* Un-Ack alarm
+```
+DELETE http://localhost:9090/alarms/5/ack
+accept: application/json
+Authorization: Bearer
+
+reponse nocontent
+```
+
+* Clear alarm
+```text
+POST http://localhost:9090/alarms/4/clear
+accept: application/json
+content-type: application/json
+Authorization: Bearer
+```
+

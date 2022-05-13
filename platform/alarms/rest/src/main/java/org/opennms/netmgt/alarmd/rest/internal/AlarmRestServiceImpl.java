@@ -217,7 +217,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     @POST
     @Path("{id}/ack")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
     public String ackAlarm(@PathParam("id") int id, AlarmAckDTO alarmAck) {
         return sessionUtils.withTransaction(() -> {
             OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), alarmAck.getUser());
@@ -234,7 +234,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     @DELETE
     @Path("{id}/ack")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
     public String unackAlarm(@PathParam("id") int id) {
         return sessionUtils.withTransaction(() -> {
             OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), "DELETE_USER__TODO_CLEAN_THIS_UP");
@@ -249,7 +249,7 @@ public class AlarmRestServiceImpl implements AlarmRestService {
 
     @POST
     @Path("{id}/clear")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
     public String clearAlarm(@PathParam("id") int id, AlarmAckDTO alarmAck) {
         return sessionUtils.withTransaction(() -> {
             OnmsAcknowledgment acknowledgment = new OnmsAcknowledgment(new Date(), alarmAck.getUser());

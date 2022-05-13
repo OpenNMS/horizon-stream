@@ -55,7 +55,7 @@ public class AbstractPlatformController {
         return ResponseEntity.badRequest().build();
     }
 
-    protected ResponseEntity put(String path, String authToken, JsonNode data) {
+    protected ResponseEntity put(String path, String authToken, String data) {
         if(gateway.put(path, authToken, data)) {
             return ResponseEntity.noContent().build();
         }
