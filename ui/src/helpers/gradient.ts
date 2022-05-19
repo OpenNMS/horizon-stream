@@ -29,8 +29,6 @@ export const animateGradient = () => {
 
     return {
       blend: `radial-gradient(circle at ${p1}% ${p2}%, ${c1}, ${c2}, ${c4}, ${c5})`,
-      c1: c1,
-      c2: c2
     }
   }
 
