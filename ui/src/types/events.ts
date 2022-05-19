@@ -7,5 +7,5 @@ export interface Event {
     notify: boolean
     dest: string
   }
-  "creation-time": string
+  'creation-time': string
 }

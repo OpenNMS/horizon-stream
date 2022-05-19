@@ -10,6 +10,7 @@ declare module '@vue/runtime-core' {
     FeatherAppBarLink: typeof import('@featherds/app-bar')['FeatherAppBarLink']
     FeatherAppLayout: typeof import('@featherds/app-layout')['FeatherAppLayout']
     FeatherButton: typeof import('@featherds/button')['FeatherButton']
+    FeatherCheckbox: typeof import('@featherds/checkbox')['FeatherCheckbox']
     FeatherIcon: typeof import('@featherds/icon')['FeatherIcon']
     FeatherInput: typeof import('@featherds/input')['FeatherInput']
     FeatherNavigationRail: typeof import('@featherds/navigation-rail')['FeatherNavigationRail']

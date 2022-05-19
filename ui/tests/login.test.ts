@@ -18,7 +18,7 @@ test('the login page renders', () => {
 })
 
 test('login page input errors get set', async () => {
-  (wrapper.vm as unknown as LoginVm).onLoginBtnClick()
+  ;(wrapper.vm as unknown as LoginVm).onLoginBtnClick()
   expect((wrapper.vm as unknown as LoginVm).usernameError).toBe('Username is required.')
   expect((wrapper.vm as unknown as LoginVm).passwordError).toBe('Password is required.')
 })

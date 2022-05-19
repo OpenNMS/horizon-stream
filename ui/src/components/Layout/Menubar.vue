@@ -29,7 +29,7 @@
 import LightDarkMode from '@featherds/icon/action/LightDarkMode'
 import Logo from '@/assets/Logo.vue'
 import { useAuthStore } from '@/store/authStore'
-import useToken from '@/composables/useToken';
+import useToken from '@/composables/useToken'
 
 const authStore = useAuthStore()
 const { isAuthenticated } = useToken()

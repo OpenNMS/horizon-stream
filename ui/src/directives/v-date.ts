@@ -2,7 +2,7 @@ import { computed } from 'vue'
 import { format as fnsFormat } from 'date-fns-tz'
 
 const timeZone = computed<string>(() => Intl.DateTimeFormat().resolvedOptions().timeZone)
-const formatString = "yyyy-MM-dd'T'HH:mm:ssxxx"
+const formatString = 'yyyy-MM-dd\'T\'HH:mm:ssxxx'
 
 const dateFormatDirective = {
   mounted(el: Element) {

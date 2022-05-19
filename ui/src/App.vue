@@ -26,6 +26,20 @@ authStore.getUserInfo()
 @import "@featherds/styles/mixins/typography";
 @import "@featherds/styles/themes/open-mixins";
 
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+@keyframes gradient {
+  to { opacity: 1; }
+  0% { -webkit-filter: blur(90px);}
+  50% { -webkit-filter: blur(100px);}
+  100% { -webkit-filter: blur(90px);}
+  from { transform : scale(0.8);}
+  to { transform : scale(1); }
+}
+
 .app-content-container {
   position: relative;
 }
