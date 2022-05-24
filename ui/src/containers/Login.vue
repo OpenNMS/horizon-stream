@@ -20,13 +20,12 @@
             />
 
             <!-- Password -->
-            <FeatherInput
+            <FeatherProtectedInput
               data-test="password-input"
               autocomplete="new-password"
               label="Password" 
               v-model="password"
               :error="passwordError"
-              type="password"
             />
             
             <!-- Remember Me Checkbox -->
