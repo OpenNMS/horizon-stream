@@ -26,9 +26,10 @@ export const animateGradient = () => {
     const c2 = getRbga()
     const c4 = getRbga(backdrop)
     const c5 = getRbga()
+    const c6 = getRbga(backdrop)
 
     return {
-      blend: `radial-gradient(circle at ${p1}% ${p2}%, ${c1}, ${c2}, ${c4}, ${c5})`,
+      blend: `radial-gradient(circle at ${p1}% ${p2}%, ${c1}, ${c2}, ${c4}, ${c5}, ${c6})`,
     }
   }
 
