@@ -13,6 +13,9 @@ spec:
     - port: 8181
       protocol: TCP
       name: http
+    - port: 8990
+      protocol: TCP
+      name: grpc
   selector:
     run: my-horizon-stream-core
 ---
@@ -30,6 +33,27 @@ spec:
       name: http
   selector:
     run: my-horizon-stream-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minion
+  labels:
+    run: my-minion
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8201
+      protocol: TCP
+      name: ssh
+    - port: 1162
+      protocol: UDP
+      name: snmp-trap
+    - port: 1514
+      protocol: UDP
+      name: syslog
+  selector:
+    run: my-minion
 ---
 apiVersion: v1
 kind: Service
@@ -359,6 +383,7 @@ spec:
           ports:
             - containerPort: 8101
             - containerPort: 8181
+            - containerPort: 8990
           volumeMounts:
             - name: config-volume
               mountPath: "/opt/horizon-stream/etc/org.opennms.horizon.alarmd.camel.cfg"
@@ -420,6 +445,53 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: my-minion
+spec:
+  selector:
+    matchLabels:
+      run: my-minion
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-minion
+    spec:
+      volumes:
+        - name: minion-config-volume
+          configMap:
+            name: minion-config-map
+      containers:
+        - name: minion
+          image: opennms/minion:29.0.10
+          args: ["-f"]
+          env:
+            - name: TZ
+              value: "America/New_York"
+            - name: JAVA_MIN_MEM
+              value: "512M"
+            - name: JAVA_MAX_MEM
+              value: "2048M"
+          ports:
+            - containerPort: 8201
+            - containerPort: 1162
+              protocol: UDP
+            - containerPort: 1514
+              protocol: UDP
+#          livenessProbe:
+#            exec:
+#              command: ["/health.sh"]
+#            initialDelaySeconds: 30
+#            periodSeconds: 30
+#            timeoutSeconds: 20
+#            failureThreshold: 3
+          volumeMounts:
+            - name: minion-config-volume
+              mountPath: "/opt/minion/minion-config.yaml"
+              subPath: "minion-config.yaml"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: my-horizon-stream-ui
 spec:
   selector:
@@ -472,6 +544,35 @@ data:
     CREATE USER keycloak with password 'passw0rd';
     CREATE DATABASE keycloak;
     GRANT ALL ON DATABASE keycloak TO keycloak;
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minion-config-map
+data:
+  minion-config.yaml: |
+    http-url: "http://horizon:8980/opennms"
+    id: "minion-01"
+    location: "minion-location"
+    
+    karaf:
+      shell:
+        ssh:
+          host: "0.0.0.0"
+    
+    ipc:
+      grpc:
+        host: "horizon-stream-core"
+        port: "8990"
+    
+    netmgt:
+      syslog:
+        syslog.listen.interface: "0.0.0.0"
+        syslog.listen.port: 1514
+    
+      traps:
+        trapd.listen.interface: "0.0.0.0"
+        trapd.listen.port: 1162
 ---
 apiVersion: v1
 kind: Secret

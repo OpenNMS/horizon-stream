@@ -49,6 +49,10 @@ portForward:
     resourceName: my-keycloak
     port: 8080
     localPort: 28080
+  - resourceType: deployment
+    resourceName: my-minion
+    port: 8201
+    localPort: 38101
 
 deploy:
   kubectl:
