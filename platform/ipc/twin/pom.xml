@@ -4,22 +4,21 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opennms.horizon</groupId>
-    <artifactId>horizon</artifactId>
+    <groupId>org.opennms.horizon.ipc</groupId>
+    <artifactId>ipc</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>org.opennms.horizon.ipc</groupId>
-  <artifactId>ipc</artifactId>
-  <name>OpenNMS Horizon :: IPC</name>
+  <groupId>org.opennms.horizon.ipc.twin</groupId>
+  <artifactId>twin</artifactId>
+  <name>OpenNMS Horizon :: IPC :: Twin</name>
   <packaging>pom</packaging>
 
   <modules>
     <module>api</module>
+    <module>common</module>
     <module>grpc</module>
-    <module>shell</module>
-    <module>twin</module>
   </modules>
 
 </project>
