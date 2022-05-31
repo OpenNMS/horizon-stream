@@ -15,11 +15,7 @@
   </FeatherAppLayout>
 </template>
   
-<script setup lang="ts">
-import { useAuthStore } from './store/authStore'
-const authStore = useAuthStore()
-authStore.getUserInfo()
-</script>
+<script setup lang="ts"></script>
   
 <style lang="scss">
 @import "@featherds/styles/lib/grid";

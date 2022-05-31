@@ -1,5 +1,5 @@
 <template>
-  <FeatherAppBar :labels="{ skip: 'main' }" content="app" v-if="isAuthenticated">
+  <FeatherAppBar :labels="{ skip: 'main' }" content="app" v-if="keycloak?.authenticated">
     <template v-slot:left>
       <FeatherAppBarLink 
         class="app-bar" 
@@ -28,11 +28,9 @@
 <script setup lang="ts">
 import LightDarkMode from '@featherds/icon/action/LightDarkMode'
 import Logo from '@/assets/Logo.vue'
-import { useAuthStore } from '@/store/authStore'
-import useToken from '@/composables/useToken'
+import useKeycloak from '@/composables/useKeycloak'
 
-const authStore = useAuthStore()
-const { isAuthenticated } = useToken()
+const { keycloak } = useKeycloak()
 
 const isDark = useDark({
   selector: 'body',
@@ -43,7 +41,7 @@ const isDark = useDark({
 
 const toggleDark = useToggle(isDark)
 
-const logout = async () => authStore.logout()
+const logout = async () => keycloak.value?.logout()
 </script>
 
 <style lang="scss" scoped>

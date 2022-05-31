@@ -1,6 +1,5 @@
 import axios from 'axios'
-import useToken from '@/composables/useToken'
-import { refreshToken } from './authService'
+import useKeycloak from '@/composables/useKeycloak'
 
 const api = axios.create({
   baseURL: process.env.API_BASE_URL || import.meta.env.VITE_BASE_URL?.toString()
@@ -8,13 +7,10 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    const { token, isExpired } = useToken()
-
-    // if token expired, attempt refresh before call
-    if (isExpired()) await refreshToken()
+    const { keycloak } = useKeycloak()
 
     const defaultHeaders = {
-      Authorization: `Bearer ${token.value.access_token}`,
+      Authorization: `Bearer ${keycloak.value?.token}`,
       'Content-Type': 'application/json'
     }
 

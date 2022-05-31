@@ -12,7 +12,7 @@
     "format": "prettier --ignore-path ./.gitignore --write \"**/*.+(ts)\""
   },
   "dependencies": {
-    "@dsb-norge/vue-keycloak-js": "^2.1.4-beta",
+    "@dsb-norge/vue-keycloak-js": "^2.1.5-beta",
     "@featherds/app-bar": "0.10.11",
     "@featherds/app-layout": "0.10.11",
     "@featherds/autocomplete": "0.10.11",

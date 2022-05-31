@@ -12,10 +12,10 @@
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.18.0.tgz#10a8d4e656bc01128d299a787aa006ce1a91e112"
   integrity sha512-AqDccGC+m5O/iUStSJy3DGRIUFu7WbY/CppZYwrEUB4N0tZlnI8CSTsgL7v5fHVFmUbRv2sd+yy27o8Ydt4MGg==
 
-"@dsb-norge/vue-keycloak-js@^2.1.4-beta":
-  version "2.1.4-beta"
-  resolved "https://registry.yarnpkg.com/@dsb-norge/vue-keycloak-js/-/vue-keycloak-js-2.1.4-beta.tgz#aedac6af9016e16ef2cd4735973407ab1d68780e"
-  integrity sha512-FcdGFbQlEmDY6lHiQFGgkyBI2Cdqn/XOCSlTOGhN6M2QjmWu4H8hcaZcFNk/YHHb6yQktne2kwdUY+E43NcVhg==
+"@dsb-norge/vue-keycloak-js@^2.1.5-beta":
+  version "2.1.5-beta"
+  resolved "https://registry.yarnpkg.com/@dsb-norge/vue-keycloak-js/-/vue-keycloak-js-2.1.5-beta.tgz#84b04344ad1ac8ef1aab77f070de8301c0a837c8"
+  integrity sha512-3FXU2u0FdCTXHTbOqy44zae9Idc5bs1IFBQNDmunBnNGycEuzdyNcc+wcj3GS1VLKff28Vo4IhRgYkJGFSLXcw==
   dependencies:
     keycloak-js "15.1.1"
 

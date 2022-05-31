@@ -1,13 +1,12 @@
 <template>
   <p class="title">Horizon Stream</p>
-  <p class="welcome" v-if="user">Welcome, {{ user }}</p>
+  <p class="welcome" v-if="keycloak?.authenticated">Welcome, {{ keycloak.profile?.username }}</p>
   <AlarmsTable />
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/store/authStore'
-const authStore = useAuthStore()
-const user = computed(() => authStore.userInfo?.preferred_username)
+import useKeycloak from '@/composables/useKeycloak'
+const { keycloak } = useKeycloak()
 </script>
 
 <style scoped lang="scss">

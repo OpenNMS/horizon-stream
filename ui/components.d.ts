@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     FeatherRailItem: typeof import('@featherds/navigation-rail')['FeatherRailItem']
     FeatherSnackbar: typeof import('@featherds/snackbar')['FeatherSnackbar']
     FeatherSpinner: typeof import('@featherds/progress')['FeatherSpinner']
+    LogoSpinner: typeof import('./src/components/Common/LogoSpinner.vue')['default']
     Menubar: typeof import('./src/components/Layout/Menubar.vue')['default']
     NavigationRail: typeof import('./src/components/Layout/NavigationRail.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
