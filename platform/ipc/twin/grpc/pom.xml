@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>org.opennms.core.ipc.twin</groupId>
-    <artifactId>org.opennms.core.ipc.twin.grpc</artifactId>
+    <artifactId>grpc</artifactId>
     <packaging>pom</packaging>
     <name>OpenNMS Horizon :: IPC :: Twin :: gRPC</name>
     <modules>

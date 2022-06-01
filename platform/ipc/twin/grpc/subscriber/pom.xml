@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.opennms.core.ipc.twin</groupId>
-        <artifactId>org.opennms.core.ipc.twin.grpc</artifactId>
+        <artifactId>grpc</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -29,12 +29,12 @@
     <dependencies>
         <dependency>
             <groupId>org.opennms.core.ipc.twin</groupId>
-            <artifactId>org.opennms.core.ipc.twin.common</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opennms.core.ipc.twin.grpc</groupId>
-            <artifactId>org.opennms.core.ipc.twin.grpc.common</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
