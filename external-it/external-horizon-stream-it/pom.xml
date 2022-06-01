@@ -17,17 +17,17 @@
 
     <name>External IT :: Horizon</name>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.opennms.horizon</groupId>
-                <artifactId>horizon-bom</artifactId>
-                <version>0.1.0-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <cucumber.version>7.1.0</cucumber.version>
+        <java.version>11</java.version>
+        <junit.version>4.13.2</junit.version>
+        <keycloak.version>17.0.0</keycloak.version>
+        <rest-assured.version>4.3.3</rest-assured.version>
+        <slf4j.version>1.7.33</slf4j.version>
+    </properties>
 
     <dependencies>
         <!--             -->
@@ -60,30 +60,36 @@
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-core</artifactId>
+            <version>${cucumber.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
         </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
         </dependency>
 
         <!-- KEYCLOAK -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
 
         <!-- REST ASSURED -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <version>${rest-assured.version}</version>
         </dependency>
 
         <!--               -->
@@ -92,12 +98,23 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.9.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
             <!-- Build a stand-alone, executable JAR file -->
             <!-- NOTE: this uses spring-boot's plugin and packaging, but does not pull in spring-boot dependencies -->
             <!--       nor make use of any other spring boot features.                                             -->
