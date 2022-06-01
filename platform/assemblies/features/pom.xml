@@ -159,6 +159,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.opennms.horizon.core</groupId>
+            <artifactId>monitor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.opennms.horizon.db</groupId>
             <artifactId>dao-impl</artifactId>
             <version>${project.version}</version>
@@ -216,6 +221,11 @@
         <dependency>
             <groupId>org.opennms.horizon.icmp</groupId>
             <artifactId>shell</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.ipc</groupId>
+            <artifactId>echo</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

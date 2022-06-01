@@ -122,6 +122,7 @@
         <bundle>mvn:org.opennms.horizon.ipc.grpc/client/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.ipc.grpc/common/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.ipc.grpc/server/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.ipc/echo/${project.version}</bundle>
     </feature>
 
     <feature name="horizon-icmp" version="${project.version}" description="Horizon :: ICMP">
@@ -156,6 +157,8 @@
         <bundle>mvn:org.opennms.core.ipc.twin/common/${project.version}</bundle>
         <bundle>mvn:org.opennms.core.ipc.twin.grpc/common/${project.version}</bundle>
         <bundle>mvn:org.opennms.core.ipc.twin.grpc/publisher/${project.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.core/monitor/${project.version}</bundle>
     </feature>
 
     <feature name="horizon-ipc-api" version="${project.version}">

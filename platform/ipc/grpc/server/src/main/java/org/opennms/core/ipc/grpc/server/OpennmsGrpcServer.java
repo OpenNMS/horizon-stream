@@ -60,6 +60,8 @@ import org.opennms.core.ipc.grpc.common.OpenNMSIpcGrpc;
 import org.opennms.core.ipc.grpc.common.RpcRequestProto;
 import org.opennms.core.ipc.grpc.common.RpcResponseProto;
 import org.opennms.core.ipc.grpc.common.SinkMessage;
+import org.opennms.core.ipc.grpc.server.manager.MinionInfo;
+import org.opennms.core.ipc.grpc.server.manager.MinionManager;
 import org.opennms.core.tracing.api.TracerConstants;
 import org.opennms.core.tracing.api.TracerRegistry;
 import org.opennms.core.tracing.util.TracingInfoCarrier;
@@ -143,6 +145,9 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
     private final ThreadFactory sinkConsumerThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("sink-consumer-%d")
             .build();
+
+
+    private MinionManager minionManager;
 
     // RPC timeout executor thread retrieves elements from delay queue used to timeout rpc requests.
     private final ExecutorService rpcTimeoutExecutor = Executors.newSingleThreadExecutor(timerThreadFactory);
@@ -361,14 +366,25 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
             return;
         }
         if (!rpcHandlerByLocation.containsValue(rpcHandler)) {
+            boolean alreadyKnown = false;
+
             StreamObserver<RpcRequestProto> obsoleteObserver = rpcHandlerByMinionId.get(systemId);
             if (obsoleteObserver != null) {
                 rpcHandlerByLocation.values().remove(obsoleteObserver);
+
+                // Replacing an old connection with a new one
+                alreadyKnown = true;
             }
             rpcHandlerByLocation.put(location, rpcHandler);
             updateIterator(location);
             rpcHandlerByMinionId.put(systemId, rpcHandler);
             LOG.info("Added RPC handler for minion {} at location {}", systemId, location);
+
+            // Notify the MinionManager of the addition
+            MinionInfo minionInfo = new MinionInfo();
+            minionInfo.setId(systemId);
+            minionInfo.setLocation(location);
+            minionManager.addMinion(minionInfo);
         }
     }
 
@@ -381,13 +397,22 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
 
     private synchronized void removeRpcHandler(StreamObserver<RpcRequestProto> rpcHandler) {
 
+        String systemId = null;
+        String location = null;
+
         Map.Entry<String, StreamObserver<RpcRequestProto>> matchingHandler =
                 rpcHandlerByLocation.entries().stream().
                         filter(entry -> entry.getValue().equals(rpcHandler)).findFirst().orElse(null);
+
         if (matchingHandler != null) {
+            systemId = matchingHandler.getKey();
+
             rpcHandlerByLocation.remove(matchingHandler.getKey(), matchingHandler.getValue());
             updateIterator(matchingHandler.getKey());
         }
+
+        // Notify the MinionManager of the removal
+        minionManager.removeMinion(systemId);
     }
 
 
@@ -451,6 +476,14 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
             return tracerRegistry.getTracer();
         }
         return GlobalTracer.get();
+    }
+
+    public MinionManager getMinionManager() {
+        return minionManager;
+    }
+
+    public void setMinionManager(MinionManager minionManager) {
+        this.minionManager = minionManager;
     }
 
     public void shutdown() {
