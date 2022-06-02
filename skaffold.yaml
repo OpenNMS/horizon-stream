@@ -29,6 +29,13 @@ build:
         - '**/*.vue'
     docker:
       dockerfile: dev/Dockerfile
+  - image: opennms/horizon-stream-keycloak
+    context: keycloak-ui
+    sync:
+      infer:
+        - 'themes/**'
+    docker:
+      dockerfile: Dockerfile
 
 portForward:
   - resourceType: deployment

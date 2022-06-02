@@ -270,7 +270,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: quay.io/keycloak/keycloak:17.0.1 #After testing, version 18 and 17.0.1 works on M1 MacBook, for more information https://github.com/keycloak/keycloak/issues/8825
+          image: opennms/horizon-stream-keycloak
           args: [ "start-dev" ]
           env:
             - name: KEYCLOAK_CREATE_ADMIN_USER
@@ -510,14 +510,17 @@ spec:
     id: opennms
     realm: opennms
     enabled: true
+    loginTheme: "horizon-stream"
     attributes:
       frontendUrl: "http://localhost:28080"
     clients:
       - id: b67dfe9a-36c2-42bc-bd23-b380023d4238
         clientId: horizon-stream
-        standardFlowEnabled: false
+        standardFlowEnabled: true
         enabled: true
         webOrigins:
+          - "*"
+        redirectUris:
           - "*"
         publicClient: true
         directAccessGrantsEnabled: true
