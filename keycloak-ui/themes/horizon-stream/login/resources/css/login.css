@@ -1,3 +1,69 @@
-body {
-    background: #000;
+.hs-card {
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 333px;
+    height: 490px;
+    position: absolute;
+    top: calc(50% - 265px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--feather-surface);
+    padding: 30px 66px 0px 66px;
+    border: 1px solid var(--feather-shade-4);
+    border-radius: 4px;
+}
+
+#hs-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+#hs-header-wrapper {
+    padding: 12px 10px 20px;
+    background-image: url(../img/OpenNMS_Horizontal-Logo_Light-BG.svg);
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#hs-stream-title {
+    display: block;
+    margin-top: 6px;
+}
+
+.hs-sign-in {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.hs-sign-in-btn {
+    margin-bottom: 10px;
+}
+
+.hs-forgot-password-msg {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.hs-remember-me {
+    margin-bottom: 20px;
+}
+
+.hs-footer {
+    font-size: 12px;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    left: 0px;
+    text-align: center;
+    height: 35px;
+    border-top: 1px solid var(--feather-shade-4);
+    color: var(--feather-shade-1);
+}
+
+.hs-terms, .hs-privacy {
+    font-weight: 600;
+    line-height: 2.7;
+    cursor: pointer;
 }

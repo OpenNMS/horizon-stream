@@ -1,0 +1,186 @@
+.feather-styles {
+  font-family: var(--feather-font-family);
+  font-size: var(--feather-body-small-font-size);
+  line-height: var(--feather-body-small-line-height);
+  letter-spacing: var(--feather-body-small-letter-spacing);
+  font-weight: var(--feather-body-small-font-weight);
+  text-transform: var(--feather-body-small-text-transform);
+  font-style: var(--feather-body-small-font-style);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.feather-styles *,
+.feather-styles *::before,
+.feather-styles *::after {
+  box-sizing: border-box;
+}
+.feather-styles h1,
+.feather-styles h2,
+.feather-styles h3,
+.feather-styles h4,
+.feather-styles h5,
+.feather-styles h6,
+.feather-styles p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.feather-styles ol,
+.feather-styles ul {
+  margin: 0;
+}
+.feather-styles h1 {
+  font-family: var(--feather-header-font-family);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--feather-headline1-font-size);
+  line-height: var(--feather-headline1-line-height);
+  letter-spacing: var(--feather-headline1-letter-spacing);
+  font-weight: var(--feather-headline1-font-weight);
+  text-transform: var(--feather-headline1-text-transform);
+  font-style: var(--feather-headline1-font-style);
+}
+.feather-styles h2 {
+  font-family: var(--feather-header-font-family);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--feather-headline2-font-size);
+  line-height: var(--feather-headline2-line-height);
+  letter-spacing: var(--feather-headline2-letter-spacing);
+  font-weight: var(--feather-headline2-font-weight);
+  text-transform: var(--feather-headline2-text-transform);
+  font-style: var(--feather-headline2-font-style);
+}
+.feather-styles h3 {
+  font-family: var(--feather-header-font-family);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--feather-headline3-font-size);
+  line-height: var(--feather-headline3-line-height);
+  letter-spacing: var(--feather-headline3-letter-spacing);
+  font-weight: var(--feather-headline3-font-weight);
+  text-transform: var(--feather-headline3-text-transform);
+  font-style: var(--feather-headline3-font-style);
+}
+.feather-styles h4 {
+  font-family: var(--feather-header-font-family);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--feather-headline4-font-size);
+  line-height: var(--feather-headline4-line-height);
+  letter-spacing: var(--feather-headline4-letter-spacing);
+  font-weight: var(--feather-headline4-font-weight);
+  text-transform: var(--feather-headline4-text-transform);
+  font-style: var(--feather-headline4-font-style);
+}
+.feather-styles h5 {
+  font-family: var(--feather-header-font-family);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--feather-subtitle1-font-size);
+  line-height: var(--feather-subtitle1-line-height);
+  letter-spacing: var(--feather-subtitle1-letter-spacing);
+  font-weight: var(--feather-subtitle1-font-weight);
+  text-transform: var(--feather-subtitle1-text-transform);
+  font-style: var(--feather-subtitle1-font-style);
+}
+.feather-styles h6 {
+  font-family: var(--feather-header-font-family);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--feather-subtitle2-font-size);
+  line-height: var(--feather-subtitle2-line-height);
+  letter-spacing: var(--feather-subtitle2-letter-spacing);
+  font-weight: var(--feather-subtitle2-font-weight);
+  text-transform: var(--feather-subtitle2-text-transform);
+  font-style: var(--feather-subtitle2-font-style);
+}
+.feather-styles p {
+  font-family: var(--feather-font-family);
+  font-size: var(--feather-body-small-font-size);
+  line-height: var(--feather-body-small-line-height);
+  letter-spacing: var(--feather-body-small-letter-spacing);
+  font-weight: var(--feather-body-small-font-weight);
+  text-transform: var(--feather-body-small-text-transform);
+  font-style: var(--feather-body-small-font-style);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.feather-styles small,
+.feather-styles .small,
+.feather-styles .caption {
+  font-size: var(--feather-caption-font-size);
+  line-height: var(--feather-caption-line-height);
+  letter-spacing: var(--feather-caption-letter-spacing);
+  font-weight: var(--feather-caption-font-weight);
+  text-transform: var(--feather-caption-text-transform);
+  font-style: var(--feather-caption-font-style);
+  color: var(--feather-primary-text-on-surface);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.feather-styles a {
+  font-family: var(--feather-font-family);
+  font-size: 1em;
+  color: var(--feather-clickable-normal);
+  text-decoration: none;
+}
+.feather-styles a:hover {
+  text-decoration: underline;
+}
+.feather-styles a:visited {
+  color: var(--feather-clickable-visited);
+}
+.feather-styles .sr-text {
+  position: absolute;
+  top: auto;
+  left: -99999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  -webkit-user-select: none;
+}
+html.feather-styles,
+html.feather-styles body,
+body.feather-styles {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+@keyframes gradient {
+  to { opacity: 1; }
+  0% { -webkit-filter: blur(90px);}
+  50% { -webkit-filter: blur(100px);}
+  100% { -webkit-filter: blur(90px);}
+  from { transform : scale(0.8);}
+  to { transform : scale(1); }
+}
+body {
+  font-family: var(--feather-font-family);
+  background: var(--feather-background);
+}
+.link {
+  color: var(--feather-primary) !important;
+  text-decoration: none;
+}

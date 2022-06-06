@@ -18,7 +18,7 @@
       />
 
     <div class="headline4-mixin"
-      @click="logout()">
+      @click="keycloak?.logout()">
       Logout
     </div>
     </template>
@@ -40,8 +40,6 @@ const isDark = useDark({
 })
 
 const toggleDark = useToggle(isDark)
-
-const logout = async () => keycloak.value?.logout()
 </script>
 
 <style lang="scss" scoped>

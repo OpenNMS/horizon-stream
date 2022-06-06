@@ -1,0 +1,41 @@
+.typography-button {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--feather-font-family);
+  color: var(--feather-primary-text-on-surface);
+  font-size: var(--feather-button-font-size);
+  line-height: var(--feather-button-line-height);
+  letter-spacing: var(--feather-button-letter-spacing);
+  font-weight: var(--feather-button-font-weight);
+  text-transform: var(--feather-button-text-transform);
+  font-style: var(--feather-button-font-style);
+}
+
+.typography-headline1 {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--feather-font-family);
+  color: var(--feather-primary-text-on-surface);
+  font-size: var(--feather-headline1-font-size);
+  line-height: var(--feather-headline1-line-height);
+  letter-spacing: var(--feather-headline1-letter-spacing);
+  font-weight: var(--feather-headline1-font-weight);
+  text-transform: var(--feather-headline1-text-transform);
+  font-style: var(--feather-headline1-font-style);
+}
+
+.typography-body-small{
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--feather-font-family);
+  font-size: var(--feather-body-small-font-size);
+  line-height: var(--feather-body-small-line-height);
+  letter-spacing: var(--feather-body-small-letter-spacing);
+  font-weight: var(--feather-body-small-font-weight);
+  text-transform: var(--feather-body-small-text-transform);
+  font-style: var(--feather-body-small-font-style);
+  color: var(--feather-primary-text-on-surface);
+}

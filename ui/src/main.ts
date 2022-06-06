@@ -28,6 +28,7 @@ const app = createApp({
     onReady: (kc: KeycloakInstance) => {
       setKeycloak(kc)
       app.mount('#app')
+      console.log(kc)
     }
   })
   .directive('date', dateFormatDirective)

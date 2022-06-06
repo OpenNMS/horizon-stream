@@ -1,0 +1,746 @@
+.mt-xxs {
+  margin-top: var(--feather-spacing-xxs);
+}
+
+.pt-xxs {
+  padding-top: var(--feather-spacing-xxs);
+}
+
+.mb-xxs {
+  margin-bottom: var(--feather-spacing-xxs);
+}
+
+.pb-xxs {
+  padding-bottom: var(--feather-spacing-xxs);
+}
+
+.ml-xxs {
+  margin-left: var(--feather-spacing-xxs);
+}
+
+.pl-xxs {
+  padding-left: var(--feather-spacing-xxs);
+}
+
+.mr-xxs {
+  margin-right: var(--feather-spacing-xxs);
+}
+
+.pr-xxs {
+  padding-right: var(--feather-spacing-xxs);
+}
+
+.mx-xxs {
+  margin-left: var(--feather-spacing-xxs);
+  margin-right: var(--feather-spacing-xxs);
+}
+
+.px-xxs {
+  padding-left: var(--feather-spacing-xxs);
+  padding-right: var(--feather-spacing-xxs);
+}
+
+.my-xxs {
+  margin-top: var(--feather-spacing-xxs);
+  margin-bottom: var(--feather-spacing-xxs);
+}
+
+.py-xxs {
+  padding-top: var(--feather-spacing-xxs);
+  padding-bottom: var(--feather-spacing-xxs);
+}
+
+.m-xxs {
+  margin: var(--feather-spacing-xxs);
+}
+
+.p-xxs {
+  padding: var(--feather-spacing-xxs);
+}
+
+.mt-xs {
+  margin-top: var(--feather-spacing-xs);
+}
+
+.pt-xs {
+  padding-top: var(--feather-spacing-xs);
+}
+
+.mb-xs {
+  margin-bottom: var(--feather-spacing-xs);
+}
+
+.pb-xs {
+  padding-bottom: var(--feather-spacing-xs);
+}
+
+.ml-xs {
+  margin-left: var(--feather-spacing-xs);
+}
+
+.pl-xs {
+  padding-left: var(--feather-spacing-xs);
+}
+
+.mr-xs {
+  margin-right: var(--feather-spacing-xs);
+}
+
+.pr-xs {
+  padding-right: var(--feather-spacing-xs);
+}
+
+.mx-xs {
+  margin-left: var(--feather-spacing-xs);
+  margin-right: var(--feather-spacing-xs);
+}
+
+.px-xs {
+  padding-left: var(--feather-spacing-xs);
+  padding-right: var(--feather-spacing-xs);
+}
+
+.my-xs {
+  margin-top: var(--feather-spacing-xs);
+  margin-bottom: var(--feather-spacing-xs);
+}
+
+.py-xs {
+  padding-top: var(--feather-spacing-xs);
+  padding-bottom: var(--feather-spacing-xs);
+}
+
+.m-xs {
+  margin: var(--feather-spacing-xs);
+}
+
+.p-xs {
+  padding: var(--feather-spacing-xs);
+}
+
+.mt-s {
+  margin-top: var(--feather-spacing-s);
+}
+
+.pt-s {
+  padding-top: var(--feather-spacing-s);
+}
+
+.mb-s {
+  margin-bottom: var(--feather-spacing-s);
+}
+
+.pb-s {
+  padding-bottom: var(--feather-spacing-s);
+}
+
+.ml-s {
+  margin-left: var(--feather-spacing-s);
+}
+
+.pl-s {
+  padding-left: var(--feather-spacing-s);
+}
+
+.mr-s {
+  margin-right: var(--feather-spacing-s);
+}
+
+.pr-s {
+  padding-right: var(--feather-spacing-s);
+}
+
+.mx-s {
+  margin-left: var(--feather-spacing-s);
+  margin-right: var(--feather-spacing-s);
+}
+
+.px-s {
+  padding-left: var(--feather-spacing-s);
+  padding-right: var(--feather-spacing-s);
+}
+
+.my-s {
+  margin-top: var(--feather-spacing-s);
+  margin-bottom: var(--feather-spacing-s);
+}
+
+.py-s {
+  padding-top: var(--feather-spacing-s);
+  padding-bottom: var(--feather-spacing-s);
+}
+
+.m-s {
+  margin: var(--feather-spacing-s);
+}
+
+.p-s {
+  padding: var(--feather-spacing-s);
+}
+
+.mt-m {
+  margin-top: var(--feather-spacing-m);
+}
+
+.pt-m {
+  padding-top: var(--feather-spacing-m);
+}
+
+.mb-m {
+  margin-bottom: var(--feather-spacing-m);
+}
+
+.pb-m {
+  padding-bottom: var(--feather-spacing-m);
+}
+
+.ml-m {
+  margin-left: var(--feather-spacing-m);
+}
+
+.pl-m {
+  padding-left: var(--feather-spacing-m);
+}
+
+.mr-m {
+  margin-right: var(--feather-spacing-m);
+}
+
+.pr-m {
+  padding-right: var(--feather-spacing-m);
+}
+
+.mx-m {
+  margin-left: var(--feather-spacing-m);
+  margin-right: var(--feather-spacing-m);
+}
+
+.px-m {
+  padding-left: var(--feather-spacing-m);
+  padding-right: var(--feather-spacing-m);
+}
+
+.my-m {
+  margin-top: var(--feather-spacing-m);
+  margin-bottom: var(--feather-spacing-m);
+}
+
+.py-m {
+  padding-top: var(--feather-spacing-m);
+  padding-bottom: var(--feather-spacing-m);
+}
+
+.m-m {
+  margin: var(--feather-spacing-m);
+}
+
+.p-m {
+  padding: var(--feather-spacing-m);
+}
+
+.mt-l {
+  margin-top: var(--feather-spacing-l);
+}
+
+.pt-l {
+  padding-top: var(--feather-spacing-l);
+}
+
+.mb-l {
+  margin-bottom: var(--feather-spacing-l);
+}
+
+.pb-l {
+  padding-bottom: var(--feather-spacing-l);
+}
+
+.ml-l {
+  margin-left: var(--feather-spacing-l);
+}
+
+.pl-l {
+  padding-left: var(--feather-spacing-l);
+}
+
+.mr-l {
+  margin-right: var(--feather-spacing-l);
+}
+
+.pr-l {
+  padding-right: var(--feather-spacing-l);
+}
+
+.mx-l {
+  margin-left: var(--feather-spacing-l);
+  margin-right: var(--feather-spacing-l);
+}
+
+.px-l {
+  padding-left: var(--feather-spacing-l);
+  padding-right: var(--feather-spacing-l);
+}
+
+.my-l {
+  margin-top: var(--feather-spacing-l);
+  margin-bottom: var(--feather-spacing-l);
+}
+
+.py-l {
+  padding-top: var(--feather-spacing-l);
+  padding-bottom: var(--feather-spacing-l);
+}
+
+.m-l {
+  margin: var(--feather-spacing-l);
+}
+
+.p-l {
+  padding: var(--feather-spacing-l);
+}
+
+.mt-xl {
+  margin-top: var(--feather-spacing-xl);
+}
+
+.pt-xl {
+  padding-top: var(--feather-spacing-xl);
+}
+
+.mb-xl {
+  margin-bottom: var(--feather-spacing-xl);
+}
+
+.pb-xl {
+  padding-bottom: var(--feather-spacing-xl);
+}
+
+.ml-xl {
+  margin-left: var(--feather-spacing-xl);
+}
+
+.pl-xl {
+  padding-left: var(--feather-spacing-xl);
+}
+
+.mr-xl {
+  margin-right: var(--feather-spacing-xl);
+}
+
+.pr-xl {
+  padding-right: var(--feather-spacing-xl);
+}
+
+.mx-xl {
+  margin-left: var(--feather-spacing-xl);
+  margin-right: var(--feather-spacing-xl);
+}
+
+.px-xl {
+  padding-left: var(--feather-spacing-xl);
+  padding-right: var(--feather-spacing-xl);
+}
+
+.my-xl {
+  margin-top: var(--feather-spacing-xl);
+  margin-bottom: var(--feather-spacing-xl);
+}
+
+.py-xl {
+  padding-top: var(--feather-spacing-xl);
+  padding-bottom: var(--feather-spacing-xl);
+}
+
+.m-xl {
+  margin: var(--feather-spacing-xl);
+}
+
+.p-xl {
+  padding: var(--feather-spacing-xl);
+}
+
+.mt-xxl {
+  margin-top: var(--feather-spacing-xxl);
+}
+
+.pt-xxl {
+  padding-top: var(--feather-spacing-xxl);
+}
+
+.mb-xxl {
+  margin-bottom: var(--feather-spacing-xxl);
+}
+
+.pb-xxl {
+  padding-bottom: var(--feather-spacing-xxl);
+}
+
+.ml-xxl {
+  margin-left: var(--feather-spacing-xxl);
+}
+
+.pl-xxl {
+  padding-left: var(--feather-spacing-xxl);
+}
+
+.mr-xxl {
+  margin-right: var(--feather-spacing-xxl);
+}
+
+.pr-xxl {
+  padding-right: var(--feather-spacing-xxl);
+}
+
+.mx-xxl {
+  margin-left: var(--feather-spacing-xxl);
+  margin-right: var(--feather-spacing-xxl);
+}
+
+.px-xxl {
+  padding-left: var(--feather-spacing-xxl);
+  padding-right: var(--feather-spacing-xxl);
+}
+
+.my-xxl {
+  margin-top: var(--feather-spacing-xxl);
+  margin-bottom: var(--feather-spacing-xxl);
+}
+
+.py-xxl {
+  padding-top: var(--feather-spacing-xxl);
+  padding-bottom: var(--feather-spacing-xxl);
+}
+
+.m-xxl {
+  margin: var(--feather-spacing-xxl);
+}
+
+.p-xxl {
+  padding: var(--feather-spacing-xxl);
+}
+
+@font-face {
+  font-family: "OpenSans";
+  font-weight: 300;
+  font-style: normal;
+  src: url("../fonts/OpenSans-Light.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "OpenSans";
+  font-weight: 400;
+  font-style: normal;
+  src: url("../fonts/OpenSans-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "OpenSans";
+  font-weight: 600;
+  font-style: normal;
+  src: url("../fonts/OpenSans-SemiBold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "OpenSans";
+  font-weight: 600;
+  font-style: italic;
+  src: url("../fonts/OpenSans-SemiBoldItalic.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 300;
+  font-style: normal;
+  src: url("../fonts/Inter-Light.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 400;
+  font-style: normal;
+  src: url("../fonts/Inter-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 500;
+  font-style: normal;
+  src: url("../fonts/Inter-Medium.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: 600;
+  font-style: normal;
+  src: url("../fonts/Inter-SemiBold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: bold;
+  font-style: normal;
+  src: url("../fonts/Inter-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+:root {
+  --feather-display1-font-size: 5rem;
+  --feather-display1-line-height: 6rem;
+  --feather-display1-letter-spacing: -0.015625em;
+  --feather-display1-font-weight: var(--feather-font-normal);
+  --feather-display1-text-transform: none;
+  --feather-display1-font-style: normal;
+  --feather-display2-font-size: 3.75rem;
+  --feather-display2-line-height: 4.5rem;
+  --feather-display2-letter-spacing: -0.0083em;
+  --feather-display2-font-weight: var(--feather-font-normal);
+  --feather-display2-text-transform: none;
+  --feather-display2-font-style: normal;
+  --feather-display3-font-size: 3rem;
+  --feather-display3-line-height: 3.75rem;
+  --feather-display3-letter-spacing: -0.005em;
+  --feather-display3-font-weight: var(--feather-font-medium);
+  --feather-display3-text-transform: none;
+  --feather-display3-font-style: normal;
+  --feather-title-font-size: 2.125rem;
+  --feather-title-line-height: 2.5rem;
+  --feather-title-letter-spacing: normal;
+  --feather-title-font-weight: var(--feather-font-light);
+  --feather-title-text-transform: none;
+  --feather-title-font-style: normal;
+  --feather-headline1-font-size: 1.75rem;
+  --feather-headline1-line-height: 2.25rem;
+  --feather-headline1-letter-spacing: normal;
+  --feather-headline1-font-weight: var(--feather-font-semibold);
+  --feather-headline1-text-transform: none;
+  --feather-headline1-font-style: normal;
+  --feather-headline2-font-size: 1.5rem;
+  --feather-headline2-line-height: 2rem;
+  --feather-headline2-letter-spacing: normal;
+  --feather-headline2-font-weight: var(--feather-font-medium);
+  --feather-headline2-text-transform: none;
+  --feather-headline2-font-style: normal;
+  --feather-headline3-font-size: 1.1875rem;
+  --feather-headline3-line-height: 2rem;
+  --feather-headline3-letter-spacing: 0.012em;
+  --feather-headline3-font-weight: var(--feather-font-bold);
+  --feather-headline3-text-transform: none;
+  --feather-headline3-font-style: normal;
+  --feather-headline4-font-size: 1rem;
+  --feather-headline4-line-height: 2rem;
+  --feather-headline4-letter-spacing: 0.0125em;
+  --feather-headline4-font-weight: var(--feather-font-semibold);
+  --feather-headline4-text-transform: none;
+  --feather-headline4-font-style: normal;
+  --feather-subtitle1-font-size: 0.875rem;
+  --feather-subtitle1-line-height: 1.5rem;
+  --feather-subtitle1-letter-spacing: 0.00714em;
+  --feather-subtitle1-font-weight: var(--feather-font-bold);
+  --feather-subtitle1-text-transform: none;
+  --feather-subtitle1-font-style: normal;
+  --feather-subtitle2-font-size: 0.8125rem;
+  --feather-subtitle2-line-height: 1.25rem;
+  --feather-subtitle2-letter-spacing: 0.00714em;
+  --feather-subtitle2-font-weight: var(--feather-font-bold);
+  --feather-subtitle2-text-transform: none;
+  --feather-subtitle2-font-style: normal;
+  --feather-body-large-font-size: 1rem;
+  --feather-body-large-line-height: 1.75rem;
+  --feather-body-large-letter-spacing: 0.03125em;
+  --feather-body-large-font-weight: var(--feather-font-normal);
+  --feather-body-large-text-transform: none;
+  --feather-body-large-font-style: normal;
+  --feather-body-small-font-size: 0.875rem;
+  --feather-body-small-line-height: 1.5rem;
+  --feather-body-small-letter-spacing: 0.01786em;
+  --feather-body-small-font-weight: var(--feather-font-normal);
+  --feather-body-small-text-transform: none;
+  --feather-body-small-font-style: normal;
+  --feather-button-font-size: 0.875rem;
+  --feather-button-line-height: 1.25rem;
+  --feather-button-letter-spacing: 0.08929em;
+  --feather-button-font-weight: var(--feather-font-bold);
+  --feather-button-text-transform: uppercase;
+  --feather-button-font-style: normal;
+  --feather-overline-font-size: 0.75rem;
+  --feather-overline-line-height: 1rem;
+  --feather-overline-letter-spacing: 0.105em;
+  --feather-overline-font-weight: var(--feather-font-semibold);
+  --feather-overline-text-transform: uppercase;
+  --feather-overline-font-style: normal;
+  --feather-caption-font-size: 0.75rem;
+  --feather-caption-line-height: 1rem;
+  --feather-caption-letter-spacing: normal;
+  --feather-caption-font-weight: var(--feather-font-normal);
+  --feather-caption-text-transform: none;
+  --feather-caption-font-style: normal;
+  --feather-root-font-size: 1rem;
+  --feather-header-font-family: Inter, Helvetica, Arial, sans-serif;
+  --feather-font-family: OpenSans, Helvetica, Arial, sans-serif;
+  --feather-font-light: 300;
+  --feather-font-normal: normal;
+  --feather-font-medium: 500;
+  --feather-font-semibold: 600;
+  --feather-font-bold: 700;
+  --feather-base-font-size: 0.875rem;
+  --feather-header-height: 3.75rem;
+  --feather-content-width: 75rem;
+  --feather-zindex-dropdown: 1000;
+  --feather-zindex-sticky: 1020;
+  --feather-zindex-fixed: 1030;
+  --feather-zindex-modal-backdrop: 1040;
+  --feather-zindex-modal: 1050;
+  --feather-zindex-popover: 1060;
+  --feather-zindex-tooltip: 1070;
+  --feather-spacing-xxs: 0.25rem;
+  --feather-spacing-xs: 0.5rem;
+  --feather-spacing-s: 0.75rem;
+  --feather-spacing-m: 1rem;
+  --feather-spacing-l: 1.25rem;
+  --feather-spacing-xl: 1.5rem;
+  --feather-spacing-xxl: 3rem;
+  --feather-secondary: #131736;
+  --feather-secondary-variant: #3a4bd3;
+  --feather-clickable-normal: #0402a9;
+  --feather-clickable-selected: #0402a9;
+  --feather-clickable-visited: #670101;
+  --feather-background: #f4f7fc;
+  --feather-surface: #ffffff;
+  --feather-error: #d43d45;
+  --feather-success: #0f6e00;
+  --feather-warning: #ffac26;
+  --feather-state-color-on-color: #fff;
+  --feather-state-color-on-neutral: #000;
+  --feather-high-visibility-on-surface: #333;
+  --feather-high-visibility-text-on-surface: #85D4FF;
+  --feather-primary-text-on-surface: rgba(10, 12, 27, 0.9);
+  --feather-secondary-r: 19;
+  --feather-secondary-g: 23;
+  --feather-secondary-b: 54;
+  --feather-secondary-variant-r: 58;
+  --feather-secondary-variant-g: 75;
+  --feather-secondary-variant-b: 211;
+  --feather-clickable-normal-r: 4;
+  --feather-clickable-normal-g: 2;
+  --feather-clickable-normal-b: 169;
+  --feather-clickable-selected-r: 4;
+  --feather-clickable-selected-g: 2;
+  --feather-clickable-selected-b: 169;
+  --feather-clickable-visited-r: 103;
+  --feather-clickable-visited-g: 1;
+  --feather-clickable-visited-b: 1;
+  --feather-background-r: 244;
+  --feather-background-g: 247;
+  --feather-background-b: 252;
+  --feather-surface-r: 255;
+  --feather-surface-g: 255;
+  --feather-surface-b: 255;
+  --feather-error-r: 212;
+  --feather-error-g: 61;
+  --feather-error-b: 69;
+  --feather-success-r: 15;
+  --feather-success-g: 110;
+  --feather-success-b: 0;
+  --feather-warning-r: 255;
+  --feather-warning-g: 172;
+  --feather-warning-b: 38;
+  --feather-state-color-on-color-r: 255;
+  --feather-state-color-on-color-g: 255;
+  --feather-state-color-on-color-b: 255;
+  --feather-state-color-on-neutral-r: 0;
+  --feather-state-color-on-neutral-g: 0;
+  --feather-state-color-on-neutral-b: 0;
+  --feather-high-visibility-on-surface-r: 51;
+  --feather-high-visibility-on-surface-g: 51;
+  --feather-high-visibility-on-surface-b: 51;
+  --feather-high-visibility-text-on-surface-r: 133;
+  --feather-high-visibility-text-on-surface-g: 212;
+  --feather-high-visibility-text-on-surface-b: 255;
+  --feather-primary-text-on-surface-r: 10;
+  --feather-primary-text-on-surface-g: 12;
+  --feather-primary-text-on-surface-b: 27;
+  --feather-hero-gradient-1-1: radial-gradient(ellipse 200% 500% at -90% 0%, rgba(219, 41, 115, 0.5) 0%, rgba(20, 209, 223, 0) 100%) 0% 0% no-repeat padding-box;
+  --feather-hero-gradient-1-2: radial-gradient(ellipse 100% 250% at 130% 180%, rgba(50, 231, 243, 0.5) 0%, rgba(20, 209, 223, 0) 100%) 0% 0% no-repeat padding-box;
+  --feather-hero-gradient-1-3: radial-gradient(ellipse 0% 0% at 0% 0%, transparent 0%, transparent 100%) 0% 0% no-repeat padding-box;
+  --feather-hero-gradient-2-1: radial-gradient(ellipse 200% 200% at -100% -110%, rgba(219, 41, 115, 0.5) 0%, rgba(20, 209, 223, 0) 100%) 0% 0% no-repeat padding-box;
+  --feather-hero-gradient-2-2: radial-gradient(ellipse 100% 250% at 130% -115%, rgba(50, 231, 243, 0.5) 0%, rgba(20, 209, 223, 0) 100%) 0% 0% no-repeat padding-box;
+  --feather-hero-gradient-2-3: radial-gradient(ellipse 100% 250% at 110% 250%, rgba(58, 75, 211, 0.5) 0%, rgba(20, 209, 223, 0) 100%) 0% 0% no-repeat padding-box;
+  --feather-hero-gradient-2-4: radial-gradient(ellipse 200% 200% at -90% 160%, rgba(61, 80, 197, 0.5) 0%, rgba(20, 209, 223, 0) 100%) 0% 0% no-repeat padding-box;
+  --feather-primary-text-on-color: rgb(255, 255, 255);
+  --feather-secondary-text-on-color: rgba(255, 255, 255, 0.78);
+  --feather-disabled-text-on-color: rgba(255, 255, 255, 0.5);
+  --feather-border-on-color: rgba(255, 255, 255, 0.24);
+  --feather-border-light-on-color: rgba(255, 255, 255, 0.12);
+  --feather-secondary-text-on-surface: rgba(10, 12, 27, 0.7);
+  --feather-disabled-text-on-surface: rgba(10, 12, 27, 0.4);
+  --feather-border-on-surface: rgba(10, 12, 27, 0.12);
+  --feather-border-light-on-surface: rgba(10, 12, 27, 0.06);
+  --feather-primary-text-on-warning: rgba(10, 12, 27, 0.9);
+  --feather-secondary-text-on-warning: rgba(10, 12, 27, 0.6);
+  --feather-disabled-text-on-warning: rgba(10, 12, 27, 0.4);
+  --feather-border-on-warning: rgba(10, 12, 27, 0.12);
+  --feather-border-light-on-warning: rgba(10, 12, 27, 0.06);
+  --feather-state-opacity-hover-on-surface: 0.08;
+  --feather-state-opacity-pressed-on-surface: 0.32;
+  --feather-state-opacity-selected-on-surface: 0.12;
+  --feather-state-opacity-focus-on-surface: 0.12;
+  --feather-state-opacity-hover-on-neutral: 0.08;
+  --feather-state-opacity-pressed-on-neutral: 0.32;
+  --feather-state-opacity-selected-on-neutral: 0.12;
+  --feather-state-opacity-focus-on-neutral: 0.12;
+  --feather-state-opacity-hover-on-color: 0.08;
+  --feather-state-opacity-pressed-on-color: 0.32;
+  --feather-state-opacity-selected-on-color: 0.16;
+  --feather-state-opacity-focus-on-color: 0.16;
+  --feather-state-border-focus-on-color: 2px solid #000;
+  --feather-state-inner-border-color-focus-on-color: rgba(255, 255, 255, 0.24);
+  --feather-shade-1: rgba(10, 12, 27, 0.6);
+  --feather-shade-2: rgba(10, 12, 27, 0.4);
+  --feather-shade-3: rgba(10, 12, 27, 0.24);
+  --feather-shade-4: rgba(10, 12, 27, 0.12);
+  --feather-elevation-background-0: #fff;
+  --feather-elevation-background-1: #fff;
+  --feather-elevation-background-2: #fff;
+  --feather-elevation-background-3: #fff;
+  --feather-elevation-background-4: #fff;
+  --feather-elevation-background-6: #fff;
+  --feather-elevation-background-8: #fff;
+  --feather-elevation-background-12: #fff;
+  --feather-elevation-background-16: #fff;
+  --feather-elevation-background-24: #fff;
+  --feather-shadow-0: 0 0 0 0 rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(0, 0, 0, 0.14), 0 0 0 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-1: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-2: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-3: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-4: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-5: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 5px 8px 0 rgba(0, 0, 0, 0.14), 0 1px 14px 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-6: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+  --feather-shadow-7: 0 4px 5px -2px rgba(0, 0, 0, 0.2), 0 7px 10px 1px rgba(0, 0, 0, 0.14), 0 2px 16px 1px rgba(0, 0, 0, 0.12);
+  --feather-shadow-8: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  --feather-shadow-9: 0 5px 6px -3px rgba(0, 0, 0, 0.2), 0 9px 12px 1px rgba(0, 0, 0, 0.14), 0 3px 16px 2px rgba(0, 0, 0, 0.12);
+  --feather-shadow-10: 0 6px 6px -3px rgba(0, 0, 0, 0.2), 0 10px 14px 1px rgba(0, 0, 0, 0.14), 0 4px 18px 3px rgba(0, 0, 0, 0.12);
+  --feather-shadow-11: 0 6px 7px -4px rgba(0, 0, 0, 0.2), 0 11px 15px 1px rgba(0, 0, 0, 0.14), 0 4px 20px 3px rgba(0, 0, 0, 0.12);
+  --feather-shadow-12: 0 7px 8px -4px rgba(0, 0, 0, 0.2), 0 12px 17px 2px rgba(0, 0, 0, 0.14), 0 5px 22px 4px rgba(0, 0, 0, 0.12);
+  --feather-shadow-13: 0 7px 8px -4px rgba(0, 0, 0, 0.2), 0 13px 19px 2px rgba(0, 0, 0, 0.14), 0 5px 24px 4px rgba(0, 0, 0, 0.12);
+  --feather-shadow-14: 0 7px 9px -4px rgba(0, 0, 0, 0.2), 0 14px 21px 2px rgba(0, 0, 0, 0.14), 0 5px 26px 4px rgba(0, 0, 0, 0.12);
+  --feather-shadow-15: 0 8px 9px -5px rgba(0, 0, 0, 0.2), 0 15px 22px 2px rgba(0, 0, 0, 0.14), 0 6px 28px 5px rgba(0, 0, 0, 0.12);
+  --feather-shadow-16: 0 8px 10px -5px rgba(0, 0, 0, 0.2), 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12);
+  --feather-shadow-17: 0 8px 11px -5px rgba(0, 0, 0, 0.2), 0 17px 26px 2px rgba(0, 0, 0, 0.14), 0 6px 32px 5px rgba(0, 0, 0, 0.12);
+  --feather-shadow-18: 0 9px 11px -5px rgba(0, 0, 0, 0.2), 0 18px 28px 2px rgba(0, 0, 0, 0.14), 0 7px 34px 6px rgba(0, 0, 0, 0.12);
+  --feather-shadow-19: 0 9px 12px -6px rgba(0, 0, 0, 0.2), 0 19px 29px 2px rgba(0, 0, 0, 0.14), 0 7px 36px 6px rgba(0, 0, 0, 0.12);
+  --feather-shadow-20: 0 10px 13px -6px rgba(0, 0, 0, 0.2), 0 20px 31px 3px rgba(0, 0, 0, 0.14), 0 8px 38px 7px rgba(0, 0, 0, 0.12);
+  --feather-shadow-21: 0 10px 13px -6px rgba(0, 0, 0, 0.2), 0 21px 33px 3px rgba(0, 0, 0, 0.14), 0 8px 40px 7px rgba(0, 0, 0, 0.12);
+  --feather-shadow-22: 0 10px 14px -6px rgba(0, 0, 0, 0.2), 0 22px 35px 3px rgba(0, 0, 0, 0.14), 0 8px 42px 7px rgba(0, 0, 0, 0.12);
+  --feather-shadow-23: 0 11px 14px -7px rgba(0, 0, 0, 0.2), 0 23px 36px 3px rgba(0, 0, 0, 0.14), 0 9px 44px 8px rgba(0, 0, 0, 0.12);
+  --feather-shadow-24: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12);
+  --feather-primary: #273180;
+  --feather-primary-variant: #00BFCB;
+  --feather-state-color-on-surface: #131736;
+  --feather-primary-r: 39;
+  --feather-primary-g: 49;
+  --feather-primary-b: 128;
+  --feather-primary-variant-r: 0;
+  --feather-primary-variant-g: 191;
+  --feather-primary-variant-b: 203;
+  --feather-state-color-on-surface-r: 19;
+  --feather-state-color-on-surface-g: 23;
+  --feather-state-color-on-surface-b: 54;
+}

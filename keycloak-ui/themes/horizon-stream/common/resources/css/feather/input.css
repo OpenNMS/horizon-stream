@@ -1,0 +1,6 @@
+.feather-input {
+  width: calc(100% - 18px);
+  height: 32px;
+  padding-left: 12px;
+  margin-bottom: 24px;
+}

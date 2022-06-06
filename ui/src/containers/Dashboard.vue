@@ -1,6 +1,6 @@
 <template>
   <p class="title">Horizon Stream</p>
-  <p class="welcome" v-if="keycloak?.authenticated">Welcome, {{ keycloak.profile?.username }}</p>
+  <p class="welcome" v-if="keycloak?.authenticated">Welcome, {{ keycloak.tokenParsed?.preferred_username }}</p>
   <AlarmsTable />
 </template>
 
