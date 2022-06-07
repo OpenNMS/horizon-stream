@@ -7,16 +7,17 @@
             <div id="hs-form-wrapper">
                 <#if realm.password>
                     <form autocomplete="off" id="hs-form-login" onsubmit="login.disabled = true; return true;" action="${url.loginAction}" method="post">
+
+                        <#if messagesPerField.existsError('username','password')>
+                            <span id="hs-input-error" aria-live="polite">
+                                    ${kcSanitize(messagesPerField.getFirstError('username','password'))?no_esc}
+                            </span>
+                        </#if>
+
                         <#if !usernameHidden??>
                             <input tabindex="1" placeholder="${msg('username')}" id="username" class="feather-input" name="username" value="${(login.username!'')}"  type="text" autofocus autocomplete="new-username"
                                 aria-invalid="<#if messagesPerField.existsError('username','password')>true</#if>"
                             />
-
-                            <#if messagesPerField.existsError('username','password')>
-                                <span id="input-error" aria-live="polite">
-                                        ${kcSanitize(messagesPerField.getFirstError('username','password'))?no_esc}
-                                </span>
-                            </#if>
                         </#if>
 
                         <input tabindex="2" placeholder="${msg('password')}" id="password" class="feather-input" name="password" type="password" autocomplete="new-password"

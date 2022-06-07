@@ -511,6 +511,8 @@ spec:
     realm: opennms
     enabled: true
     loginTheme: "horizon-stream"
+    rememberMe: true
+    resetPasswordAllowed: true
     attributes:
       frontendUrl: "http://localhost:28080"
     clients:

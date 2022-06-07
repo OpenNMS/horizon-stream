@@ -184,3 +184,9 @@ body {
   color: var(--feather-primary) !important;
   text-decoration: none;
 }
+#hs-input-error {
+  text-align: center;
+  display: block;
+  margin: -10px 0px 10px 0px;
+  color: var(--feather-error);
+}

@@ -1,32 +1,27 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=true displayMessage=!messagesPerField.existsError('username'); section>
     <#if section = "header">
-        ${msg("emailForgotTitle")}
-        ${msg("emailForgotTitleMsg")}
+        ${msg("emailForgotTitle")} </br>
+        <span class="typography-body-small">${msg("emailForgotTitleMsg")}<span>
     <#elseif section = "form">
-        <form id="hs-reset-password-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
-            <div class="${properties.kcFormGroupClass!}">
-                <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="username">${msg("username")}</label>
-                </div>
-                <div class="${properties.kcInputWrapperClass!}">
-                    <input type="text" id="username" name="username" class="${properties.kcInputClass!}" autofocus value="${(auth.attemptedUsername!'')}" aria-invalid="<#if messagesPerField.existsError('username')>true</#if>"/>
-                    <#if messagesPerField.existsError('username')>
-                        <span id="input-error-username" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
-                                    ${kcSanitize(messagesPerField.get('username'))?no_esc}
-                        </span>
-                    </#if>
-                </div>
-            </div>
-            <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
-                <div id="hs-form-options" class="${properties.kcFormOptionsClass!}">
-                    <div class="${properties.kcFormOptionsWrapperClass!}">
-                        <span><a href="${url.loginUrl}">${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
-                    </div>
-                </div>
+        <form id="hs-reset-password-form" action="${url.loginAction}" method="post">
+            <div>
+                <#if messagesPerField.existsError('username')>
+                    <span id="hs-input-error" aria-live="polite">
+                        ${kcSanitize(messagesPerField.get('username'))?no_esc}
+                    </span>
+                </#if>
 
-                <div id="hs-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doSubmit")}"/>
+                <input placeholder="${msg('placeholderEmail')}" type="text" id="username" name="username" class="feather-input" autofocus value="${(auth.attemptedUsername!'')}" aria-invalid="<#if messagesPerField.existsError('username')>true</#if>"/>
+            </div>
+            <div>
+                <div id="hs-form-buttons">
+                    <button class="btn hover focus btn-primary" type="submit">${msg("doSubmit")}</button>
+                </div>
+                <div id="hs-form-options">
+                    <div class="typography-button">
+                        <span><a class="link" href="${url.loginUrl}">${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
+                    </div>
                 </div>
             </div>
         </form>
