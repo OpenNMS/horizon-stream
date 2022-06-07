@@ -26,7 +26,7 @@ auth.interceptors.request.use(
 const logout = async (): Promise<void> => {
   const params = new URLSearchParams()
   params.append('client_id', keycloakConfig.clientId as string)
-  params.append('refresh_token', keycloak.value?.refreshTokenParsed as unknown as string)
+  params.append('refresh_token', keycloak.value?.refreshToken as unknown as string)
 
   startSpinner()
 
@@ -34,6 +34,7 @@ const logout = async (): Promise<void> => {
     await auth.post('/logout', params)
   } finally {
     stopSpinner()
+    location.reload()
   }
 }
 
