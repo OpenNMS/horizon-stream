@@ -1,4 +1,5 @@
+import { logout } from './authService'
 import { sendEvent } from './eventService'
 import { getAlarms, deleteAlarmById } from './alarmService'
 
-export default { getAlarms, deleteAlarmById, sendEvent }
+export default { logout, getAlarms, deleteAlarmById, sendEvent }

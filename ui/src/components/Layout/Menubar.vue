@@ -18,7 +18,7 @@
       />
 
     <div class="headline4-mixin"
-      @click="keycloak?.logout()">
+      @click="API.logout()">
       Logout
     </div>
     </template>
@@ -29,6 +29,7 @@
 import LightDarkMode from '@featherds/icon/action/LightDarkMode'
 import Logo from '@/assets/Logo.vue'
 import useKeycloak from '@/composables/useKeycloak'
+import API from '@/services'
 
 const { keycloak } = useKeycloak()
 
