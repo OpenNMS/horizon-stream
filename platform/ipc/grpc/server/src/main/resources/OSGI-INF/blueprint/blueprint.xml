@@ -27,12 +27,16 @@
   </bean>
   <service ref="grpcIpcServer" interface="org.opennms.core.grpc.common.GrpcIpcServer"/>
 
+  <bean id="minionManager" class="org.opennms.core.ipc.grpc.server.manager.impl.MinionManagerImpl" />
+  <service ref="minionManager" interface="org.opennms.core.ipc.grpc.server.manager.MinionManager" />
+
   <bean id="grpcServer" class="org.opennms.core.ipc.grpc.server.OpennmsGrpcServer"
         init-method="start" destroy-method="shutdown">
     <argument ref="grpcIpcServer"/>
     <property name="identity" ref="identity"/>
     <property name="rpcMetrics" ref="grpcRpcMetrics"/>
     <property name="sinkMetrics" ref="grpcSinkMetrics"/>
+    <property name="minionManager" ref="minionManager"/>
 <!--    <property name="tracerRegistry" ref="tracerRegistry"/>-->
   </bean>
 

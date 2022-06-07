@@ -30,8 +30,11 @@ package org.opennms.horizon.server.security;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Response;
 
@@ -45,11 +48,18 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class KeyCloakUtils {
+    @Value("${keycloak.realm}")
+    private String appRealm;
     private final Keycloak keycloak;
 
     @Autowired
@@ -57,10 +67,14 @@ public class KeyCloakUtils {
         this.keycloak = keycloak;
     }
 
-    public void createRealm(String realm, String frontendUrl) {
+    public void setAppRealm(String appRealm) {
+        this.appRealm = appRealm;
+    }
+
+    public void createRealm(String frontendUrl) {
         RealmRepresentation realmRp = new RealmRepresentation();
-        realmRp.setId(realm);
-        realmRp.setRealm(realm);
+        realmRp.setId(appRealm);
+        realmRp.setRealm(appRealm);
         realmRp.setEnabled(true);
         if(StringUtils.hasLength(frontendUrl)) {
             Map<String, String> attr = new HashMap<>();
@@ -70,14 +84,14 @@ public class KeyCloakUtils {
         keycloak.realms().create(realmRp);
     }
 
-    public void addRole(String realm, String role) {
+    public void addRole(String role) {
         RoleRepresentation rr = new RoleRepresentation();
         rr.setName(role);
         rr.setName(role);
-        keycloak.realm(realm).roles().create(rr);
+        keycloak.realm(appRealm).roles().create(rr);
     }
 
-    public void addUser(String realm, String username, String password, String role) {
+    public void addUser(String username, String password, String role) {
         UserRepresentation userRp = new UserRepresentation();
         userRp.setUsername(username);
         if(StringUtils.hasLength(password)) {
@@ -87,14 +101,13 @@ public class KeyCloakUtils {
             userRp.setCredentials(Arrays.asList(cr));
         }
         userRp.setEnabled(true);
-        addUser(realm, userRp, role);
+        addUser(userRp, role);
     }
 
-    public boolean addUser(String realm, UserRepresentation userRp, String role) {
-        RealmResource realmResource = keycloak.realm(realm);
+    public boolean addUser(UserRepresentation userRp, String role) {
+        RealmResource realmResource = keycloak.realm(appRealm);
         UsersResource usersResource = realmResource.users();
         Response response = usersResource.create(userRp);
-        int statusCode = response.getStatus();
         String userId = CreatedResponseUtil.getCreatedId(response);
         RoleRepresentation roleRp = realmResource.roles().get(role).toRepresentation();
         UserResource userResource = usersResource.get(userId);
@@ -102,12 +115,24 @@ public class KeyCloakUtils {
         return response.getStatus()==200;
     }
 
-    public void addRoles(String realm, List<String> roles) {
-        roles.forEach(r -> addRole(realm, r));
+    public void addRoles(List<String> roles) {
+        roles.forEach(r -> addRole(r));
     }
 
-    public boolean isClosed() {
-        return keycloak.isClosed();
+    /**
+     *
+     * @param usrId the keycloak user id
+     * @return set of realm roles assigned to the user
+     */
+    public Set<String> listUserRoles(String usrId) {
+        log.info("list roles for user {} with realm {}", usrId, appRealm);
+        UserResource userResource = keycloak.realm(appRealm).users().get(usrId);
+        try {
+            return userResource.roles().getAll().getRealmMappings().stream().map(r->r.getName()).collect(Collectors.toSet());
+        } catch (Exception e) {
+            log.error("failed list user roles: {}", e.getMessage());
+            return new HashSet<>();
+        }
     }
 
     public void close() {

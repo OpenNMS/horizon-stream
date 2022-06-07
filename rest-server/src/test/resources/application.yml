@@ -15,6 +15,9 @@ spring:
     enabled: false
   main:
     allow-bean-definition-overriding: true
+  cache:
+    caffeine:
+      spec: maximumSize=10000,expireAfterAccess=600s
 
 # keycloak
 keycloak:

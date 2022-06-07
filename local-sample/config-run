@@ -2,6 +2,10 @@
 
 VERSION_KEY_CLOAK=18.0.0
 
+CI_CD_RUN=false
+
+IMAGE_TAG=latest
+
 DOMAIN_CORE=localhostcore # Service on port 8181
 DOMAIN_KARAF=localhostkaraf # Service on port 8101
 DOMAIN_UI=localhostui 

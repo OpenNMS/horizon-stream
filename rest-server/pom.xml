@@ -35,12 +35,14 @@
 		<lombok.version>1.18.22</lombok.version>
 		<lombok.binding.version>0.2.0</lombok.binding.version>
 		<liquibase.version>4.9.1</liquibase.version>
+		<graphql.spqr.version>0.0.6</graphql.spqr.version>
 		<skip-docker-image-build>true</skip-docker-image-build>
 		<docker.image.tag>local</docker.image.tag>
 		<docker.image.skipPush>false</docker.image.skipPush>
 		<docker.it.network>rest-server-it-network</docker.it.network>
 		<cucumber.version>7.3.4</cucumber.version>
 		<skipITs>true</skipITs>
+		<caffeine.cache.version>3.1.0</caffeine.cache.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -53,19 +55,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>${liquibase.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -86,7 +85,7 @@
 		<dependency>
 			<groupId>io.leangen.graphql</groupId>
 			<artifactId>graphql-spqr-spring-boot-starter</artifactId>
-			<version>0.0.6</version>
+			<version>${graphql.spqr.version}</version>
 		</dependency>
 
 		<dependency>
@@ -102,6 +101,15 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.ben-manes.caffeine</groupId>
+			<artifactId>caffeine</artifactId>
+			<version>${caffeine.cache.version}</version>
 		</dependency>
 
 		<!-- Test -->

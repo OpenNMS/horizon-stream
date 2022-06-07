@@ -37,6 +37,31 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.github.java-json-tools</groupId>
+                <artifactId>json-patch</artifactId>
+                <version>${jsonPatch.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.java-json-tools</groupId>
+                <artifactId>jackson-coreutils</artifactId>
+                <version>${jacksonCoreUtils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.fge</groupId>
+                <artifactId>msg-simple</artifactId>
+                <version>${fgeMsgSimple.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.fge</groupId>
+                <artifactId>btf</artifactId>
+                <version>${fgeBtf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${jsr305.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.swrve</groupId>
                 <artifactId>rate-limited-logger</artifactId>
                 <version>${rate.limitted.logger.version}</version>

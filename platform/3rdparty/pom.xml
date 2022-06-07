@@ -17,7 +17,9 @@
 
     <modules>
         <module>grpc</module>
+        <module>jackson-coreutils</module>
         <module>jaeger</module>
+        <module>json-patch</module>
         <module>keycloak-admin-client</module>
     </modules>
 

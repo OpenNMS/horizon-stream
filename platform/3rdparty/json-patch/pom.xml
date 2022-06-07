@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.opennms.horizon.3rdparty</groupId>
+    <artifactId>3rdparty</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>json-patch-osgi</artifactId>
+  <name>OpenNMS Horizon :: 3rd Party :: Json Patch OSGI</name>
+  <packaging>bundle</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opennms.horizon</groupId>
+        <artifactId>horizon-bom</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.java-json-tools</groupId>
+      <artifactId>json-patch</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <defaultGoal>install</defaultGoal>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Import-Package>
+              com.fasterxml.jackson.annotation;version="[2.11,3)",
+              com.fasterxml.jackson.core;version="[2.11,3)",
+              com.fasterxml.jackson.databind;version="[2.11,3)",
+              com.fasterxml.jackson.databind.annotation;version="[2.11,3)",
+              com.fasterxml.jackson.databind.jsontype;version="[2.11,3)",
+              com.fasterxml.jackson.databind.node;version="[2.11,3)",
+              com.fasterxml.jackson.databind.ser.std;version="[2.11,3)",
+              com.github.fge.jackson,
+              com.github.fge.jackson.jsonpointer,
+              com.github.fge.msgsimple.bundle;version="[1.1,2)",
+              com.github.fge.msgsimple.load;version="[1.1,2)",
+              javax.annotation;version="[3.0,4)"
+            </Import-Package>
+            <Export-Package>
+              com.github.fge.jsonpatch,
+              com.github.fge.jsonpatch.diff,
+              com.github.fge.jsonpatch.mergepatch
+            </Export-Package>
+          </instructions>
+          <unpackBundle>true</unpackBundle>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -19,6 +19,8 @@
     <module>api</module>
     <module>grpc</module>
     <module>shell</module>
+    <module>echo</module>
+    <module>twin</module>
   </modules>
 
 </project>

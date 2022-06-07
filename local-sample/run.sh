@@ -1,28 +1,5 @@
 #!/bin/bash
 
-function app_check_wait () {
-
-# For loop to this instead of while loop:
-#kubectl wait \
-#  --for=condition=ready pod \
-#  --selector=app=keycloak-operator
-
-for APP in "$@"; do
-  # Ignore the first 2 args, not an app, but type.
-  if [[ $APP != $1 ]] && [[ $APP != $2 ]]; then
-    printf "\nWaiting for $APP to be ready. May take a few minutes.\nWaiting."
-    while true; do
-      sleep 5; printf "."
-      if [[ "$(kubectl -n $2 get pods -l=$1=$APP -o jsonpath='{.items[*].status.containerStatuses[0].started}')" == "true" ]]; then
-        break;
-      fi
-    done
-    printf "DONE\n"
-  fi
-done
-
-}
-
 printf "\n# Init\n"
 printf "################################################################################\n\n"
 
@@ -70,11 +47,18 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main
 printf "\n\n# Update and Deploy yaml files\n"
 printf "################################################################################\n\n"
 
+# TODO: Remove the /.m2 persistent volume and volume claim from the manifest
+# yaml file. This is for skaffold and will cause this to fail.
+# Just remove the following volume mount:
+#            - name: maven-repo-volume
+#              mountPath: "/opt/horizon-stream/.m2"
+#              readOnly: true
+
 printf "# Update yaml files\n"
 cat ../dev/kubernetes.kafka.yaml | \
-  sed "s/opennms\/horizon-stream-core/opennms\/horizon-stream-core\:latest/" | \
-  sed "s/opennms\/horizon-stream-api/opennms\/horizon-stream-rest-server\:latest/" | \
-  sed "s/opennms\/horizon-stream-ui-dev/opennms\/horizon-stream-ui\:latest/" | \
+  sed "s/opennms\/horizon-stream-core/opennms\/horizon-stream-core\:$IMAGE_TAG/" | \
+  sed "s/opennms\/horizon-stream-api/opennms\/horizon-stream-rest-server\:$IMAGE_TAG/" | \
+  sed "s/opennms\/horizon-stream-ui-dev/opennms\/horizon-stream-ui\:$IMAGE_TAG/" | \
   sed "s/frontendUrl: \"http:\/\/localhost:28080\"/frontendUrl: \"http:\/\/$DOMAIN_KEYCLOAK\"/" | \
   sed "s/localhost:28080/$DOMAIN_KEYCLOAK/" | \
   sed "s/localhost:9090/$DOMAIN_API/" | \
@@ -91,19 +75,42 @@ printf "\n\n# Deploy yaml files\n"
 
 kubectl apply -f tmp/hs.yaml
 
+# This is only for CI-CD pipeline
+if [[ $CI_CD_RUN == true ]]; then
+printf "\n\n# Import Images for Testing \n"
+kind load docker-image opennms/horizon-stream-ui:local
+kind load docker-image opennms/horizon-stream-core:local
+kind load docker-image opennms/horizon-stream-rest-server:local
+kubectl patch deployments my-horizon-stream-ui -p '{"spec": {"template": {"spec":{"containers":[{"name": "horizon-stream-ui", "imagePullPolicy":"Never"}]}}}}'
+kubectl patch deployments my-horizon-stream-core -p '{"spec": {"template": {"spec":{"containers":[{"name": "horizon-stream-core", "imagePullPolicy":"Never"}]}}}}'
+kubectl patch deployments my-horizon-stream-api -p '{"spec": {"template": {"spec":{"containers":[{"name": "horizon-stream-api", "imagePullPolicy":"Never"}]}}}}'
+fi
+
+printf "\nWaiting for startup of pods, could take a few minutes\n"
+
+# Let creation of pods
+sleep 30
+
 # Wait until services are running.
-APPS=('keycloak-operator')
-app_check_wait "app.kubernetes.io/name" "default" "${APPS[@]}"
-APPS=('my-kafka' 'my-postgres' 'my-keycloak' 'my-horizon-stream-core' 'my-horizon-stream-api' 'my-zookeeper')
-app_check_wait "run" "default" "${APPS[@]}"
-APPS=('my-horizon-stream-ui')
-app_check_wait "app" "default" "${APPS[@]}" 
-APPS=('controller')
-app_check_wait "app.kubernetes.io/component" "ingress-nginx" "${APPS[@]}" 
+kubectl wait --for=condition=ready pod --timeout=600s -l run=my-horizon-stream-core
+kubectl wait --for=condition=ready pod --timeout=600s -l run=my-horizon-stream-api
+kubectl wait --for=condition=ready pod --timeout=600s -l run=my-kafka
+kubectl wait --for=condition=ready pod --timeout=600s -l run=my-postgres
+kubectl wait --for=condition=ready pod --timeout=600s -l run=my-keycloak
+kubectl wait --for=condition=ready pod --timeout=600s -l run=my-zookeeper
+kubectl wait --for=condition=ready pod --timeout=600s -l app=my-horizon-stream-ui
+kubectl wait --for=condition=ready pod --timeout=600s -l app.kubernetes.io/name=keycloak-operator
+kubectl -n ingress-nginx wait --for=condition=ready pod --timeout=60s -l app.kubernetes.io/component=controller
  
+# Wait...
+sleep 60
+
 kubectl apply -f services.yaml
 kubectl apply -f tmp/ingress.yaml
 
+# Wait...
+sleep 60
+ 
 printf "\n\n# Create user through keycloak.\n"
 printf "################################################################################\n\n"
 

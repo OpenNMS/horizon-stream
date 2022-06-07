@@ -2,9 +2,7 @@ name: develop
 
 on:
   pull_request:
-    branches: 
-      - 'develop'
-    types: [closed]
+    types: [ labeled ]
 
 # For now, we have put all steps into a single job, this will allow for just
 # one vm to run. We use actions to factor out the functionality. If there is a
@@ -13,6 +11,7 @@ on:
 
 jobs:
   develop:
+    if: ${{ ( github.event.label.name == 'actions-test-develop' ) || ( github.event.label.name == 'actions-test-release' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -23,6 +22,7 @@ jobs:
         run: |
 
           echo "For init steps."
+          echo "TEST: ${{ github.event.comment.body }}"
 
       - name: feature-ui
         id: action-feature-ui

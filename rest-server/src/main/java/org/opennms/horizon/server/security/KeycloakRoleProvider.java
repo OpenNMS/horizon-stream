@@ -28,38 +28,20 @@
 
 package org.opennms.horizon.server.security;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
+import org.springframework.cache.annotation.Cacheable;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class KeycloakRoleProvider implements UserRoleProvider{
-    private String kcRealm;
-    private Keycloak keycloak;
+    private KeyCloakUtils keyCloakUtils;
 
-    public KeycloakRoleProvider(Keycloak keycloak, String userRealm) {
-        this.keycloak = keycloak;
-        this.kcRealm = userRealm;
+    public KeycloakRoleProvider(KeyCloakUtils keyCloakUtils) {
+        this.keyCloakUtils= keyCloakUtils;
     }
 
     @Override
-    public Set<String> lookupUserRoles(String userId) {
-        //TODO add cache
-        return getRolesFromServer(userId);
-    }
-
-    private Set<String> getRolesFromServer(String userId) {
-        RealmResource realmResource = keycloak.realm(kcRealm);
-        UserResource user = realmResource.users().get(userId);
-        if(user != null) {
-            return user.roles().getAll().getRealmMappings().stream().map(r->r.getName()).collect(Collectors.toSet());
-        }
-        return new HashSet<>();
+    @Cacheable("user-roles")
+    public Set<String> lookupUserRoles(final String userId) {
+        return keyCloakUtils.listUserRoles(userId);
     }
 }

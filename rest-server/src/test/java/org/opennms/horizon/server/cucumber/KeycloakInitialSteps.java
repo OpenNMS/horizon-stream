@@ -49,7 +49,6 @@ public class KeycloakInitialSteps {
     private String keycloakAdminUser;
     private String keycloakAdminPassword;
     private String adminClientId;
-    private String testRealm;
 
     @Given("Keycloak auth server url in system property {string}")
     public void keycloakAuthServerUrlInSystemProperty(String authUrl) {
@@ -75,24 +74,24 @@ public class KeycloakInitialSteps {
 
     @Then("Create Keycloak realm {string}")
     public void createKeycloakRealm(String realm) {
-        this.testRealm = realm;
-        keyCloakUtils.createRealm(realm, keycloakAuthUrl);
+        keyCloakUtils.setAppRealm(realm);
+        keyCloakUtils.createRealm(keycloakAuthUrl);
     }
 
     @Then("Add roles")
     public void addRoles(List<String> roles) {
-        keyCloakUtils.addRoles(testRealm, roles);
+        keyCloakUtils.addRoles(roles);
     }
 
 
     @Then("Add admin user {string} with password {string} and role {string}")
     public void addAdminUserWithPassword(String username, String password, String role) {
-        keyCloakUtils.addUser(testRealm, username, password, role);
+        keyCloakUtils.addUser(username, password, role);
     }
 
     @Then("Add regular user {string} with password {string} and role {string}")
     public void addRegularUserWithPassword(String user, String pwd, String role) {
-        keyCloakUtils.addUser(testRealm, user, pwd, role);
+        keyCloakUtils.addUser(user, pwd, role);
         keyCloakUtils.close();
     }
 

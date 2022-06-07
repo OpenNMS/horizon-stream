@@ -63,8 +63,13 @@
         <jna.version>4.4.0</jna.version>
         <joda.time.version>2.1</joda.time.version>
         <junit.version>4.13.2</junit.version>
+        <jsonPatch.version>1.13</jsonPatch.version>
+        <jacksonCoreUtils.version>2.0</jacksonCoreUtils.version>
+        <fgeMsgSimple.version>1.1</fgeMsgSimple.version>
+        <fgeBtf.version>1.2</fgeBtf.version>
         <json.version>20171018</json.version>
         <jsr250.version>1.0</jsr250.version>
+        <jsr305.version>3.0.2</jsr305.version>
         <karaf.version>4.3.6</karaf.version>
         <keycloak.version>17.0.0</keycloak.version>
         <liquibaseVersion>3.6.3</liquibaseVersion>

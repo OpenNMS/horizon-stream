@@ -47,8 +47,6 @@ public class KeycloakConfig {
     private final String masterRealm = "master";
     @Value("${keycloak.auth-server-url}")
     private String serverURl;
-    @Value("${keycloak.realm}")
-    private String appRealm;
 
     //keycloak admin clients properties for role provider
     @Value("${horizon-stream.keycloak.admin.client-id}")
@@ -91,8 +89,8 @@ public class KeycloakConfig {
 
     @Autowired
     @Bean
-    UserRoleProvider initialRoleProvider(Keycloak keycloakk) {
-        return new KeycloakRoleProvider(keycloakk, appRealm);
+    UserRoleProvider initialRoleProvider(KeyCloakUtils keyCloakUtils) {
+        return new KeycloakRoleProvider(keyCloakUtils);
     }
 
     @Autowired

@@ -28,6 +28,8 @@
 
 package org.opennms.horizon.server.controller;
 
+import java.util.List;
+
 import org.opennms.horizon.server.service.AbstractService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,9 +40,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 public abstract class AbstractController<D, ID> {
     protected AbstractService<?, D, ID> service;
 
@@ -50,20 +49,20 @@ public abstract class AbstractController<D, ID> {
 
     @PreAuthorize("hasRole('admin')")
     @PostMapping
-    public Mono<D> create(@RequestBody D dto) {
-        return Mono.just(service.create(dto));
+    public D create(@RequestBody D dto) {
+        return service.create(dto);
     }
 
     @GetMapping
-    public Flux<D> listAll() {
-        return Flux.fromIterable(service.findAll());
+    public List<D> listAll() {
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Mono<D>> findById(@PathVariable ID id) {
+    public ResponseEntity<D> findById(@PathVariable ID id) {
         D dto = service.findById(id);
         if(dto != null) {
-            return ResponseEntity.ok().body(Mono.just(dto));
+            return ResponseEntity.ok().body(dto);
 
         }
         return ResponseEntity.notFound().build();
@@ -71,10 +70,10 @@ public abstract class AbstractController<D, ID> {
 
     @PreAuthorize("hasRole('admin')")
     @PutMapping("/{id}")
-    public ResponseEntity<Mono<D>> update(@PathVariable ID id, @RequestBody D dto) {
+    public ResponseEntity<D> update(@PathVariable ID id, @RequestBody D dto) {
         D result = service.update(id, dto);
         if(result != null) {
-            return ResponseEntity.ok(Mono.just(result));
+            return ResponseEntity.ok(result);
         }
         return ResponseEntity.notFound().build();
     }

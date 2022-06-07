@@ -1,0 +1,24 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 
+		https://osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+">
+
+    <reference id="rpcClientFactory" interface="org.opennms.horizon.ipc.rpc.api.RpcClientFactory"/>
+    <reference id="minionManager" interface="org.opennms.core.ipc.grpc.server.manager.MinionManager"/>
+
+    <bean id="minionRpcMonitorManager" class="org.opennms.horizon.core.monitor.MinionRpcMonitorManager" init-method="init">
+        <property name="rpcClientFactory" ref="rpcClientFactory"/>
+    </bean>
+    <bean id="minionRpcMonitorMinionManagerListener" class="org.opennms.horizon.core.monitor.MinionRpcMonitorMinionManagerListener">
+        <property name="minionRpcMonitorManager" ref="minionRpcMonitorManager"/>
+    </bean>
+
+    <bean id="minionMonitorListenerRegistration" class="org.opennms.core.ipc.grpc.server.manager.util.MinionManagerListenerRegistrar"
+          init-method="init" destroy-method="shutdown">
+
+        <property name="minionManager" ref="minionManager"/>
+        <property name="listener" ref="minionRpcMonitorMinionManagerListener"/>
+    </bean>
+</blueprint>
