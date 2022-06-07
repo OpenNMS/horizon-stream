@@ -62,6 +62,8 @@ import org.opennms.core.ipc.grpc.common.RpcResponseProto;
 import org.opennms.core.ipc.grpc.common.SinkMessage;
 import org.opennms.core.ipc.grpc.server.manager.MinionInfo;
 import org.opennms.core.ipc.grpc.server.manager.MinionManager;
+import org.opennms.core.ipc.grpc.server.manager.RpcConnectionTracker;
+import org.opennms.core.ipc.grpc.server.manager.impl.RpcConnectionTrackerImpl;
 import org.opennms.core.tracing.api.TracerConstants;
 import org.opennms.core.tracing.api.TracerRegistry;
 import org.opennms.core.tracing.util.TracingInfoCarrier;
@@ -158,13 +160,15 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
     // Delay queue maintains the priority queue of RPC requests and times out the requests if no response was received
     // within the delay specified.
     private DelayQueue<RpcResponseHandler> rpcTimeoutQueue = new DelayQueue<>();
-    // Maintains map of minionId and rpc handler for that minion. Used for directed RPC requests.
-    private Map<String, StreamObserver<RpcRequestProto>> rpcHandlerByMinionId = new HashMap<>();
-    // Maintains multi element map of location and rpc handlers for that location.
-    // Used to get one of the rpc handlers for a specific location.
-    private Multimap<String, StreamObserver<RpcRequestProto>> rpcHandlerByLocation = LinkedListMultimap.create();
-    // Maintains the state of iteration for the list of minions for a given location.
-    private Map<String, Iterator<StreamObserver<RpcRequestProto>>> rpcHandlerIteratorMap = new HashMap<>();
+    // // Maintains map of minionId and rpc handler for that minion. Used for directed RPC requests.
+    // private Map<String, StreamObserver<RpcRequestProto>> rpcHandlerByMinionId = new HashMap<>();
+    // // Maintains multi element map of location and rpc handlers for that location.
+    // // Used to get one of the rpc handlers for a specific location.
+    // private Multimap<String, StreamObserver<RpcRequestProto>> rpcHandlerByLocation = LinkedListMultimap.create();
+    // // Maintains the state of iteration for the list of minions for a given location.
+    // private Map<String, Iterator<StreamObserver<RpcRequestProto>>> rpcHandlerIteratorMap = new HashMap<>();
+    private RpcConnectionTracker rpcConnectionTracker = new RpcConnectionTrackerImpl(); // TODO: injection
+
     // Maintains the map of sink modules by it's id.
     private final Map<String, SinkModule<?, Message>> sinkModulesById = new ConcurrentHashMap<>();
     // Maintains the map of sink consumer executor and by module Id.
@@ -350,34 +354,21 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
     @VisibleForTesting
     public synchronized StreamObserver<RpcRequestProto> getRpcHandler(String location, String systemId) {
 
-        if (!Strings.isNullOrEmpty(systemId)) {
-            return rpcHandlerByMinionId.get(systemId);
+        if (! Strings.isNullOrEmpty(systemId)) {
+            return rpcConnectionTracker.lookupByMinionId(systemId);
         }
-        Iterator<StreamObserver<RpcRequestProto>> iterator = rpcHandlerIteratorMap.get(location);
-        if (iterator == null) {
-            return null;
-        }
-        return iterator.next();
+
+        return rpcConnectionTracker.lookupByLocationRoundRobin(location);
     }
 
-    private synchronized void addRpcHandler(String location, String systemId, StreamObserver<RpcRequestProto> rpcHandler) {
+    private void addRpcHandler(String location, String systemId, StreamObserver<RpcRequestProto> rpcHandler) {
         if (Strings.isNullOrEmpty(location) || Strings.isNullOrEmpty(systemId)) {
             LOG.error("Invalid metadata received with location = {} , systemId = {}", location, systemId);
             return;
         }
-        if (!rpcHandlerByLocation.containsValue(rpcHandler)) {
-            boolean alreadyKnown = false;
 
-            StreamObserver<RpcRequestProto> obsoleteObserver = rpcHandlerByMinionId.get(systemId);
-            if (obsoleteObserver != null) {
-                rpcHandlerByLocation.values().remove(obsoleteObserver);
-
-                // Replacing an old connection with a new one
-                alreadyKnown = true;
-            }
-            rpcHandlerByLocation.put(location, rpcHandler);
-            updateIterator(location);
-            rpcHandlerByMinionId.put(systemId, rpcHandler);
+        boolean added = rpcConnectionTracker.addConnection(location, systemId, rpcHandler);
+        if (added) {
             LOG.info("Added RPC handler for minion {} at location {}", systemId, location);
 
             // Notify the MinionManager of the addition
@@ -387,34 +378,6 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
             minionManager.addMinion(minionInfo);
         }
     }
-
-    private synchronized void updateIterator(String location) {
-        Collection<StreamObserver<RpcRequestProto>> streamObservers = rpcHandlerByLocation.get(location);
-        Iterator<StreamObserver<RpcRequestProto>> iterator = Iterables.cycle(streamObservers).iterator();
-        rpcHandlerIteratorMap.put(location, iterator);
-    }
-
-
-    private synchronized void removeRpcHandler(StreamObserver<RpcRequestProto> rpcHandler) {
-
-        String systemId = null;
-        String location = null;
-
-        Map.Entry<String, StreamObserver<RpcRequestProto>> matchingHandler =
-                rpcHandlerByLocation.entries().stream().
-                        filter(entry -> entry.getValue().equals(rpcHandler)).findFirst().orElse(null);
-
-        if (matchingHandler != null) {
-            systemId = matchingHandler.getKey();
-
-            rpcHandlerByLocation.remove(matchingHandler.getKey(), matchingHandler.getValue());
-            updateIterator(matchingHandler.getKey());
-        }
-
-        // Notify the MinionManager of the removal
-        minionManager.removeMinion(systemId);
-    }
-
 
     private boolean isHeaders(RpcResponseProto rpcMessage) {
         return !Strings.isNullOrEmpty(rpcMessage.getModuleId()) &&
@@ -489,9 +452,9 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
     public void shutdown() {
         closed.set(true);
         rpcTimeoutQueue.clear();
-        rpcHandlerByLocation.clear();
-        rpcHandlerByMinionId.clear();
-        rpcHandlerIteratorMap.clear();
+
+        rpcConnectionTracker.clear();
+
         rpcResponseMap.clear();
         sinkModulesById.clear();
         if (rpcMetricsReporter != null) {
@@ -504,11 +467,6 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
         rpcTimeoutExecutor.shutdownNow();
         responseHandlerExecutor.shutdownNow();
         LOG.info("OpenNMS gRPC server stopped");
-    }
-
-    @VisibleForTesting
-    public Multimap<String, StreamObserver<RpcRequestProto>> getRpcHandlerByLocation() {
-        return rpcHandlerByLocation;
     }
 
     private class OpennmsIpcService extends OpenNMSIpcGrpc.OpenNMSIpcImplBase {
@@ -537,7 +495,12 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
                 @Override
                 public void onCompleted() {
                     LOG.info("Minion RPC handler closed");
-                    removeRpcHandler(responseObserver);
+                    MinionInfo removedMinionInfo = rpcConnectionTracker.removeConnection(responseObserver);
+
+                    // Notify the MinionManager of the removal
+                    if (removedMinionInfo.getId() != null) {
+                        minionManager.removeMinion(removedMinionInfo.getId());
+                    }
                 }
             };
         }
