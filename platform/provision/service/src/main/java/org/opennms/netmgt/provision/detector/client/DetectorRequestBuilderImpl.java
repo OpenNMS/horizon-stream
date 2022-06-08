@@ -197,7 +197,7 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
             try {
                 port = Integer.parseInt(portString);
             } catch (NumberFormatException nfe) {
-                LOG.warn("Failed to parse port as integer from: ", portString);
+                LOG.warn("Failed to parse port as integer from: {}", portString);
             }
         }
 
