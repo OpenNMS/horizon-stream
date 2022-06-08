@@ -98,6 +98,7 @@
             <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
             <Import-Package>
               javax.persistence;version="[2,3)",
+              javax.persistence.criteria;version="[2,3)",
               *
             </Import-Package>
           </instructions>
