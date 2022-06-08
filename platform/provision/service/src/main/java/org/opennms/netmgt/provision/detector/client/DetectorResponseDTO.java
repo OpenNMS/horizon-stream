@@ -28,23 +28,35 @@
 
 package org.opennms.netmgt.provision.detector.client;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.opennms.horizon.ipc.rpc.api.RemoteExecutionException;
 import org.opennms.horizon.ipc.rpc.api.RpcResponse;
 import org.opennms.netmgt.provision.DetectResults;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Data
 @NoArgsConstructor
+@XmlRootElement(name = "detector-response")
+@XmlAccessorType(XmlAccessType.NONE)
 public class DetectorResponseDTO implements DetectResults, RpcResponse {
 
+    @XmlAttribute(name = "error")
     private String error;
+
+    @XmlAttribute(name = "detected")
     private boolean detected;
+
+    @XmlElement(name = "attribute")
     private List<DetectorAttributeDTO> attributes = new ArrayList<>();
 
     public DetectorResponseDTO(DetectResults results) {

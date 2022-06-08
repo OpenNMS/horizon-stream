@@ -29,28 +29,51 @@
 package org.opennms.netmgt.provision.detector.client;
 
 import io.opentracing.Span;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.opennms.core.xml.InetAddressXmlAdapter;
+import org.opennms.horizon.ipc.rpc.api.RpcRequest;
+import org.opennms.netmgt.provision.DetectRequest;
+import org.opennms.netmgt.provision.PreDetectCallback;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.opennms.horizon.ipc.rpc.api.RpcRequest;
-import org.opennms.netmgt.provision.DetectRequest;
-import org.opennms.netmgt.provision.PreDetectCallback;
 
 @Data
 @NoArgsConstructor
+
+@XmlRootElement(name = "detector-request")
+@XmlAccessorType(XmlAccessType.NONE)
+//TODO lombok
 public class DetectorRequestDTO implements DetectRequest, RpcRequest {
 
+    @XmlAttribute(name = "location")
     private String location;
+
+    @XmlAttribute(name="system-id")
     private String systemId;
+
+    @XmlAttribute(name = "class-name")
     private String className;
+
+    @XmlAttribute(name = "address")
+    @XmlJavaTypeAdapter(InetAddressXmlAdapter.class)
     private InetAddress address;
+
+    @XmlElement(name = "detector-attribute")
     private List<DetectorAttributeDTO> detectorAttributes = new ArrayList<>();
+
+    @XmlElement(name = "runtime-attribute")
     private List<DetectorAttributeDTO> runtimeAttributes = new ArrayList<>();
 
     private Long timeToLiveMs;

@@ -465,6 +465,8 @@ spec:
           image: opennms/minion:29.0.10
           args: ["-f"]
           env:
+            - name: KARAF_DEBUG
+              value: "true"
             - name: TZ
               value: "America/New_York"
             - name: JAVA_MIN_MEM

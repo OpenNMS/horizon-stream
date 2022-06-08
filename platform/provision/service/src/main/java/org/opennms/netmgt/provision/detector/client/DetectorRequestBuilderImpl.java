@@ -29,6 +29,7 @@
 package org.opennms.netmgt.provision.detector.client;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
 import io.opentracing.Span;
 import java.net.InetAddress;
 import java.util.Collections;
@@ -208,6 +209,10 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
             .thenApply(response -> {
                 // Notify the factory that a request was successfully executed
                 try {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("DETECTOR RESPONSE: {}", new Gson().toJson(response));
+                    }
+
                     factory.afterDetect(request, response, nodeId);
                 } catch (Throwable t) {
                     LOG.error("Error while processing detect callback.", t);
