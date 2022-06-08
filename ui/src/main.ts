@@ -12,6 +12,7 @@ import '@featherds/styles/themes/open-light.css'
 import dateFormatDirective from './directives/v-date'
 
 const { setKeycloak } = useKeycloak()
+const dark = useDark()
 
 const app = createApp({
   render: () => h(App)
@@ -20,6 +21,10 @@ const app = createApp({
   .use(createPinia())
   .use(store)
   .use(VueKeycloak, {
+    init: {
+      onLoad: 'login-required',
+      redirectUri: `${window.location.href}${dark.value ? '?theme=dark' : '?theme=light'}`
+    },
     config: {
       realm: keycloakConfig.realm,
       url: keycloakConfig.url,

@@ -4,12 +4,15 @@ let interval3
 let interval4
 
 const animateGradient = () => {
-  const isDark = { value: false}
+  const theme = window.localStorage.getItem('theme')
+  const isDark = theme === 'dark'
 
+  // set backdrop gradient
   const dark = [10, 12, 27, 1]
   const light = [255, 255, 255, 0]
-  const backdrop = isDark.value ? dark : light
+  const backdrop = isDark ? dark : light
 
+  // set gradient color spectrum
   const rgbs = [[36, 49, 132, 0.3], [251, 135, 191, 0.3], [20, 209, 233, 0.3], backdrop]
 
   const randum = (max, min = 0) => Math.round(Math.random() * (max - min) + min)

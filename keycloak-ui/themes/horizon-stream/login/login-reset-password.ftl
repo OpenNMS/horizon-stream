@@ -18,12 +18,12 @@
                 <div id="hs-form-buttons">
                     <button class="btn hover focus btn-primary" type="submit">${msg("doSubmit")}</button>
                 </div>
-                <div id="hs-form-options">
+                <div id="hs-back-link">
                     <div class="typography-button">
                         <span><a class="link" href="${url.loginUrl}">${kcSanitize(msg("backToLogin"))?no_esc}</a></span>
                     </div>
                 </div>
-            </div>
+            </div> 
         </form>
     <#elseif section = "info" >
         <#if realm.duplicateEmailsAllowed>

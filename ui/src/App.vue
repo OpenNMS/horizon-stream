@@ -15,7 +15,12 @@
   </FeatherAppLayout>
 </template>
   
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// Remove KC redirectUri theme param
+const route = useRoute()
+const router = useRouter()
+if (route.query.theme) router.push('/')
+</script>
   
 <style lang="scss">
 @import "@featherds/styles/lib/grid";

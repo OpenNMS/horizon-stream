@@ -20,13 +20,6 @@
     margin-bottom: 25px;
 }
 
-#hs-header-wrapper {
-    padding: 12px 10px 20px;
-    background-image: url(../img/OpenNMS_Horizontal-Logo_Light-BG.svg);
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
 #hs-stream-title {
     display: block;
     margin-top: 6px;
@@ -66,4 +59,17 @@
     font-weight: 600;
     line-height: 2.7;
     cursor: pointer;
+}
+
+#hs-page-title {
+    color: var(--feather-primary-text-on-surface);
+    text-align: center;
+}
+  
+#hs-form-buttons {
+    margin-top: 5px;
+}
+
+#hs-back-link {
+    margin-top: 30px;
 }
