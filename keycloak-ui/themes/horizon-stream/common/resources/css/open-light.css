@@ -419,34 +419,6 @@
 }
 
 @font-face {
-  font-family: "OpenSans";
-  font-weight: 300;
-  font-style: normal;
-  src: url("../fonts/OpenSans-Light.ttf") format("truetype");
-  font-display: swap;
-}
-@font-face {
-  font-family: "OpenSans";
-  font-weight: 400;
-  font-style: normal;
-  src: url("../fonts/OpenSans-Regular.ttf") format("truetype");
-  font-display: swap;
-}
-@font-face {
-  font-family: "OpenSans";
-  font-weight: 600;
-  font-style: normal;
-  src: url("../fonts/OpenSans-SemiBold.ttf") format("truetype");
-  font-display: swap;
-}
-@font-face {
-  font-family: "OpenSans";
-  font-weight: 600;
-  font-style: italic;
-  src: url("../fonts/OpenSans-SemiBoldItalic.ttf") format("truetype");
-  font-display: swap;
-}
-@font-face {
   font-family: "Inter";
   font-weight: 300;
   font-style: normal;
