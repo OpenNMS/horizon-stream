@@ -14,7 +14,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class RpcConnectionTrackerImpl implements RpcConnectionTracker {
 
@@ -31,6 +34,11 @@ public class RpcConnectionTrackerImpl implements RpcConnectionTracker {
     private Multimap<String, StreamObserver<RpcRequestProto>> connectionListByLocation = LinkedListMultimap.create();
     private Map<String, Iterator<StreamObserver<RpcRequestProto>>> rpcHandlerIteratorMap = new HashMap<>();
 
+    /**
+     * Semaphore per connection that is used to ensure thread-safe sending to each connection.
+     */
+    private Map<StreamObserver<RpcRequestProto>, Semaphore> sempahoreByConnection = new IdentityHashMap<>();
+
     @Override
     public boolean addConnection(String location, String minionId, StreamObserver<RpcRequestProto> connection) {
         boolean added = false;
@@ -46,6 +54,8 @@ public class RpcConnectionTrackerImpl implements RpcConnectionTracker {
 
                 locationByConnection.put(connection, location);
                 minionIdByConnection.put(connection, minionId);
+
+                sempahoreByConnection.put(connection, new Semaphore(1, true));
 
                 updateIteratorLocked(location);
 
@@ -101,9 +111,18 @@ public class RpcConnectionTrackerImpl implements RpcConnectionTracker {
 
                 removedMinionInfo.setLocation(locationId);
             }
+
+            sempahoreByConnection.remove(connection);
         }
 
         return removedMinionInfo;
+    }
+
+    @Override
+    public Semaphore getConnectionSemaphore(StreamObserver<RpcRequestProto> connection) {
+        synchronized (lock) {
+            return sempahoreByConnection.get(connection);
+        }
     }
 
     @Override
@@ -115,6 +134,7 @@ public class RpcConnectionTrackerImpl implements RpcConnectionTracker {
             connectionListByLocation.clear();
             locationByConnection.clear();
             minionIdByConnection.clear();
+            sempahoreByConnection.clear();
         }
     }
 

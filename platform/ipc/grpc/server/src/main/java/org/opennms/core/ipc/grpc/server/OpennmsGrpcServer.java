@@ -30,16 +30,12 @@ package org.opennms.core.ipc.grpc.server;
 
 import static org.opennms.core.ipc.grpc.server.GrpcServerConstants.DEFAULT_GRPC_TTL;
 import static org.opennms.core.ipc.grpc.server.GrpcServerConstants.GRPC_TTL_PROPERTY;
-import static org.opennms.core.tracing.api.TracerConstants.TAG_LOCATION;
-import static org.opennms.core.tracing.api.TracerConstants.TAG_SYSTEM_ID;
 import static org.opennms.core.tracing.api.TracerConstants.TAG_TIMEOUT;
 import static org.opennms.horizon.ipc.rpc.api.RpcModule.MINION_HEADERS_MODULE;
 import static org.opennms.horizon.ipc.sink.api.Message.SINK_METRIC_CONSUMER_DOMAIN;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -60,13 +56,16 @@ import org.opennms.core.ipc.grpc.common.OpenNMSIpcGrpc;
 import org.opennms.core.ipc.grpc.common.RpcRequestProto;
 import org.opennms.core.ipc.grpc.common.RpcResponseProto;
 import org.opennms.core.ipc.grpc.common.SinkMessage;
+import org.opennms.core.ipc.grpc.server.manager.LocationIndependentRpcClientFactory;
 import org.opennms.core.ipc.grpc.server.manager.MinionInfo;
 import org.opennms.core.ipc.grpc.server.manager.MinionManager;
 import org.opennms.core.ipc.grpc.server.manager.RpcConnectionTracker;
+import org.opennms.core.ipc.grpc.server.manager.RpcRequestTracker;
 import org.opennms.core.ipc.grpc.server.manager.impl.RpcConnectionTrackerImpl;
+import org.opennms.core.ipc.grpc.server.manager.impl.RpcRequestTrackerImpl;
+import org.opennms.core.ipc.grpc.server.manager.rpc.RemoteRegistrationHandler;
 import org.opennms.core.tracing.api.TracerConstants;
 import org.opennms.core.tracing.api.TracerRegistry;
-import org.opennms.core.tracing.util.TracingInfoCarrier;
 import org.opennms.horizon.core.identity.Identity;
 import org.opennms.horizon.core.lib.Logging;
 import org.opennms.horizon.core.lib.PropertiesUtils;
@@ -88,13 +87,8 @@ import org.slf4j.LoggerFactory;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.protobuf.ByteString;
 
 import io.grpc.stub.StreamObserver;
 import io.opentracing.References;
@@ -124,6 +118,7 @@ import io.opentracing.util.GlobalTracer;
  * in the consumer threads that are initialized at start.
  */
 
+@SuppressWarnings("rawtypes")
 public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements RpcClientFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpennmsGrpcServer.class);
@@ -153,21 +148,17 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
 
     // RPC timeout executor thread retrieves elements from delay queue used to timeout rpc requests.
     private final ExecutorService rpcTimeoutExecutor = Executors.newSingleThreadExecutor(timerThreadFactory);
+
     // Each RPC response is handled on a new thread which does unmarshalling and returning response to corresponding module.
     private final ExecutorService responseHandlerExecutor = Executors.newCachedThreadPool(responseHandlerThreadFactory);
-    // This map used to maintain all the requests that are sent with unique Id and all the context related to the request.
-    private final Map<String, RpcResponseHandler> rpcResponseMap = new ConcurrentHashMap<>();
+
     // Delay queue maintains the priority queue of RPC requests and times out the requests if no response was received
     // within the delay specified.
     private DelayQueue<RpcResponseHandler> rpcTimeoutQueue = new DelayQueue<>();
-    // // Maintains map of minionId and rpc handler for that minion. Used for directed RPC requests.
-    // private Map<String, StreamObserver<RpcRequestProto>> rpcHandlerByMinionId = new HashMap<>();
-    // // Maintains multi element map of location and rpc handlers for that location.
-    // // Used to get one of the rpc handlers for a specific location.
-    // private Multimap<String, StreamObserver<RpcRequestProto>> rpcHandlerByLocation = LinkedListMultimap.create();
-    // // Maintains the state of iteration for the list of minions for a given location.
-    // private Map<String, Iterator<StreamObserver<RpcRequestProto>>> rpcHandlerIteratorMap = new HashMap<>();
-    private RpcConnectionTracker rpcConnectionTracker = new RpcConnectionTrackerImpl(); // TODO: injection
+
+    private RpcConnectionTracker rpcConnectionTracker;
+    private RpcRequestTracker rpcRequestTracker;
+    private LocationIndependentRpcClientFactory locationIndependentRpcClientFactory;
 
     // Maintains the map of sink modules by it's id.
     private final Map<String, SinkModule<?, Message>> sinkModulesById = new ConcurrentHashMap<>();
@@ -225,72 +216,29 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
         sinkModulesById.remove(module.getId());
     }
 
+    private String registerRemoteCall(RpcRequest request, long expiration, CompletableFuture future, RpcModule localModule, Span span) {
+        String rpcId = UUID.randomUUID().toString();
+
+        Map<String, String> loggingContext = Logging.getCopyOfContextMap();
+
+        RpcResponseHandlerImpl responseHandler =
+                new RpcResponseHandlerImpl(future, localModule, rpcId, request.getLocation(), expiration, span, loggingContext);
+
+        rpcRequestTracker.addRequest(rpcId, responseHandler);
+        rpcTimeoutQueue.offer(responseHandler);
+
+        return rpcId;
+    }
+
     @Override
     public <S extends RpcRequest, T extends RpcResponse> RpcClient<S, T> getClient(RpcModule<S, T> module) {
 
-        return new RpcClient<S, T>() {
-            @Override
-            public CompletableFuture<T> execute(S request) {
-                if (request.getLocation() == null || request.getLocation().equals(getLocation())) {
-                    // The request is for the current location, invoke it directly
-                    return module.execute(request);
-                }
-                final Map<String, String> loggingContext = Logging.getCopyOfContextMap();
+        CompletableFuture<T> future = new CompletableFuture<>();
 
-                Span span = getTracer().buildSpan(module.getId()).start();
-                String marshalRequest = module.marshalRequest(request);
-                String rpcId = UUID.randomUUID().toString();
-                CompletableFuture<T> future = new CompletableFuture<T>();
-                Long timeToLive = request.getTimeToLiveMs();
-                timeToLive = (timeToLive != null && timeToLive > 0) ? timeToLive : ttl;
-                long expirationTime = System.currentTimeMillis() + timeToLive;
-                RpcResponseHandlerImpl responseHandler = new RpcResponseHandlerImpl<S, T>(future,
-                        module, rpcId, request.getLocation(), expirationTime, span, loggingContext);
-                rpcResponseMap.put(rpcId, responseHandler);
-                rpcTimeoutQueue.offer(responseHandler);
-                RpcRequestProto.Builder builder = RpcRequestProto.newBuilder()
-                        .setRpcId(rpcId)
-                        .setLocation(request.getLocation())
-                        .setModuleId(module.getId())
-                        .setRpcContent(ByteString.copyFrom(marshalRequest.getBytes()));
-                if (!Strings.isNullOrEmpty(request.getSystemId())) {
-                    builder.setSystemId(request.getSystemId());
-                }
-                addTracingInfo(request, span, builder);
-                RpcRequestProto requestProto = builder.build();
+        RemoteRegistrationHandler remoteRegistrationHandler =
+                (request, timeout, span) -> registerRemoteCall(request, timeout, future, module, span);
 
-                boolean succeeded = sendRequest(requestProto);
-
-                addMetrics(request, requestProto.getSerializedSize());
-                if (!succeeded) {
-                    RpcClientFactory.markFailed(getRpcMetrics(), request.getLocation(), module.getId());
-                    future.completeExceptionally(new RuntimeException("No minion found at location " + request.getLocation()));
-                    return future;
-                }
-                LOG.debug("RPC request from module: {} with RpcId:{} sent to minion at location {}", module.getId(), rpcId, request.getLocation());
-                return future;
-            }
-
-            private void addMetrics(RpcRequest request, int messageLen) {
-                RpcClientFactory.markRpcCount(getRpcMetrics(), request.getLocation(), module.getId());
-                RpcClientFactory.updateRequestSize(getRpcMetrics(), request.getLocation(), module.getId(), messageLen);
-            }
-
-            private void addTracingInfo(RpcRequest request, Span span, RpcRequestProto.Builder builder) {
-                //Add tags to span.
-                span.setTag(TAG_LOCATION, request.getLocation());
-                if (request.getSystemId() != null) {
-                    span.setTag(TAG_SYSTEM_ID, request.getSystemId());
-                }
-                request.getTracingInfo().forEach(span::setTag);
-                TracingInfoCarrier tracingInfoCarrier = new TracingInfoCarrier();
-                getTracer().inject(span.context(), Format.Builtin.TEXT_MAP, tracingInfoCarrier);
-                // Tracer adds it's own metadata.
-                tracingInfoCarrier.getTracingInfoMap().forEach(builder::putTracingInfo);
-                //Add custom tags from RpcRequest.
-                request.getTracingInfo().forEach(builder::putTracingInfo);
-            }
-        };
+        return locationIndependentRpcClientFactory.createClient(module, remoteRegistrationHandler);
     }
 
 
@@ -319,46 +267,16 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
         if (Strings.isNullOrEmpty(responseProto.getRpcId())) {
             return;
         }
+
         // Handle response from the Minion.
-        RpcResponseHandler responseHandler = rpcResponseMap.get(responseProto.getRpcId());
+        RpcResponseHandler responseHandler = rpcRequestTracker.lookup(responseProto.getRpcId());
+
         if (responseHandler != null && responseProto.getRpcContent() != null) {
             responseHandler.sendResponse(responseProto.getRpcContent().toStringUtf8());
         } else {
             LOG.debug("Received a response for request for module: {} with RpcId:{}, but no outstanding request was found with this id." +
                     "The request may have timed out", responseProto.getModuleId(), responseProto.getRpcId());
         }
-    }
-
-    private boolean sendRequest(RpcRequestProto requestProto) {
-        StreamObserver<RpcRequestProto> rpcHandler = getRpcHandler(requestProto.getLocation(), requestProto.getSystemId());
-        if (rpcHandler == null) {
-            LOG.warn("No RPC handlers found for location {}", requestProto.getLocation());
-            return false;
-        }
-        try {
-            sendRpcRequest(rpcHandler, requestProto);
-            return true;
-        } catch (Throwable e) {
-            LOG.error("Encountered exception while sending request {}", requestProto, e);
-        }
-        return false;
-    }
-
-    /**
-     * Writing message through stream observer is not thread safe.
-     */
-    private synchronized void sendRpcRequest(StreamObserver<RpcRequestProto> rpcHandler, RpcRequestProto rpcMessage) {
-        rpcHandler.onNext(rpcMessage);
-    }
-
-    @VisibleForTesting
-    public synchronized StreamObserver<RpcRequestProto> getRpcHandler(String location, String systemId) {
-
-        if (! Strings.isNullOrEmpty(systemId)) {
-            return rpcConnectionTracker.lookupByMinionId(systemId);
-        }
-
-        return rpcConnectionTracker.lookupByLocationRoundRobin(location);
     }
 
     private void addRpcHandler(String location, String systemId, StreamObserver<RpcRequestProto> rpcHandler) {
@@ -449,13 +367,37 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
         this.minionManager = minionManager;
     }
 
+    public LocationIndependentRpcClientFactory getLocationIndependentRpcClientFactory() {
+        return locationIndependentRpcClientFactory;
+    }
+
+    public void setLocationIndependentRpcClientFactory(LocationIndependentRpcClientFactory locationIndependentRpcClientFactory) {
+        this.locationIndependentRpcClientFactory = locationIndependentRpcClientFactory;
+    }
+
+    public RpcConnectionTracker getRpcConnectionTracker() {
+        return rpcConnectionTracker;
+    }
+
+    public void setRpcConnectionTracker(RpcConnectionTracker rpcConnectionTracker) {
+        this.rpcConnectionTracker = rpcConnectionTracker;
+    }
+
+    public RpcRequestTracker getRpcRequestTracker() {
+        return rpcRequestTracker;
+    }
+
+    public void setRpcRequestTracker(RpcRequestTracker rpcRequestTracker) {
+        this.rpcRequestTracker = rpcRequestTracker;
+    }
+
     public void shutdown() {
         closed.set(true);
         rpcTimeoutQueue.clear();
 
         rpcConnectionTracker.clear();
 
-        rpcResponseMap.clear();
+        rpcRequestTracker.clear();
         sinkModulesById.clear();
         if (rpcMetricsReporter != null) {
             rpcMetricsReporter.close();
@@ -619,7 +561,7 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
                     responseFuture.completeExceptionally(new RequestTimedOutException(new TimeoutException()));
                 }
                 RpcClientFactory.updateDuration(getRpcMetrics(), this.location, rpcModule.getId(), System.currentTimeMillis() - requestCreationTime);
-                rpcResponseMap.remove(rpcId);
+                rpcRequestTracker.remove(rpcId);
                 span.finish();
             } catch (Throwable e) {
                 LOG.error("Error while processing RPC response {}", message, e);

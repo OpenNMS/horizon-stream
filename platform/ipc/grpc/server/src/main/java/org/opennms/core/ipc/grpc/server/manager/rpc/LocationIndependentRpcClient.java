@@ -2,7 +2,6 @@ package org.opennms.core.ipc.grpc.server.manager.rpc;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 import io.opentracing.Span;
@@ -10,7 +9,6 @@ import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.util.GlobalTracer;
 import org.opennms.core.ipc.grpc.common.RpcRequestProto;
-import org.opennms.core.ipc.grpc.server.OpennmsGrpcServer;
 import org.opennms.core.ipc.grpc.server.manager.RpcConnectionTracker;
 import org.opennms.core.tracing.api.TracerRegistry;
 import org.opennms.core.tracing.util.TracingInfoCarrier;
@@ -21,13 +19,13 @@ import org.opennms.horizon.ipc.rpc.api.RpcClientFactory;
 import org.opennms.horizon.ipc.rpc.api.RpcModule;
 import org.opennms.horizon.ipc.rpc.api.RpcRequest;
 import org.opennms.horizon.ipc.rpc.api.RpcResponse;
-import org.opennms.horizon.ipc.rpc.api.RpcResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Semaphore;
 
 import static org.opennms.core.tracing.api.TracerConstants.TAG_LOCATION;
 import static org.opennms.core.tracing.api.TracerConstants.TAG_SYSTEM_ID;
@@ -42,11 +40,10 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
     private TracerRegistry tracerRegistry;
     private MetricRegistry rpcMetrics;
     private long ttl;
+    private RpcConnectionTracker rpcConnectionTracker;
 
     private final RpcModule<REQUEST, RESPONSE> localModule;
-    private final RpcResponseHandler responseHandler;
-    private final RemoteRegistrationHandler remoteRegistrationHandler;
-    private final RpcConnectionTracker rpcConnectionTracker;
+    private final RemoteRegistrationHandler remoteRegistrationHandler; // TODO: injection?
 
 
 //========================================
@@ -55,14 +52,10 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
 
     public LocationIndependentRpcClient(
             RpcModule<REQUEST, RESPONSE> localModule,
-            RpcResponseHandler responseHandler,
-            RemoteRegistrationHandler remoteRegistrationHandler,
-            RpcConnectionTracker rpcConnectionTracker) {
+            RemoteRegistrationHandler remoteRegistrationHandler) {
 
         this.localModule = localModule;
-        this.responseHandler = responseHandler;
         this.remoteRegistrationHandler = remoteRegistrationHandler;
-        this.rpcConnectionTracker = rpcConnectionTracker;
     }
 
 
@@ -100,6 +93,14 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
 
     public void setTtl(long ttl) {
         this.ttl = ttl;
+    }
+
+    public RpcConnectionTracker getRpcConnectionTracker() {
+        return rpcConnectionTracker;
+    }
+
+    public void setRpcConnectionTracker(RpcConnectionTracker rpcConnectionTracker) {
+        this.rpcConnectionTracker = rpcConnectionTracker;
     }
 
 
@@ -171,7 +172,7 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
 
 
         long expirationTime = this.calcuateExpiration(request);
-        String rpcId = remoteRegistrationHandler.registerRemoteCall(request, expirationTime);
+        String rpcId = remoteRegistrationHandler.registerRemoteCall(request, expirationTime, span);
 
         RpcRequestProto.Builder builder = RpcRequestProto.newBuilder()
                 .setRpcId(rpcId)
@@ -226,7 +227,7 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
     }
 
     private boolean sendRequest(RpcRequestProto requestProto) {
-        StreamObserver<RpcRequestProto> rpcHandler = null;
+        StreamObserver<RpcRequestProto> rpcHandler;
 
         // If a specific Minion weas requested, use it
         if (! Strings.isNullOrEmpty(requestProto.getSystemId())) {
@@ -253,8 +254,27 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
     /**
      * Writing message through stream observer is not thread safe.
      */
-    // TBD888 - synchronized on the entire class
-    private synchronized void sendRpcRequest(StreamObserver<RpcRequestProto> rpcHandler, RpcRequestProto rpcMessage) {
-        rpcHandler.onNext(rpcMessage);
+    private void sendRpcRequest(StreamObserver<RpcRequestProto> rpcHandler, RpcRequestProto rpcMessage) {
+        Semaphore connectionSemaphore = rpcConnectionTracker.getConnectionSemaphore(rpcHandler);
+
+        if (connectionSemaphore != null) {
+            // StreamObserver.onNext() is NOT thread-safe; use the semaphore to prevent concurrent calls
+
+            // Acquire - note the finally does not go here because a failed call to acquire() must not result in a
+            //  call to release()
+            try {
+                connectionSemaphore.acquire();
+            } catch (InterruptedException intExc) {
+                throw new RuntimeException("Interrupted while waiting to send request to RPC connection", intExc);
+            }
+
+            try {
+                // Send
+                rpcHandler.onNext(rpcMessage);
+            } finally {
+                // Release the semaphore
+                connectionSemaphore.release();
+            }
+        }
     }
 }
