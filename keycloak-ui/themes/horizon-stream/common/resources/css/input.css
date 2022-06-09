@@ -3,4 +3,8 @@
   height: 32px;
   padding-left: 12px;
   margin-bottom: 24px;
+  border: 1px solid var(--feather-primary-text-on-surface);
+  border-radius: 5px;
+  background: var(--feather-surface);
+  color: var(--feather-primary-text-on-surface)
 }

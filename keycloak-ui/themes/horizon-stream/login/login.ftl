@@ -32,12 +32,14 @@
 
                         <div id="hs-form-options">
                             <#if realm.rememberMe && !usernameHidden??>
-                                <div class="hs-remember-me typography-body-small">
+                                <div id="hs-remember-me" class="typography-body-small">
                                     <label>
                                         <#if login.rememberMe??>
-                                            <input tabindex="3" id="rememberMe" name="rememberMe" type="checkbox" checked> ${msg("rememberMe")}
+                                            <input tabindex="3" id="rememberMe" class="hs-remember-me-checkbox" name="rememberMe" type="checkbox" checked> 
+                                            <span class="hs-remember-me-text"> ${msg("rememberMe")}
                                         <#else>
-                                            <input tabindex="3" id="rememberMe" name="rememberMe" type="checkbox"> ${msg("rememberMe")}
+                                            <input tabindex="3" id="rememberMe" class="hs-remember-me-checkbox" name="rememberMe" type="checkbox">
+                                            <span class="hs-remember-me-text"> ${msg("rememberMe")} </span>
                                         </#if>
                                     </label>
                                 </div>

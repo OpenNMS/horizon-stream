@@ -16,7 +16,7 @@
   
   if (isDark) {
     // remove the light theme, dark will apply
-    const lightStyle = document.querySelector('link[href$="/resources/iriis/login/horizon-stream/css/open-light.css"]')
+    const lightStyle = document.querySelector('link[href$="open-light.css"]')
     if (lightStyle) lightStyle.remove()
   }
 

@@ -39,10 +39,6 @@
     justify-content: flex-end;
 }
 
-.hs-remember-me {
-    margin-bottom: 20px;
-}
-
 .hs-footer {
     font-size: 12px;
     position: absolute;
@@ -72,4 +68,25 @@
 
 #hs-back-link {
     margin-top: 30px;
+}
+
+#hs-remember-me {
+    margin-bottom: 20px;
+}
+
+.hs-remember-me-checkbox {
+    width: 15px;
+    height: 15px;
+}
+
+.hs-remember-me-text {
+    display: inline-block;
+    margin-top: -1px;
+    position: absolute;
+    margin-left: 4px;
+}
+
+.pf-m-danger {
+    margin-bottom: 10px;
+    margin-top: -10px;
 }
