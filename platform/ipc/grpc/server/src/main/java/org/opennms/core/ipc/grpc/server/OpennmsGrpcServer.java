@@ -49,21 +49,25 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.opennms.core.grpc.common.GrpcIpcServer;
 import org.opennms.core.ipc.grpc.common.Empty;
-import org.opennms.core.ipc.grpc.common.OpenNMSIpcGrpc;
 import org.opennms.core.ipc.grpc.common.RpcRequestProto;
 import org.opennms.core.ipc.grpc.common.RpcResponseProto;
 import org.opennms.core.ipc.grpc.common.SinkMessage;
 import org.opennms.core.ipc.grpc.server.manager.LocationIndependentRpcClientFactory;
 import org.opennms.core.ipc.grpc.server.manager.MinionInfo;
 import org.opennms.core.ipc.grpc.server.manager.MinionManager;
+import org.opennms.core.ipc.grpc.server.manager.RpcRequestTimeoutManager;
+import org.opennms.core.ipc.grpc.server.manager.rpcstreaming.MinionRpcStreamConnection;
 import org.opennms.core.ipc.grpc.server.manager.RpcConnectionTracker;
 import org.opennms.core.ipc.grpc.server.manager.RpcRequestTracker;
-import org.opennms.core.ipc.grpc.server.manager.impl.RpcConnectionTrackerImpl;
-import org.opennms.core.ipc.grpc.server.manager.impl.RpcRequestTrackerImpl;
+import org.opennms.core.ipc.grpc.server.manager.adapter.InboundRpcAdapter;
+import org.opennms.core.ipc.grpc.server.manager.adapter.MinionRSTransportAdapter;
 import org.opennms.core.ipc.grpc.server.manager.rpc.RemoteRegistrationHandler;
+import org.opennms.core.ipc.grpc.server.manager.rpcstreaming.MinionRpcStreamConnectionManager;
+import org.opennms.core.ipc.grpc.server.manager.rpcstreaming.impl.MinionRpcStreamConnectionImpl;
 import org.opennms.core.tracing.api.TracerConstants;
 import org.opennms.core.tracing.api.TracerRegistry;
 import org.opennms.horizon.core.identity.Identity;
@@ -133,32 +137,16 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
     private JmxReporter sinkMetricsReporter;
     private TracerRegistry tracerRegistry;
     private AtomicBoolean closed = new AtomicBoolean(false);
-    private final ThreadFactory responseHandlerThreadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("rpc-response-handler-%d")
-            .build();
-    private final ThreadFactory timerThreadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("rpc-timeout-tracker-%d")
-            .build();
     private final ThreadFactory sinkConsumerThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("sink-consumer-%d")
             .build();
 
-
-    private MinionManager minionManager;
-
-    // RPC timeout executor thread retrieves elements from delay queue used to timeout rpc requests.
-    private final ExecutorService rpcTimeoutExecutor = Executors.newSingleThreadExecutor(timerThreadFactory);
-
-    // Each RPC response is handled on a new thread which does unmarshalling and returning response to corresponding module.
-    private final ExecutorService responseHandlerExecutor = Executors.newCachedThreadPool(responseHandlerThreadFactory);
-
-    // Delay queue maintains the priority queue of RPC requests and times out the requests if no response was received
-    // within the delay specified.
-    private DelayQueue<RpcResponseHandler> rpcTimeoutQueue = new DelayQueue<>();
-
     private RpcConnectionTracker rpcConnectionTracker;
     private RpcRequestTracker rpcRequestTracker;
     private LocationIndependentRpcClientFactory locationIndependentRpcClientFactory;
+    private MinionRpcStreamConnectionManager minionRpcStreamConnectionManager;
+    private RpcRequestTimeoutManager rpcRequestTimeoutManager;
+    private MinionManager minionManager;
 
     // Maintains the map of sink modules by it's id.
     private final Map<String, SinkModule<?, Message>> sinkModulesById = new ConcurrentHashMap<>();
@@ -169,16 +157,17 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
         this.grpcIpcServer = grpcIpcServer;
     }
 
-
     public void start() throws IOException {
         try (Logging.MDCCloseable mdc = Logging.withPrefixCloseable(RpcClientFactory.LOG_PREFIX)) {
 
-            grpcIpcServer.startServer(new OpennmsIpcService());
+            grpcIpcServer.startServer(
+                    new MinionRSTransportAdapter(minionRpcStreamConnectionManager::startRpcStreaming, this::processSinkStreamingCall)
+            );
+
             LOG.info("Added RPC/Sink Service to OpenNMS IPC Grpc Server");
 
             properties = grpcIpcServer.getProperties();
             ttl = PropertiesUtils.getProperty(properties, GRPC_TTL_PROPERTY, DEFAULT_GRPC_TTL);
-            rpcTimeoutExecutor.execute(this::handleRpcTimeouts);
             rpcMetricsReporter = JmxReporter.forRegistry(getRpcMetrics())
                     .inDomain(JMX_DOMAIN_RPC)
                     .build();
@@ -225,7 +214,7 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
                 new RpcResponseHandlerImpl(future, localModule, rpcId, request.getLocation(), expiration, span, loggingContext);
 
         rpcRequestTracker.addRequest(rpcId, responseHandler);
-        rpcTimeoutQueue.offer(responseHandler);
+        rpcRequestTimeoutManager.registerRequestTimeout(responseHandler);
 
         return rpcId;
     }
@@ -233,51 +222,12 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
     @Override
     public <S extends RpcRequest, T extends RpcResponse> RpcClient<S, T> getClient(RpcModule<S, T> module) {
 
-        CompletableFuture<T> future = new CompletableFuture<>();
-
         RemoteRegistrationHandler remoteRegistrationHandler =
-                (request, timeout, span) -> registerRemoteCall(request, timeout, future, module, span);
+                (request, timeout, span, future) -> registerRemoteCall(request, timeout, future, module, span);
 
         return locationIndependentRpcClientFactory.createClient(module, remoteRegistrationHandler);
     }
 
-
-    private void handleRpcTimeouts() {
-        while (!closed.get()) {
-            try {
-                RpcResponseHandler responseHandler = rpcTimeoutQueue.take();
-                if (!responseHandler.isProcessed()) {
-                    LOG.warn("RPC request from module: {} with RpcId:{} timedout ", responseHandler.getRpcModule().getId(),
-                            responseHandler.getRpcId());
-                    responseHandlerExecutor.execute(() -> responseHandler.sendResponse(null));
-                }
-            } catch (InterruptedException e) {
-                LOG.info("interrupted while waiting for an element from rpcTimeoutQueue", e);
-                Thread.currentThread().interrupt();
-                break;
-            } catch (Exception e) {
-                LOG.warn("error while sending response from timeout handler", e);
-            }
-        }
-    }
-
-
-    private void handleResponse(RpcResponseProto responseProto) {
-
-        if (Strings.isNullOrEmpty(responseProto.getRpcId())) {
-            return;
-        }
-
-        // Handle response from the Minion.
-        RpcResponseHandler responseHandler = rpcRequestTracker.lookup(responseProto.getRpcId());
-
-        if (responseHandler != null && responseProto.getRpcContent() != null) {
-            responseHandler.sendResponse(responseProto.getRpcContent().toStringUtf8());
-        } else {
-            LOG.debug("Received a response for request for module: {} with RpcId:{}, but no outstanding request was found with this id." +
-                    "The request may have timed out", responseProto.getModuleId(), responseProto.getRpcId());
-        }
-    }
 
     private void addRpcHandler(String location, String systemId, StreamObserver<RpcRequestProto> rpcHandler) {
         if (Strings.isNullOrEmpty(location) || Strings.isNullOrEmpty(systemId)) {
@@ -391,10 +341,24 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
         this.rpcRequestTracker = rpcRequestTracker;
     }
 
+    public MinionRpcStreamConnectionManager getMinionRpcStreamConnectionManager() {
+        return minionRpcStreamConnectionManager;
+    }
+
+    public void setMinionRpcStreamConnectionManager(MinionRpcStreamConnectionManager minionRpcStreamConnectionManager) {
+        this.minionRpcStreamConnectionManager = minionRpcStreamConnectionManager;
+    }
+
+    public RpcRequestTimeoutManager getRpcRequestTimeoutManager() {
+        return rpcRequestTimeoutManager;
+    }
+
+    public void setRpcRequestTimeoutManager(RpcRequestTimeoutManager rpcRequestTimeoutManager) {
+        this.rpcRequestTimeoutManager = rpcRequestTimeoutManager;
+    }
+
     public void shutdown() {
         closed.set(true);
-        rpcTimeoutQueue.clear();
-
         rpcConnectionTracker.clear();
 
         rpcRequestTracker.clear();
@@ -406,77 +370,34 @@ public class OpennmsGrpcServer extends AbstractMessageConsumerManager implements
             sinkMetricsReporter.close();
         }
         grpcIpcServer.stopServer();
-        rpcTimeoutExecutor.shutdownNow();
-        responseHandlerExecutor.shutdownNow();
         LOG.info("OpenNMS gRPC server stopped");
     }
 
-    private class OpennmsIpcService extends OpenNMSIpcGrpc.OpenNMSIpcImplBase {
+    private StreamObserver<SinkMessage> processSinkStreamingCall(StreamObserver<Empty> responseObserver) {
+        return new StreamObserver<SinkMessage>() {
 
-        @Override
-        public StreamObserver<RpcResponseProto> rpcStreaming(
-                StreamObserver<RpcRequestProto> responseObserver) {
+            @Override
+            public void onNext(SinkMessage sinkMessage) {
 
-            return new StreamObserver<RpcResponseProto>() {
-
-                @Override
-                public void onNext(RpcResponseProto rpcResponseProto) {
-                    // Register client when message is metadata.
-                    if (isHeaders(rpcResponseProto)) {
-                        addRpcHandler(rpcResponseProto.getLocation(), rpcResponseProto.getSystemId(), responseObserver);
-                    } else {
-                        responseHandlerExecutor.execute(() -> handleResponse(rpcResponseProto));
+                if (!Strings.isNullOrEmpty(sinkMessage.getModuleId())) {
+                    ExecutorService sinkModuleExecutor = sinkConsumersByModuleId.get(sinkMessage.getModuleId());
+                    if(sinkModuleExecutor != null) {
+                        sinkModuleExecutor.execute(() -> dispatchSinkMessage(sinkMessage));
                     }
                 }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    LOG.error("Error in rpc streaming", throwable);
-                }
-
-                @Override
-                public void onCompleted() {
-                    LOG.info("Minion RPC handler closed");
-                    MinionInfo removedMinionInfo = rpcConnectionTracker.removeConnection(responseObserver);
-
-                    // Notify the MinionManager of the removal
-                    if (removedMinionInfo.getId() != null) {
-                        minionManager.removeMinion(removedMinionInfo.getId());
-                    }
-                }
-            };
-        }
-
-        @Override
-        public io.grpc.stub.StreamObserver<SinkMessage> sinkStreaming(
-                io.grpc.stub.StreamObserver<Empty> responseObserver) {
+            }
 
 
-            return new StreamObserver<SinkMessage>() {
+            @Override
+            public void onError(Throwable throwable) {
+                LOG.error("Error in sink streaming", throwable);
+            }
 
-                @Override
-                public void onNext(SinkMessage sinkMessage) {
+            @Override
+            public void onCompleted() {
 
-                    if (!Strings.isNullOrEmpty(sinkMessage.getModuleId())) {
-                        ExecutorService sinkModuleExecutor = sinkConsumersByModuleId.get(sinkMessage.getModuleId());
-                        if(sinkModuleExecutor != null) {
-                            sinkModuleExecutor.execute(() -> dispatchSinkMessage(sinkMessage));
-                        }
-                    }
-                }
-
-
-                @Override
-                public void onError(Throwable throwable) {
-                    LOG.error("Error in sink streaming", throwable);
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            };
-        }
+            }
+        };
     }
 
     private void dispatchSinkMessage(SinkMessage sinkMessage) {

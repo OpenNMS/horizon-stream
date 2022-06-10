@@ -170,9 +170,9 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
 
         String marshalRequest = localModule.marshalRequest(request);
 
-
+        CompletableFuture<RESPONSE> future = new CompletableFuture<>();
         long expirationTime = this.calcuateExpiration(request);
-        String rpcId = remoteRegistrationHandler.registerRemoteCall(request, expirationTime, span);
+        String rpcId = remoteRegistrationHandler.registerRemoteCall(request, expirationTime, span, future);
 
         RpcRequestProto.Builder builder = RpcRequestProto.newBuilder()
                 .setRpcId(rpcId)
@@ -191,7 +191,6 @@ public class LocationIndependentRpcClient<REQUEST extends RpcRequest, RESPONSE e
 
         addMetrics(request, requestProto.getSerializedSize());
 
-        CompletableFuture<RESPONSE> future = new CompletableFuture<>();
         if (!succeeded) {
             RpcClientFactory.markFailed(rpcMetrics, request.getLocation(), localModule.getId());
             future.completeExceptionally(new RuntimeException("No minion found at location " + request.getLocation()));
