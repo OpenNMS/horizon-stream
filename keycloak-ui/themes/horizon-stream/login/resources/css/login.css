@@ -86,7 +86,24 @@
     margin-left: 4px;
 }
 
-.pf-m-danger {
+.alert-error {
+    color: var(--feather-error);
+}
+
+.alert-success, 
+.alert-warning {
+    color: var(--feather-primary-text-on-surface);
+}
+
+.alert-error, 
+.alert-success, 
+.alert-warning {
+    text-align: center;
     margin-bottom: 10px;
     margin-top: -10px;
 }
+
+.instruction {
+    color: var(--feather-primary-text-on-surface)
+}
+
