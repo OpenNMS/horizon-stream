@@ -26,48 +26,40 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.provision.rpc.relocate.mate;
+package org.opennms.configvars;
 
+import com.google.common.collect.Maps;
+
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
-public interface Scope {
-    Optional<ScopeValue> get(final ContextKey contextKey);
-    Set<ContextKey> keys();
+public class ObjectScope<T> implements Scope {
+    private final ScopeName scopeName;
+    private final T object;
+    private final Map<ContextKey, Function<T, Optional<String>>> accessors = Maps.newHashMap();
 
-    public static class ScopeValue {
-        public final ScopeName scopeName;
-        public final String value;
-
-        public ScopeValue(final ScopeName scopeName, final String value) {
-            this.scopeName = Objects.requireNonNull(scopeName);
-            this.value = Objects.requireNonNull(value);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ScopeValue that = (ScopeValue) o;
-            return scopeName == that.scopeName && value.equals(that.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(scopeName, value);
-        }
-
-        @Override
-        public String toString() {
-            return "ScopeValue{" +
-                    "scopeName=" + scopeName +
-                    ", value='" + value + '\'' +
-                    '}';
-        }
+    public ObjectScope(final ScopeName scopeName, final T object) {
+        this.scopeName = Objects.requireNonNull(scopeName);
+        this.object = Objects.requireNonNull(object);
     }
 
-    public enum ScopeName {
-        DEFAULT, NODE, INTERFACE, SERVICE;
+    @Override
+    public Optional<ScopeValue> get(final ContextKey contextKey) {
+        return this.accessors.getOrDefault(contextKey, (missing) -> Optional.empty())
+                .apply(this.object)
+                .map(value -> new ScopeValue(this.scopeName, value));
+    }
+
+    @Override
+    public Set<ContextKey> keys() {
+        return this.accessors.keySet();
+    }
+
+    public ObjectScope<T> map(final String context, final String key, final Function<T, Optional<String>> accessor) {
+        this.accessors.put(new ContextKey(context, key), accessor);
+        return this;
     }
 }

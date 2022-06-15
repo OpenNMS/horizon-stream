@@ -26,24 +26,26 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.provision.rpc.relocate.mate;
+package org.opennms.configvars;
 
-import java.net.InetAddress;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 
-public interface EntityScopeProvider {
+public final class EmptyScope implements Scope {
 
-    interface Contexts {
-        String ASSET = "asset";
-        String INTERFACE = "interface";
-        String NODE = "node";
-        String SERVICE = "service";
+    public final static EmptyScope EMPTY = new EmptyScope();
+
+    private EmptyScope() {
     }
 
-    Scope getScopeForNode(final Integer nodeId);
+    @Override
+    public Optional<ScopeValue> get(ContextKey contextKey) {
+        return Optional.empty();
+    }
 
-    Scope getScopeForInterface(final Integer nodeId, final String ipAddress);
-
-    Scope getScopeForInterfaceByIfIndex(final Integer nodeId, final int ifIndex);
-
-    Scope getScopeForService(final Integer nodeId, final InetAddress ipAddress, final String serviceName);
+    @Override
+    public Set<ContextKey> keys() {
+        return Collections.emptySet();
+    }
 }

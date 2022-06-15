@@ -19,6 +19,7 @@
         <module>identity</module>
         <!-- <module>jaas</module> -->
         <module>lib</module>
+        <module>config-vars</module>
         <module>monitor</module>
         <module>rest</module>
         <module>tracing</module>

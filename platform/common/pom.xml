@@ -29,6 +29,7 @@
 
   <modules>
     <module>common-concurrency</module>
+    <module>common-config-vars</module>
     <module>common-net</module>
     <module>common-web</module>
   </modules>

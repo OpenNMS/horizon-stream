@@ -26,38 +26,48 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.provision.rpc.relocate.mate;
+package org.opennms.configvars;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class FallbackScope implements Scope {
-    private final List<Scope> scopes;
+public interface Scope {
+    Optional<ScopeValue> get(final ContextKey contextKey);
+    Set<ContextKey> keys();
 
-    public FallbackScope(final List<Scope> scopes) {
-        this.scopes = ImmutableList.copyOf(scopes).reverse();
+    public static class ScopeValue {
+        public final ScopeName scopeName;
+        public final String value;
+
+        public ScopeValue(final ScopeName scopeName, final String value) {
+            this.scopeName = Objects.requireNonNull(scopeName);
+            this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ScopeValue that = (ScopeValue) o;
+            return scopeName == that.scopeName && value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(scopeName, value);
+        }
+
+        @Override
+        public String toString() {
+            return "ScopeValue{" +
+                    "scopeName=" + scopeName +
+                    ", value='" + value + '\'' +
+                    '}';
+        }
     }
 
-    public FallbackScope(final Scope... scopes) {
-        this.scopes = ImmutableList.copyOf(scopes).reverse();
-    }
-
-    @Override
-    public Optional<ScopeValue> get(final ContextKey contextKey) {
-        return this.scopes.stream()
-                .map(scope -> scope.get(contextKey))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst();
-    }
-
-    @Override
-    public Set<ContextKey> keys() {
-        return this.scopes.stream()
-                .flatMap(scope -> scope.keys().stream())
-                .collect(Collectors.toSet());
+    public enum ScopeName {
+        DEFAULT, NODE, INTERFACE, SERVICE;
     }
 }

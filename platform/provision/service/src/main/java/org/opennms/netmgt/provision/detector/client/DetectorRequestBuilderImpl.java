@@ -43,8 +43,8 @@ import org.opennms.netmgt.provision.DetectorRequestBuilder;
 import org.opennms.netmgt.provision.PreDetectCallback;
 import org.opennms.netmgt.provision.ServiceDetector;
 import org.opennms.netmgt.provision.ServiceDetectorFactory;
-import org.opennms.netmgt.provision.rpc.relocate.mate.FallbackScope;
-import org.opennms.netmgt.provision.rpc.relocate.mate.Interpolator;
+import org.opennms.configvars.FallbackScope;
+import org.opennms.configvars.Interpolator;
 import org.opennms.netmgt.provision.rpc.relocate.MetadataConstants;
 import org.opennms.netmgt.provision.rpc.relocate.ParameterMap;
 import org.slf4j.Logger;
@@ -154,15 +154,14 @@ public class DetectorRequestBuilderImpl implements DetectorRequestBuilder {
             throw new IllegalArgumentException("Detector class name is required.");
         }
 
-        // TBD888: need to get the scopes working
-        final Map<String, String> interpolatedAttributes =
-                Interpolator.interpolateStrings(attributes,
-                        new FallbackScope(Collections.emptyList())
+        FallbackScope entityAttributeScope = new FallbackScope(
+                client.getEntityScopeProvider().getScopeForNode(nodeId),
+                client.getEntityScopeProvider().getScopeForInterface(nodeId, InetAddressUtils.toIpAddrString(address))
         );
-        // final Map<String, String> interpolatedAttributes = Interpolator.interpolateStrings(attributes, new FallbackScope(
-        //         this.client.getEntityScopeProvider().getScopeForNode(nodeId),
-        //         this.client.getEntityScopeProvider().getScopeForInterface(nodeId, InetAddressUtils.toIpAddrString(address))
-        // ));
+
+        // Process the requested attributes for "${...}" replacements using the underlying entity attributes as values
+        //  to fill in the replacements.
+        Map<String, String> interpolatedAttributes = Interpolator.interpolateStrings(attributes, entityAttributeScope);
 
         // Retrieve the factory associated with the requested detector
         final ServiceDetectorFactory<?> factory = client.getRegistry().getDetectorFactoryByClassName(className);

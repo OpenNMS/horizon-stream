@@ -233,6 +233,7 @@
         <feature>horizon-db</feature>
         <feature>horizon-tracing</feature>
         <feature>horizon-grpc</feature>
+        <feature>horizon-configvar-scopes</feature>
 
         <bundle>mvn:commons-io/commons-io/${commons.io.version}</bundle>
         <bundle>mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
@@ -250,7 +251,19 @@
         <bundle>mvn:org.opennms.horizon.provision/service/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/rest/${project.version}</bundle>
     </feature>
-    
+
+    <!--                               -->
+    <!-- CONFIGURATION VARIABLE SCOPES -->
+    <!--                               -->
+    <feature name="horizon-configvar-scopes" version="${project.version}" description="Horizon : Configuration Variable Scopes">
+        <feature>horizon-db</feature>
+
+        <bundle>mvn:org.opennms.horizon.common/common-config-vars/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.core/config-vars/${project.version}</bundle>
+
+        <bundle>wrap:mvn:ch.hsr/geohash/${geohash.version}</bundle>
+    </feature>
+
     <!--        -->
     <!-- MINION -->
     <!--        -->

@@ -62,4 +62,17 @@
         </bean>
     </service>
 
+    <service interface="org.opennms.horizon.db.dao.api.MonitoredServiceDao">
+        <bean class="org.opennms.horizon.db.dao.impl.MonitoredServiceDaoHibernate">
+            <argument ref="entityManagerHolder"/>
+        </bean>
+    </service>
+
+    <service interface="org.opennms.horizon.db.dao.api.SnmpInterfaceDao">
+        <bean class="org.opennms.horizon.db.dao.impl.SnmpInterfaceDaoHibernate">
+            <argument ref="entityManagerHolder"/>
+        </bean>
+    </service>
+
+
 </blueprint>

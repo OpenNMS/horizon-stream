@@ -28,17 +28,13 @@
 
 package org.opennms.netmgt.provision.detector.client;
 
-//import org.opennms.core.rpc.api.RpcClient;
-//import org.opennms.core.rpc.api.RpcClientFactory;
-//import org.opennms.core.rpc.utils.mate.EntityScopeProvider;
 import lombok.Data;
+import org.opennms.horizon.core.configvars.EntityScopeProvider;
 import org.opennms.horizon.ipc.rpc.api.RpcClient;
 import org.opennms.horizon.ipc.rpc.api.RpcClientFactory;
 import org.opennms.netmgt.provision.DetectorRequestBuilder;
 import org.opennms.netmgt.provision.LocationAwareDetectorClient;
-//import org.opennms.netmgt.provision.detector.registry.api.ServiceDetectorRegistry;
 import org.opennms.netmgt.provision.ServiceDetectorRegistry;
-import org.opennms.netmgt.provision.rpc.relocate.mate.EntityScopeProvider;
 import org.springframework.beans.factory.InitializingBean;
 
 @Data

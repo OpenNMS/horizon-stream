@@ -64,6 +64,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opennms.horizon.common</groupId>
+      <artifactId>common-config-vars</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opennms.horizon.core</groupId>
+      <artifactId>config-vars</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.opennms.horizon.core</groupId>
       <artifactId>soa</artifactId>
       <version>${project.version}</version>

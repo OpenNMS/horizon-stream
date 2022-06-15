@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.netmgt.provision.rpc.relocate.mate;
+package org.opennms.configvars;
 
 import com.google.common.collect.ComparisonChain;
 import java.util.Objects;
