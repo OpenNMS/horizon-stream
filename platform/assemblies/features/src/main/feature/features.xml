@@ -250,6 +250,7 @@
         <bundle>mvn:org.opennms.horizon.provision/api/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/core/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/detector-jdbc/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-ssh/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/detector-web/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/persistence/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/service/${project.version}</bundle>

@@ -26,6 +26,7 @@
     <module>rest</module>
 
     <module>service</module>
+    <module>ssh</module>
     <module>persistence</module>
   </modules>
 

@@ -324,6 +324,11 @@
         </dependency>
         <dependency>
             <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-ssh</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
             <artifactId>detector-web</artifactId>
             <version>${project.version}</version>
         </dependency>
