@@ -20,9 +20,12 @@
     <module>activemq</module>
     <module>bsf</module>
     <module>core</module>
+
+    <module>jdbc</module>
     <module>web</module>
-    <module>service</module>
     <module>rest</module>
+
+    <module>service</module>
     <module>persistence</module>
   </modules>
 
