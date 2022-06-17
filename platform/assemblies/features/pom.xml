@@ -319,6 +319,11 @@
         </dependency>
         <dependency>
             <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-activemq</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
             <artifactId>detector-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
