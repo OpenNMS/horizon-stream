@@ -309,11 +309,6 @@
         </dependency>
         <dependency>
             <groupId>org.opennms.horizon.provision</groupId>
-            <artifactId>activemq</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opennms.horizon.provision</groupId>
             <artifactId>bsf</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -325,6 +320,11 @@
         <dependency>
             <groupId>org.opennms.horizon.provision</groupId>
             <artifactId>detector-dhcp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-activemq</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
