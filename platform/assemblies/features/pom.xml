@@ -318,6 +318,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.opennms.horizon</groupId>
+            <artifactId>dhcpd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-dhcp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.opennms.horizon.provision</groupId>
             <artifactId>detector-jdbc</artifactId>
             <version>${project.version}</version>

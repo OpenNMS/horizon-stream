@@ -21,6 +21,7 @@
     <module>bsf</module>
     <module>core</module>
 
+    <module>dhcp</module>
     <module>jdbc</module>
     <module>web</module>
     <module>rest</module>

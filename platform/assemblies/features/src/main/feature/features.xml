@@ -255,6 +255,10 @@
         <bundle>mvn:org.opennms.horizon.provision/persistence/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/service/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.provision/rest/${project.version}</bundle>
+
+        <bundle>mvn:com.helger/dhcp4java/${dhcp4java.version}</bundle>
+        <bundle>mvn:org.opennms.horizon/dhcpd/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-dhcp/${project.version}</bundle>
     </feature>
 
     <!--                               -->
