@@ -119,6 +119,10 @@ public class OnmsIpInterface extends OnmsEntity implements Serializable {
         this(InetAddressUtils.getInetAddress(ipAddr), node);
     }
 
+    public OnmsIpInterface(String ipAddr) {
+        m_ipAddress = InetAddressUtils.getInetAddress(ipAddr);
+    }
+
     /**
      * minimal constructor
      *

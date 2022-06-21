@@ -85,6 +85,7 @@
                                 <feature>horizon-grpc</feature>
                                 <feature>horizon-icmp</feature>
                                 <feature>horizon-ipc-api</feature>
+                                <feature>horizon-provision</feature>
                                 <feature>horizon-snmp</feature>
                                 <feature>horizon-tracing</feature>
                                 <feature>jackson</feature>
@@ -159,6 +160,11 @@
         <dependency>
             <groupId>org.opennms.horizon.core</groupId>
             <artifactId>monitor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.core</groupId>
+            <artifactId>soa</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -294,6 +300,66 @@
         <dependency>
             <groupId>org.opennms.horizon.core.tracing</groupId>
             <artifactId>registry</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>bsf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon</groupId>
+            <artifactId>dhcpd</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-datagram</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-dhcp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-activemq</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-ssh</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>detector-web</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>rest</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.provision</groupId>
+            <artifactId>service</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

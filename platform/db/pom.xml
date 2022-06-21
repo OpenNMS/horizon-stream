@@ -12,12 +12,14 @@
 
   <groupId>org.opennms.horizon.db</groupId>
   <artifactId>db</artifactId>
-  <name>OpenNMS Horizon :: Database</name>
+  <name>OpenNMS Horizon :: DB</name>
   <packaging>pom</packaging>
 
   <modules>
     <module>dao-api</module>
     <module>dao-impl</module>
+    <module>repository-api</module>
+    <module>repository-impl</module>
     <module>model</module>
     <module>schema</module>
     <module>schema-liquibase</module>

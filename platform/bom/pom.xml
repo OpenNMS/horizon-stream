@@ -17,6 +17,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>ch.hsr</groupId>
+                <artifactId>geohash</artifactId>
+                <version>${geohash.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
@@ -62,9 +67,25 @@
                 <version>${jsr305.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.helger</groupId>
+                <artifactId>dhcp4java</artifactId>
+                <version>${dhcp4java.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.swrve</groupId>
                 <artifactId>rate-limited-logger</artifactId>
                 <version>${rate.limitted.logger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>bsf</groupId>
+                <artifactId>bsf</artifactId>
+                <version>${bsf.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>jakarta.annotation</groupId>
@@ -90,6 +111,48 @@
                 <groupId>org.apache.aries.jpa</groupId>
                 <artifactId>org.apache.aries.jpa.api</artifactId>
                 <version>${aries.jpa.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-client</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-osgi</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-osgi</artifactId>
+                <version>${httpcore.version}</version>
+            </dependency>
+            <!-- Mina -->
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>${mina.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-client</artifactId>
+                <version>${activemq.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-osgi</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-osgi</artifactId>
+                <version>${httpcore.version}</version>
+            </dependency>
+            <!-- Mina -->
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>${mina.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.bundles</groupId>
@@ -140,6 +203,76 @@
                 <groupId>io.jaegertracing</groupId>
                 <artifactId>jaeger-client</artifactId>
                 <version>${jaeger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>${netty3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>${netty3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>
+                <version>${netty4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-common</artifactId>
+                <version>${netty4.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -469,6 +602,16 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.snmp4j</groupId>
                 <artifactId>snmp4j</artifactId>
                 <version>${snmp4j.version}</version>
@@ -505,6 +648,16 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j18-impl</artifactId>
                 <version>${log4j2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.testcontainers</groupId>

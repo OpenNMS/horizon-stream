@@ -13,12 +13,15 @@
     <cm:default-properties>
       <cm:property name="port" value="8990"/>
       <cm:property name="startDelay" value="PT60S"/>
+      <cm:property name="org.opennms.core.ipc.rpc.ttl" value="20000"/>
     </cm:default-properties>
   </cm:property-placeholder>
 
   <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin" />
   <reference id="identity" interface="org.opennms.horizon.core.identity.Identity"/>
-<!--  <reference id="tracerRegistry" interface="org.opennms.core.tracing.api.TracerRegistry"/>-->
+  <reference id="tracerRegistry" interface="org.opennms.core.tracing.api.TracerRegistry"/>
+
+  <bean id="threadExecutorManager" class="org.opennms.core.ipc.grpc.server.manager.util.ThreadExecutorManager"/>
 
   <bean id="grpcIpcServer" class="org.opennms.core.grpc.common.GrpcIpcServerBuilder">
     <argument ref="configAdmin"/>
@@ -30,14 +33,44 @@
   <bean id="minionManager" class="org.opennms.core.ipc.grpc.server.manager.impl.MinionManagerImpl" />
   <service ref="minionManager" interface="org.opennms.core.ipc.grpc.server.manager.MinionManager" />
 
+  <bean id="locationIndependentRpcClientFactory" class="org.opennms.core.ipc.grpc.server.manager.rpc.LocationIndependentRpcClientFactoryImpl">
+    <property name="serverIdentity" ref="identity"/>
+    <property name="tracerRegistry" ref="tracerRegistry"/>
+    <property name="rpcMetrics" ref="grpcRpcMetrics"/>
+    <property name="rpcConnectionTracker" ref="rpcConnectionTracker"/>
+    <property name="ttl" value="${org.opennms.core.ipc.rpc.ttl}"/>
+  </bean>
+
+  <bean id="rpcConnectionTracker" class="org.opennms.core.ipc.grpc.server.manager.impl.RpcConnectionTrackerImpl" />
+  <bean id="rpcRequestTracker" class="org.opennms.core.ipc.grpc.server.manager.impl.RpcRequestTrackerImpl"/>
+
+  <bean id="rpcRequestTimeoutManager" class="org.opennms.core.ipc.grpc.server.manager.impl.RpcRequestTimeoutManagerImpl" init-method="start" destroy-method="shutdown">
+    <property name="rpcTimeoutExecutor"><bean factory-ref="threadExecutorManager" factory-method="getRpcTimeoutExecutor"/></property>
+    <property name="responseHandlerExecutor"><bean factory-ref="threadExecutorManager" factory-method="getResponseHandlerExecutor"/></property>
+  </bean>
+
+  <bean id="minionRpcStreamConnectionManager" class="org.opennms.core.ipc.grpc.server.manager.rpcstreaming.impl.MinionRpcStreamConnectionManagerImpl" destroy-method="shutdown">
+    <argument ref="rpcConnectionTracker"/>
+    <argument ref="rpcRequestTracker"/>
+    <argument ref="minionManager"/>
+    <argument><bean factory-ref="threadExecutorManager" factory-method="getResponseHandlerExecutor"/></argument>
+  </bean>
+
   <bean id="grpcServer" class="org.opennms.core.ipc.grpc.server.OpennmsGrpcServer"
         init-method="start" destroy-method="shutdown">
+
     <argument ref="grpcIpcServer"/>
+
     <property name="identity" ref="identity"/>
     <property name="rpcMetrics" ref="grpcRpcMetrics"/>
     <property name="sinkMetrics" ref="grpcSinkMetrics"/>
     <property name="minionManager" ref="minionManager"/>
-<!--    <property name="tracerRegistry" ref="tracerRegistry"/>-->
+
+    <property name="rpcRequestTracker" ref="rpcRequestTracker"/>
+    <property name="rpcConnectionTracker" ref="rpcConnectionTracker"/>
+    <property name="locationIndependentRpcClientFactory" ref="locationIndependentRpcClientFactory"/>
+    <property name="minionRpcStreamConnectionManager" ref="minionRpcStreamConnectionManager"/>
+    <property name="rpcRequestTimeoutManager" ref="rpcRequestTimeoutManager"/>
   </bean>
 
   <service ref="grpcServer" interface="org.opennms.horizon.ipc.sink.api.MessageConsumerManager">
@@ -71,5 +104,4 @@
       <entry key="description" value="Sink consumer Metrics on OpenNMS"/>
     </service-properties>
   </service>
-
 </blueprint>

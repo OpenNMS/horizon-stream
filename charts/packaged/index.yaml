@@ -1,0 +1,11 @@
+apiVersion: v1
+entries:
+  opennms-operator-dependencies:
+  - apiVersion: v2
+    created: "2022-06-20T12:55:27.885505-04:00"
+    digest: c455c70041d93b130d511b5cf6959965cbea1defb65ce747d5ff5b232d8e93dd
+    name: opennms-operator-dependencies
+    urls:
+    - https://opennms.github.io/horizon-stream/charts/packaged/opennms-operator-dependencies-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-06-20T12:55:27.885233-04:00"

@@ -56,4 +56,17 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.keycloak: DEBUG
+    org.springdoc: DEBUG
   file.path: /var/log/restServer
+#spring doc
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    operations-sorter: method
+    oauth:
+      client_id: horizon-stream
+  packages-to-exclude:
+    - "io.leangen.graphql"
+  oAuthFlow:
+    tokenUrl: http://localhost:28080/realms/opennms/protocol/openid-connect/token

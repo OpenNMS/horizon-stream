@@ -20,7 +20,7 @@ const getAlarms = async (): Promise<AlarmResponseList> => {
   }
 
   try {
-    const resp = await api.get(endpoint)
+    const resp = await api.get(`${endpoint}/list`)
 
     if (!resp.data) return emptyResponse
 

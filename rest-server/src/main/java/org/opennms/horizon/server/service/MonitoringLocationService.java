@@ -43,8 +43,11 @@ import io.leangen.graphql.annotations.GraphQLArgument;
 import io.leangen.graphql.annotations.GraphQLMutation;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @Service
 @GraphQLApi
+@SecurityRequirement(name = "security_auth")
 public class MonitoringLocationService extends AbstractService<MonitoringLocation, MonitoringLocationDto, Long> {
     @Autowired
     public MonitoringLocationService(MonitoringLocationRepository repository, MonitoringLocationMapper mapper) {

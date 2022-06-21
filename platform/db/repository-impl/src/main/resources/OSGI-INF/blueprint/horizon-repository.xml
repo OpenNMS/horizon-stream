@@ -1,0 +1,23 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0
+  http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+  <cm:property-placeholder persistent-id="org.opennms.horizon.provision.persistence" update-strategy="reload">
+    <cm:default-properties>
+
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <reference id="nodeDao" interface="org.opennms.horizon.db.dao.api.NodeDao"/>
+  <reference id="monitoringLocation" interface="org.opennms.horizon.db.dao.api.MonitoringLocationDao"/>
+
+  <service interface="org.opennms.horizon.repository.api.NodeRepository">
+    <bean class="org.opennms.horizon.repository.impl.NodeRepositoryImpl">
+      <argument ref="nodeDao"/>
+      <argument ref="monitoringLocation"/>
+    </bean>
+  </service>
+
+</blueprint>

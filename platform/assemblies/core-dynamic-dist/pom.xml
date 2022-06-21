@@ -119,6 +119,7 @@
                         <feature>scr</feature>
                         <feature>horizon-alarms</feature>
                         <feature>horizon-icmp</feature>
+                        <feature>horizon-provision</feature>
                     </bootFeatures>
                     <libraries>
                     </libraries>

@@ -34,8 +34,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/nodes")
+@SecurityRequirement(name = "security_auth")
+@Tag(name = "Node endpoints")
 public class NodeController extends AbstractController<NodeDto, Long> {
     @Autowired
     public NodeController(NodeService service) {

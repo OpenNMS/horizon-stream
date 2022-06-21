@@ -59,7 +59,7 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/gui");
+        web.ignoring().antMatchers(new String [] {"/gui", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"});
     }
 
     @Autowired

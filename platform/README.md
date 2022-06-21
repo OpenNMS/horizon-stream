@@ -47,7 +47,7 @@ opennms:ping -l cloud 127.0.0.1
 
 ```
 feature:repo-add mvn:org.opennms.horizon.assemblies/features/0.1.0-SNAPSHOT/xml/features
-feature:install aries-blueprint horizon-alarms
+feature:install aries-blueprint horizon-alarms horizon-icmp horizon-provision
 ```
 
 ```

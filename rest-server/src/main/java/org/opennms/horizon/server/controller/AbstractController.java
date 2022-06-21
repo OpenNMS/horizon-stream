@@ -31,6 +31,7 @@ package org.opennms.horizon.server.controller;
 import java.util.List;
 
 import org.opennms.horizon.server.service.AbstractService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,6 +40,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 public abstract class AbstractController<D, ID> {
     protected AbstractService<?, D, ID> service;
@@ -49,6 +53,7 @@ public abstract class AbstractController<D, ID> {
 
     @PreAuthorize("hasRole('admin')")
     @PostMapping
+    @ApiResponse(responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE), useReturnTypeSchema = true)
     public D create(@RequestBody D dto) {
         return service.create(dto);
     }

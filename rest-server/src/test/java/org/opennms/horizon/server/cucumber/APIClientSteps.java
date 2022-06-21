@@ -28,18 +28,23 @@
 
 package org.opennms.horizon.server.cucumber;
 
+import static graphql.Assert.assertTrue;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
 
+import org.keycloak.TokenVerifier;
+import org.keycloak.common.VerificationException;
+import org.keycloak.representations.AccessToken;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.Given;
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
@@ -57,6 +62,7 @@ public class APIClientSteps {
     public static final String PATH_LOCATIONS = "/locations";
     public static final String PATH_NODS = "/nodes";
     public static final String PATH_GRAPHQL = "/graphql";
+    public static final String PATH_USERS = "/users";
 
     private final ObjectMapper mapper = new ObjectMapper();
     private  String clientId;
@@ -67,8 +73,8 @@ public class APIClientSteps {
 
     private String accessToken;
 
-    private String adminUsername;
-    private String adminPassword;
+    private String username;
+    private String password;
 
 
 
@@ -84,18 +90,15 @@ public class APIClientSteps {
         this.clientId = clientId;
     }
 
-    @Given("Admin user {string} with password {string}")
-    public void adminUserWithPassword(String username, String password) {
-        this.adminUsername = username;
-        this.adminPassword = password;
+    @Given("User {string} with password {string}")
+    public void userWithPassword(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public String getAdminUsername() {
-        return adminUsername;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
+    @Then("User can loging and create access token")
+    public void userCanLogingAndCreateAccessToken() {
+        assertTrue(login(username, password));
     }
 
     public void setAccessToken(String accessToken) {
@@ -169,7 +172,7 @@ public class APIClientSteps {
     }
 
     protected void cleanDB() {
-        login(adminUsername, adminPassword);
+        login("admin-user", "password123");
         List<Long> ids = getRequest(PATH_LOCATIONS).jsonPath().getList("id", Long.class);
         ids.forEach(id -> deleteRequest(PATH_LOCATIONS + "/" + id));
     }
@@ -180,5 +183,18 @@ public class APIClientSteps {
 
     protected ObjectNode createJsonNode() {
         return mapper.createObjectNode();
+    }
+
+    public ObjectMapper getMapper() {
+        return mapper;
+    }
+
+    public void verifyWthJsonPath(Response response, List<String> pathValue) {
+        assertEquals(pathValue.get(1), response.jsonPath().getString(pathValue.get(0)), "json path:" + pathValue.get(0));
+    }
+
+    public String getUserIDFromToken() throws VerificationException {
+        AccessToken token = TokenVerifier.create(accessToken.substring(7), AccessToken.class).getToken();
+        return token.getSubject();
     }
 }

@@ -11,7 +11,7 @@
 
     <groupId>org.opennms.core.ipc.twin.grpc</groupId>
     <artifactId>subscriber</artifactId>
-    <name>OpenNMS :: Core :: IPC :: Twin :: gRPC :: Subscriber</name>
+    <name>OpenNMS :: Horizon :: IPC :: Twin :: gRPC :: Subscriber</name>
     <packaging>bundle</packaging>
 
     <dependencyManagement>

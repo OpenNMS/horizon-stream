@@ -34,11 +34,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opennms.horizon.server.cucumber.APIClientSteps.PATH_LOCATIONS;
 
 import java.util.List;
+import java.util.Map;
 
 import org.opennms.horizon.server.model.dto.MonitoringLocationDto;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -46,109 +48,70 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocationEndpointsIntegrationSteps {
     APIClientSteps apiClient;
-    private MonitoringLocationDto location1;
-    private MonitoringLocationDto location2;
-    private List<MonitoringLocationDto> result;
+    private MonitoringLocationDto testLocation;
 
     public LocationEndpointsIntegrationSteps(APIClientSteps apiClient) {
         this.apiClient = apiClient;
     }
 
-    @Then("Admin user can create an access token")
-    public void adminUserCanCreateAnAccessToken() {
-        assertTrue(apiClient.login(apiClient.getAdminUsername(), apiClient.getAdminPassword()));
+    @Then("User can create new locations via REST API")
+    public void userCanCreateNewLocationsViaRESTAPI(DataTable locations) {
+        for (Map<String, String> location: locations.asMaps()) {
+            ObjectNode data = apiClient.createJsonNode();
+            data.put("location", location.get("location"));
+            data.put("monitoringArea", location.get("monitoringArea"));
+            Response response = apiClient.postRequest(PATH_LOCATIONS, data);
+            assertEquals(200, response.statusCode());
+            MonitoringLocationDto result = response.as(MonitoringLocationDto.class);
+            assertEquals(location.get("location"), result.getLocation());
+            assertEquals(location.get("monitoringArea"), result.getMonitoringArea());
+        }
     }
 
-    @Then("Admin user can create new location")
-    public void adminUserCanCreateNewLocation() {
 
-        ObjectNode data = apiClient.createJsonNode();
-        data.put("location", "Default");
-        data.put("monitoringArea", "localhost");
-
-        ObjectNode data2 = apiClient.createJsonNode();
-        data2.put("location", "test-location");
-        data2.put("monitoringArea", "office-network");
-
-        Response response = apiClient.postRequest(PATH_LOCATIONS, data);
-        assertEquals(200, response.statusCode());
-        location1 = response.as(MonitoringLocationDto.class);
-        assertNotNull(location1);
-        assertEquals("Default", location1.getLocation());
-        assertEquals("localhost", location1.getMonitoringArea());
-        Response response2 = apiClient.postRequest(PATH_LOCATIONS, data2);
-        assertEquals(200, response2.statusCode());
-        location2 = response2.as(MonitoringLocationDto.class);
-        assertNotNull(location2);
-        assertEquals("test-location", location2.getLocation());
-        assertEquals("office-network", location2.getMonitoringArea());
-    }
-
-    @Then("Admin user can list location")
-    public void adminUserCanListLocation() {
+    @Then("User can list locations")
+    public void adminUserCanListLocation(DataTable locations) {
         Response response = apiClient.getRequest(PATH_LOCATIONS);
         assertEquals(200, response.statusCode());
-        result = response.jsonPath().getList(".", MonitoringLocationDto.class);
-        assertEquals(2, result.size());
-
+        List<MonitoringLocationDto> result = response.jsonPath().getList(".", MonitoringLocationDto.class);
+        List<Map<String, String>> locationList = locations.asMaps();
+        assertEquals(locationList.size(), result.size());
+        for(int i=0; i<locationList.size(); i++) {
+            assertTrue(result.get(i).getId()> 0);
+            assertEquals(locationList.get(i).get("location"), result.get(i).getLocation());
+            assertEquals(locationList.get(i).get("monitoringArea"), result.get(i).getMonitoringArea());
+        }
+        testLocation = result.get(result.size() -1 );
     }
 
-    @Then("Verify location ids in the list")
-    public void verifyLocationIds() {
-        assertEquals(location1.getId(), result.get(0).getId());
-        assertEquals(location2.getId(), result.get(1).getId());
-    }
-
-    @Then("Admin user can get location by ID")
-    public void adminUserCanGetLocationByID() {
-        Response response = apiClient.getRequest(PATH_LOCATIONS + "/" + location1.getId());
+    @Then("User can get location by ID")
+    public void userCanGetLocationByID() {
+        Response response = apiClient.getRequest(PATH_LOCATIONS + "/" + testLocation.getId());
         assertEquals(200, response.statusCode());
         MonitoringLocationDto result = response.as(MonitoringLocationDto.class);
         assertNotNull(result);
-        assertEquals(location1.getLocation(), result.getLocation());
+        assertEquals(testLocation.getLocation(), result.getLocation());
+        assertEquals(testLocation.getMonitoringArea(), result.getMonitoringArea());
     }
 
-    @Then("Admin user can update the location")
-    public void adminUserCanUpdateTheLocation() {
-        location1.setMonitoringArea("updated_network");
-        Response response = apiClient.putRequest(PATH_LOCATIONS + "/" + location1.getId(), apiClient.objectToJson(location1));
+    @Then("User can update the location")
+    public void userCanUpdateTheLocation() {
+        testLocation.setMonitoringArea("updated_network");
+        Response response = apiClient.putRequest(PATH_LOCATIONS + "/" + testLocation.getId(), apiClient.objectToJson(testLocation));
         assertEquals(200, response.statusCode());
-        assertEquals(location1.getMonitoringArea(), response.jsonPath().get("monitoringArea"));
+        assertEquals(testLocation.getMonitoringArea(), response.jsonPath().get("monitoringArea"));
     }
 
-    @Then("Admin user can delete the location by ID")
-    public void adminUserCanDeleteTheLocationByID() {
-        Response response = apiClient.deleteRequest(PATH_LOCATIONS + "/" + location1.getId());
+    @Then("User can delete the location by ID")
+    public void userCanDeleteTheLocationByID() {
+        Response response = apiClient.deleteRequest(PATH_LOCATIONS + "/" + testLocation.getId());
         assertEquals(204, response.statusCode());
         List <MonitoringLocationDto> list = apiClient.getRequest(PATH_LOCATIONS).jsonPath().getList(".", MonitoringLocationDto.class);
         assertEquals(1, list.size());
     }
 
-    @Then("Normal user {string} with password {string} login to test location api")
-    public void aNormalUserWithUsernameAndPassword(String username, String password) {
-        assertTrue(apiClient.login(username, password));
-    }
-
-    @Then("Normal user can list location")
-    public void normalUserCanListLocation() {
-        Response response = apiClient.getRequest(PATH_LOCATIONS);
-        assertEquals(200, response.statusCode());
-        List<MonitoringLocationDto> result = response.jsonPath().getList(".", MonitoringLocationDto.class);
-        assertEquals(1, result.size());
-        location2 = result.get(0);
-    }
-
-    @Then("Normal user can get location by ID")
-    public void normalUserCanGetLocationByID() {
-        Response response = apiClient.getRequest(PATH_LOCATIONS + "/" + location2.getId());
-        assertEquals(200, response.statusCode());
-        MonitoringLocationDto result = response.as(MonitoringLocationDto.class);
-        assertNotNull(result);
-        assertEquals(location2.getLocation(), result.getLocation());
-    }
-
-    @Then("Normal user am not allowed to create new location")
-    public void normalUserAmNotAllowedToCreateNewLocation() {
+    @Then("User am not allowed to create new location")
+    public void UserAmNotAllowedToCreateNewLocation() {
         ObjectNode data = apiClient.createJsonNode();
         data.put("location", "Default");
         data.put("monitoringArea", "localhost");
@@ -156,16 +119,16 @@ public class LocationEndpointsIntegrationSteps {
         assertEquals(403, response.statusCode());
     }
 
-    @Then("Normal user am not allowed to update the location by ID")
-    public void normalUserAmNotAllowedToUpdateTheLocationByID() {
-        location2.setMonitoringArea("updated_network");
-        Response response = apiClient.putRequest(PATH_LOCATIONS + "/" + location2.getId(), apiClient.objectToJson(location2));
+    @Then("User am not allowed to update the location by ID")
+    public void userAmNotAllowedToUpdateTheLocationByID() {
+        testLocation.setMonitoringArea("updated_network");
+        Response response = apiClient.putRequest(PATH_LOCATIONS + "/" + testLocation.getId(), apiClient.objectToJson(testLocation));
         assertEquals(403, response.statusCode());
     }
 
-    @Then("Normal user am not allowed to delete the location")
-    public void normalUserAmNotAllowedToDeleteTheLocation() {
-        Response response = apiClient.deleteRequest(PATH_LOCATIONS + "/" + location2.getId());
+    @Then("User am not allowed to delete the location")
+    public void userAmNotAllowedToDeleteTheLocation() {
+        Response response = apiClient.deleteRequest(PATH_LOCATIONS + "/" + testLocation.getId());
         assertEquals(403, response.statusCode());
     }
 
