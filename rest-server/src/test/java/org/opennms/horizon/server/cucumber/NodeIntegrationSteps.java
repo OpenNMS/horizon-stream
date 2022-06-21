@@ -29,158 +29,130 @@
 package org.opennms.horizon.server.cucumber;
 
 import static graphql.Assert.assertNotNull;
-import static graphql.Assert.assertNull;
-import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opennms.horizon.server.cucumber.APIClientSteps.PATH_LOCATIONS;
 import static org.opennms.horizon.server.cucumber.APIClientSteps.PATH_NODS;
 
 import java.util.List;
+import java.util.Map;
 
 import org.opennms.horizon.server.model.dto.MonitoringLocationDto;
 import org.opennms.horizon.server.model.dto.NodeDto;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.cucumber.java.en.Given;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.restassured.response.Response;
-import liquibase.hub.model.ApiKey;
 
 public class NodeIntegrationSteps {
-
-    private static final String foreignID1 = "asdfasdf";
-    private static final String foreignID2 = "sdfhsdfhfasdf";
     private APIClientSteps apiClient;
     private MonitoringLocationDto location;
-    private NodeDto node1;
-    private NodeDto node2;
+    private NodeDto testNode;
 
     public NodeIntegrationSteps(APIClientSteps apiClient) {
         this.apiClient = apiClient;
     }
 
-    @Then("Admin user can login and generate an access token")
-    public void adminUserCanLoginAndGenerateAnAccessToken() {
-        assertTrue(apiClient.login(apiClient.getAdminUsername(), apiClient.getAdminPassword()));
+    @Then("Use can create new node")
+    public void useCanCreateNewNode(DataTable dataTable) {
+        prepareLocation(true);
+        Long parentID = null;
+        for(Map<String, String> map: dataTable.asMaps()) {
+            NodeDto node = createNodeDto();
+            node.setLabel(map.get("label"));
+            node.setForeignId(map.get("foreignId"));
+            node.setSysLocation(map.get("sysLocation"));
+            if(parentID != null) { //this is not the first node
+                node.setParentId(parentID);
+                node.setLocationId(location.getId());
+            }
+            Response response = apiClient.postRequest(PATH_NODS, apiClient.objectToJson(node));
+            assertEquals(200, response.statusCode());
+            NodeDto result = response.as(NodeDto.class);
+            assertNotNull(result);
+            assertEquals(location.getId(), result.getLocationId());
+            if(parentID!=null) {
+                assertEquals(parentID, result.getParentId());
+            }
+            assertNodes(node, result);
+            parentID = result.getId();
+        }
     }
 
-    @Then("Admin user create a location")
-    public void adminUserCreateALocation() {
-        ObjectNode data = apiClient.createJsonNode();
-        data.put("location", "Default");
-        data.put("monitoringArea", "localhost");
-        Response response = apiClient.postRequest(PATH_LOCATIONS, data);
-        assertEquals(200, response.statusCode());
-        location = response.as(MonitoringLocationDto.class);
-        assertNotNull(location);
-    }
-
-    @Then("Admin use can create new node")
-    public void adminUseCanCreateNewNode() {
-        JsonNode tmpNode1 = createNodeDto(foreignID1, null, null);
-        Response response = apiClient.postRequest(PATH_NODS, tmpNode1);
-        assertEquals(200, response.statusCode());
-        node1 = response.as(NodeDto.class);
-        assertNotNull(node1);
-        JsonNode tmpNode2 = createNodeDto(foreignID2, node1.getId(), location.getId());
-        Response response2 = apiClient.postRequest(PATH_NODS, tmpNode2);
-        assertEquals(200, response.statusCode());
-        node2 = response2.as(NodeDto.class);
-        assertNotNull(node2);
-    }
-
-    @Then("Admin user can list nodes")
-    public void adminUserCanListNodes() {
+    @Then("User can list nodes")
+    public void userCanListNodes(DataTable table) {
+        if(location == null) {
+            prepareLocation(false);
+        }
+        List<Map<String, String>> mapList = table.asMaps();
         Response response = apiClient.getRequest(PATH_NODS);
         assertEquals(200, response.statusCode());
         List<NodeDto> result = response.jsonPath().getList(".", NodeDto.class);
-        assertEquals(2, result.size());
-        assertEquals(node1.getId(), result.get(0).getId());
-        assertEquals(location.getId(), result.get(0).getLocationId());
-        assertNull(result.get(0).getParentId());
-        assertEquals(foreignID1, result.get(0).getForeignId());
-
-        assertEquals(node2.getId(), result.get(1).getId());
-        assertEquals(location.getId(), result.get(1).getLocationId());
-        assertEquals(node1.getId(), result.get(1).getParentId());
-        assertEquals(foreignID2, result.get(1).getForeignId());
+        assertEquals(mapList.size(), result.size());
+        Long parentID = null;
+        for(int i=0; i<mapList.size(); i++) {
+            Map<String, String> map = mapList.get(i);
+            NodeDto node = result.get(i);
+            assertEquals(map.get("label"), node.getLabel());
+            assertEquals(map.get("foreignId"), node.getForeignId());
+            assertEquals(map.get("sysLocation"), node.getSysLocation());
+            assertEquals(location.getId(), node.getLocationId());
+            if(i==0) {
+                parentID = node.getId();
+            } else {
+                assertEquals(parentID, node.getParentId());
+            }
+        }
+        testNode = result.get(result.size()-1);
     }
 
-    @Then("Admin user can get node by ID")
-    public void adminUserCanGetNodeByID() {
-        Response response = apiClient.getRequest(PATH_NODS + "/" + node2.getId());
+    @Then("User can get node by ID")
+    public void userCanGetNodeByID() {
+        Response response = apiClient.getRequest(PATH_NODS + "/" + testNode.getId());
         assertEquals(200, response.statusCode());
         NodeDto result = response.as(NodeDto.class);
         assertNotNull(result);
-        assertEquals(node2.getId(), result.getId());
-        assertEquals(foreignID2, result.getForeignId());
-        assertEquals(location.getId(), result.getLocationId());
-        assertEquals(node1.getId(), result.getParentId());
+        assertNodes(testNode, result);
     }
 
-    @Then("Admin user can update node")
-    public void adminUserCanUpdateNode() {
+    @Then("User can update node")
+    public void userCanUpdateNode() {
         String newLabel = "updated_label";
-        node2.setLabel(newLabel);
-        Response response = apiClient.putRequest(PATH_NODS + "/" + node2.getId(), apiClient.objectToJson(node2));
+        testNode.setLabel(newLabel);
+        Response response = apiClient.putRequest(PATH_NODS + "/" + testNode.getId(), apiClient.objectToJson(testNode));
         assertEquals(200, response.statusCode());
         NodeDto result = response.as(NodeDto.class);
         assertNotNull(result);
-        assertEquals(newLabel, newLabel);
+        assertNodes(testNode, result);
     }
 
-    @Then("Admin user can delete a node")
-    public void adminUserCanDeleteANode() {
-        Response response = apiClient.deleteRequest(PATH_NODS + "/" + node2.getId());
+    @Then("User can delete node")
+    public void userCanDeleteANode() {
+        Response response = apiClient.deleteRequest(PATH_NODS + "/" + testNode.getId());
         assertEquals(204, response.statusCode());
         List<NodeDto> list = apiClient.getRequest(PATH_NODS).jsonPath().getList(".", NodeDto.class);
         assertEquals(1, list.size());
     }
 
-    @Then("Normal user {string} and password {string} login to test node api")
-    public void normalAndPasswordLoginToTestNodeApi(String username, String password) {
-        assertTrue(apiClient.login(username, password));
-    }
-
-    @Then("Normal user can list nodes")
-    public void normalUserCanListNodes() {
-        Response response = apiClient.getRequest(PATH_NODS);
-        assertEquals(200, response.statusCode());
-        List<NodeDto> result = response.jsonPath().getList(".", NodeDto.class);
-        assertEquals(1, result.size());
-        assertEquals(foreignID1, result.get(0).getForeignId());
-        node1 = result.get(0);
-    }
-
-    @Then("Normal user can get node by ID")
-    public void normalUserCanGetNodeByID() {
-        Response response = apiClient.getRequest(PATH_NODS + "/" + node1.getId());
-        assertEquals(200, response.statusCode());
-        NodeDto result = response.as(NodeDto.class);
-        assertNotNull(result);
-        assertEquals(foreignID1, result.getForeignId());
-    }
-
-    @Then("Normal user is not allowed to create new node")
-    public void normalUserIsNotAllowedToCreateNewNode() {
-        JsonNode tmpNode = createNodeDto(foreignID2, null, null);
+    @Then("User is not allowed to create new node")
+    public void userIsNotAllowedToCreateNewNode() {
+        JsonNode tmpNode = apiClient.createJsonNode();
         Response response = apiClient.postRequest(PATH_NODS, tmpNode);
         assertEquals(403, response.statusCode());
     }
 
-    @Then("Normal user is not allowed to update a node")
-    public void normalUserIsNotAllowedToUpdateANode() {
-        node1.setLabel("new_label");
-        Response response = apiClient.putRequest(PATH_NODS + "/" + node1.getId(), apiClient.objectToJson(node1));
+    @Then("User is not allowed to update a node")
+    public void userIsNotAllowedToUpdateANode() {
+        testNode.setLabel("new_label");
+        Response response = apiClient.putRequest(PATH_NODS + "/" + testNode.getId(), apiClient.objectToJson(testNode));
         assertEquals(403, response.statusCode());
     }
 
-    @Then("Normal user is not allowed to delete a node")
-    public void normalUserIsNotAllowedToDeleteANode() {
-        Response response = apiClient.deleteRequest(PATH_NODS + "/" + node1.getId());
+    @Then("User is not allowed to delete a node")
+    public void userIsNotAllowedToDeleteANode() {
+        Response response = apiClient.deleteRequest(PATH_NODS + "/" + testNode.getId());
         assertEquals(403, response.statusCode());
     }
 
@@ -191,22 +163,47 @@ public class NodeIntegrationSteps {
         assertEquals(401, response.statusCode());
     }
 
-    private JsonNode createNodeDto(String foreignID, Long parentId, Long locationId) {
+    private void prepareLocation(boolean createNew ) {
+        if(createNew) {
+            ObjectNode data = apiClient.createJsonNode();
+            data.put("location", "Default");
+            data.put("monitoringArea", "localhost");
+            Response response = apiClient.postRequest(PATH_LOCATIONS, data);
+            assertEquals(200, response.statusCode());
+            location = response.as(MonitoringLocationDto.class);
+            assertNotNull(location);
+        } else {
+            Response response = apiClient.getRequest(PATH_LOCATIONS);
+            assertEquals(200, response.statusCode());
+            location = response.jsonPath().getList(".", MonitoringLocationDto.class).get(0);
+        }
+    }
+
+    private NodeDto createNodeDto() {
         NodeDto node = new NodeDto();
         node.setType("A");
-        node.setForeignId(foreignID);
         node.setSysOid("os_id");
         node.setOperatingSystem("MacBook Pro");
         node.setSysDescription("MacbookPro with M1 Pro processor");
-        node.setSysLocation("Kanata office");
-        node.setLabel("YangLi_working_laptop");
         node.setLabelSource("H");
         node.setNetBiosName("BiosName");
         node.setDomainName("test.com");
         node.setOperatingSystem("Mac OS");
         node.setForeignSource("Opennms");
-        node.setLocationId(locationId);
-        node.setParentId(parentId);
-        return apiClient.objectToJson(node);
+        return node;
+    }
+
+    private void assertNodes(NodeDto expected, NodeDto actual) {
+        assertEquals(expected.getLabel(), actual.getLabel());
+        assertEquals(expected.getForeignId(), actual.getForeignId());
+        assertEquals(expected.getSysLocation(), actual.getSysLocation());
+        assertEquals(expected.getType(), expected.getType());
+        assertEquals(expected.getSysOid(), actual.getSysOid());
+        assertEquals(expected.getOperatingSystem(), actual.getOperatingSystem());
+        assertEquals(expected.getSysDescription(), actual.getSysDescription());
+        assertEquals(expected.getLabelSource(), actual.getLabelSource());
+        assertEquals(expected.getNetBiosName(), actual.getNetBiosName());
+        assertEquals(expected.getDomainName(), actual.getDomainName());
+        assertEquals(expected.getForeignSource(), actual.getForeignSource());
     }
 }

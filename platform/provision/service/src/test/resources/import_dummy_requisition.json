@@ -1,0 +1,125 @@
+{
+  "nodes": {
+    "blahForeignId2": {
+      "foreignId": "blahForeignId2",
+      "location": "Default",
+      "nodeLabel": "blahNodeLabel2",
+      "interfaces": {
+        "/192.168.1.2": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.2",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.1": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "P"
+          },
+          "ipAddress": "192.168.1.1",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.5": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.5",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.4": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.4",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.3": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.3",
+          "categories": {},
+          "metaData": {}
+        }
+      },
+      "categories": {},
+      "metaData": {}
+    },
+    "blahForeignId1": {
+      "foreignId": "blahForeignId1",
+      "location": "Default",
+      "nodeLabel": "blahNodeLabel1",
+      "interfaces": {
+        "/192.168.1.2": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.2",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.1": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "P"
+          },
+          "ipAddress": "192.168.1.1",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.5": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.5",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.4": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.4",
+          "categories": {},
+          "metaData": {}
+        },
+        "/192.168.1.3": {
+          "monitoredServices": {},
+          "managed": true,
+          "snmpPrimary": {
+            "m_collType": "S"
+          },
+          "ipAddress": "192.168.1.3",
+          "categories": {},
+          "metaData": {}
+        }
+      },
+      "categories": {},
+      "metaData": {}
+    }
+  },
+  "dateStamp": "Jun 14, 2022, 9:35:42 AM",
+  "foreignSource": "imported",
+  "id": "blahId"
+}

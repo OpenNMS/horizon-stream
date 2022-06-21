@@ -1,0 +1,37 @@
+<blueprint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:jpa="http://aries.apache.org/xmlns/jpa/v2.0.0"
+  xmlns:tx="http://aries.apache.org/xmlns/transactions/v2.0.0"
+  xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+  xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+  xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0
+  http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+http://aries.apache.org/xmlns/jpa/v2.0.0
+http://aries.apache.org/xmlns/transactions/v2.0.0">
+
+  <cm:property-placeholder persistent-id="org.opennms.horizon.provision.persistence" update-strategy="reload">
+    <cm:default-properties>
+
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <jpa:enable/>
+  <tx:enable/>
+
+  <bean id="entityManagerHolder" class="org.opennms.netmgt.provision.persistence.model.EntityManagerHolderImpl"/>
+
+  <bean id="requisitionDao" class="org.opennms.netmgt.provision.persistence.RequisitionDao">
+     <argument ref="entityManagerHolder"/>
+  </bean>
+
+  <service interface="org.opennms.netmgt.provision.persistence.model.ForeignSourceRepository">
+    <bean class="org.opennms.netmgt.provision.persistence.ForeignSourceRepositoryImpl">
+    </bean>
+  </service>
+
+  <service interface="org.opennms.netmgt.provision.persistence.model.RequisitionRepository">
+    <bean class="org.opennms.netmgt.provision.persistence.RequisitionRepositoryImpl">
+      <argument ref="requisitionDao"/>
+    </bean>
+  </service>
+
+</blueprint>

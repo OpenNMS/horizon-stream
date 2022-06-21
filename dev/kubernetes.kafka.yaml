@@ -118,6 +118,55 @@ spec:
   selector:
     run: my-keycloak
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  labels:
+    run: api-gateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+      name: gateway-http
+  selector:
+    run: api-gateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      volumes:
+        - name: nginx-conf-volume
+          configMap:
+            name: nginx-conf-template
+      containers:
+        - name: api-gateway
+          image: nginx:1.21.6-alpine
+          ports:
+            - containerPort: 80
+          env:
+            - name: HORIZON_CORE_URL
+              value: "http://horizon-stream-core:8181"
+            - name: KEYCLOAK_URL
+              value: "http://keycloak:8080"
+            - name: KEYCLOAK_REALM
+              value: "opennms"
+          volumeMounts:
+            - name: nginx-conf-volume
+              mountPath: "/etc/nginx/templates/default.conf.template"
+              subPath: "default.conf.template"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -294,7 +343,7 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: opennms/horizon-stream-keycloak
+          image: opennms/horizon-stream-keycloak-dev
           args: [ "start-dev" ]
           env:
             - name: KEYCLOAK_CREATE_ADMIN_USER
@@ -465,6 +514,8 @@ spec:
           image: opennms/minion:29.0.10
           args: ["-f"]
           env:
+            - name: KARAF_DEBUG
+              value: "true"
             - name: TZ
               value: "America/New_York"
             - name: JAVA_MIN_MEM
@@ -509,7 +560,7 @@ spec:
             - containerPort: 3000
           env:
             - name: DOMAIN_API
-              value: "localhost:9090"
+              value: "localhost:48080"
             - name: DOMAIN_KEYCLOAK
               value: "localhost:28080"
           command: ["/app/dev/entrypoint.sh"]
@@ -575,6 +626,61 @@ data:
         trapd.listen.port: 1162
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf-template
+data:
+  default.conf.template: |
+    server {
+      listen       80;
+      listen  [::]:80;
+      server_name  localhost;
+      
+      set $cors_credentials '';
+      set $cors_content_type '';
+      set $cors_content_length '';
+      if ($http_origin ~ '.+') {
+        set $cors_credentials 'true';
+      }
+
+      if ($request_method = OPTIONS) {
+        set $cors_content_type 'text/plain';
+        set $cors_content_length '0';
+      }
+
+      add_header Access-Control-Allow-Origin $http_origin always;
+      add_header Access-Control-Allow-Credentials $cors_credentials always;
+      add_header Access-Control-Allow-Methods $http_access_control_request_method always;
+      add_header Access-Control-Allow-Headers $http_access_control_request_headers always;
+      add_header Content-Type $cors_content_type;
+      add_header Content-Length $cors_content_length;
+    
+      if ($request_method = OPTIONS) {
+        return 204;
+      }
+
+      location / {
+        auth_request /verifytoken;
+        auth_request_set $auth_status $upstream_status;
+
+        proxy_pass ${HORIZON_CORE_URL};
+        add_header Access-Control-Allow-Origin * always;
+      }
+
+      location /verifytoken {
+    	internal;
+    	proxy_pass ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/userinfo;
+    	proxy_pass_request_body off;
+    	proxy_set_header Content-Length "";
+      }
+
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+        root   /usr/share/nginx/html;
+      }
+    }
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-admin-secret
@@ -610,6 +716,7 @@ metadata:
 spec:
   keycloakCRName: my-keycloak
   realm:
+    accessTokenLifespan: 6000
     id: opennms
     realm: opennms
     enabled: true

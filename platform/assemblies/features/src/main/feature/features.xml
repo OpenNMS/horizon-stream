@@ -20,7 +20,7 @@
         <feature>camel-jaxb</feature>
         <feature>camel-kafka</feature>
         <feature>camel-activemq</feature>
-        <feature>activemq-client</feature>
+        <feature version="${activemq.version}">activemq-client</feature>
 
         <feature version="${drools.version}">kie-drools</feature>
 
@@ -40,6 +40,7 @@
         <bundle>mvn:org.opennms.horizon.core/identity/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.core/lib/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.core/xml/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.core/soa/${project.version}</bundle>
     </feature>
 
     <feature name="horizon-core-rest" version="${project.version}">
@@ -75,6 +76,8 @@
 
         <bundle>mvn:org.opennms.horizon.db/dao-api/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/dao-impl/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.db/repository-api/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.db/repository-impl/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/schema/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/schema-liquibase/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.db/model/${project.version}</bundle>
@@ -222,6 +225,58 @@
     </feature>
 
 
+    <!--           -->
+    <!-- PROVSIOND -->
+    <!--           -->
+    <feature name="horizon-provision" version="${project.version}" description="Horizon : Provision">
+        <feature>onms-httpclient</feature>
+        <feature>onms-netty3</feature>
+        <feature>camel-gson</feature>
+        <feature>camel-quartz</feature>
+        <feature>horizon-db</feature>
+        <feature>horizon-tracing</feature>
+        <feature>horizon-grpc</feature>
+        <feature>horizon-configvar-scopes</feature>
+
+        <feature>opennms-activemq-client-fix</feature>
+
+        <bundle>mvn:commons-io/commons-io/${commons.io.version}</bundle>
+        <bundle>mvn:commons-lang/commons-lang/${commons.lang.version}</bundle>
+
+        <bundle>mvn:org.apache.mina/mina-core/${mina.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.common/common-concurrency/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.common/common-net/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.common/common-web/${project.version}</bundle>
+
+        <bundle>mvn:org.opennms.horizon.provision/api/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/core/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-activemq/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-datagram/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-jdbc/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-ssh/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-web/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/persistence/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/service/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/rest/${project.version}</bundle>
+
+        <bundle>mvn:com.helger/dhcp4java/${dhcp4java.version}</bundle>
+        <bundle>mvn:org.opennms.horizon/dhcpd/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.provision/detector-dhcp/${project.version}</bundle>
+    </feature>
+
+    <!--                               -->
+    <!-- CONFIGURATION VARIABLE SCOPES -->
+    <!--                               -->
+    <feature name="horizon-configvar-scopes" version="${project.version}" description="Horizon : Configuration Variable Scopes">
+        <feature>horizon-db</feature>
+
+        <bundle>mvn:org.opennms.horizon.common/common-config-vars/${project.version}</bundle>
+        <bundle>mvn:org.opennms.horizon.core/config-vars/${project.version}</bundle>
+
+        <bundle>wrap:mvn:ch.hsr/geohash/${geohash.version}</bundle>
+    </feature>
+
     <!--        -->
     <!-- MINION -->
     <!--        -->
@@ -261,6 +316,17 @@
     <!--        -->
     <!-- COMMON -->
     <!--        -->
+    <!-- TODO: this is a workaround - remove when the activemq-client feature loads the correct package -->
+    <feature name="opennms-activemq-client-fix" description="ActiveMQ Client (fix)">
+        <feature version="${activemq.version}">activemq-client</feature>
+
+        <!-- The AMQ karaf feature loads the jms2.0 spec bundle, which leads to failed resolution for the -->
+        <!--  application because the AMQ artifacts all depend on the jms1.1 spec bundle.  (i.e. runtime  -->
+        <!--  version does not match the compile-time one.)                                               -->
+        <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
+    </feature>
+
+
     <feature name="guava" version="${guava.version}" description="Google :: Guava">
         <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
         <bundle dependency="true">mvn:com.google.guava/failureaccess/1.0.1</bundle>
@@ -321,6 +387,16 @@
         <bundle>mvn:joda-time/joda-time/2.1</bundle>
         <bundle>wrap:mvn:com.swrve/rate-limited-logger/${rate.limitted.logger.version}</bundle>
     </feature>
+
+    <!-- -->
+    <feature name="onms-httpclient" version="${project.version}" description="HTTP Client Feature">
+        <bundle>mvn:org.apache.httpcomponents/httpcore-osgi/${httpcore.version}</bundle>
+        <bundle>mvn:org.apache.httpcomponents/httpclient-osgi/${httpclient.version}</bundle>
+    </feature>
+    <feature name="onms-netty3" version="${project.version}" description="Netty3 Feature">
+        <bundle>mvn:io.netty/netty/3.10.6.Final</bundle>
+    </feature>
+
 
     <!--             -->
     <!-- WORKAROUNDS -->

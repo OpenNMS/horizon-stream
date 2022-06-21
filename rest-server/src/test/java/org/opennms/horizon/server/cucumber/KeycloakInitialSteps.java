@@ -35,6 +35,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.opennms.horizon.server.model.mapper.KeycloakUserMapperImpl;
 import org.opennms.horizon.server.security.KeyCloakUtils;
 
 import io.cucumber.java.en.Given;
@@ -108,6 +109,6 @@ public class KeycloakInitialSteps {
                 .password(keycloakAdminPassword)
                 .resteasyClient(clientBuilder.build());
         Keycloak keycloak = kb.build();
-        keyCloakUtils = new KeyCloakUtils(keycloak);
+      keyCloakUtils = new KeyCloakUtils(keycloak);
     }
 }

@@ -36,28 +36,38 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.client.jaxrs.internal.ClientResponse;
+import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.common.VerificationException;
+import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.opennms.horizon.server.exception.UserManagementException;
+import org.opennms.horizon.server.model.dto.ResetPasswordDTO;
+import org.opennms.horizon.server.model.dto.UserSearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import liquibase.repackaged.org.apache.commons.lang3.RandomStringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class KeyCloakUtils {
+    private final String pwdChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%";
+    public static final int PWD_MINI_LEN = 10;
+    public static final String USER_ROLE_ADMIN = "admin";
     @Value("${keycloak.realm}")
     private String appRealm;
     private final Keycloak keycloak;
@@ -91,28 +101,21 @@ public class KeyCloakUtils {
         keycloak.realm(appRealm).roles().create(rr);
     }
 
-    public void addUser(String username, String password, String role) {
-        UserRepresentation userRp = new UserRepresentation();
-        userRp.setUsername(username);
-        if(StringUtils.hasLength(password)) {
+    public UserRepresentation addUser(String username, String password, String role) {
+        UserRepresentation user = new UserRepresentation();
+        user.setUsername(username);
+        user.setRealmRoles(Arrays.asList(role));
+        user.setEnabled(true);
+        try {
             CredentialRepresentation cr = new CredentialRepresentation();
             cr.setType(CredentialRepresentation.PASSWORD);
             cr.setValue(password);
-            userRp.setCredentials(Arrays.asList(cr));
+            user.setCredentials(Arrays.asList(cr));
+            return createUser(user);
+        } catch (UserManagementException e) {
+            log.error(e.getMessage(), e);
+            return null;
         }
-        userRp.setEnabled(true);
-        addUser(userRp, role);
-    }
-
-    public boolean addUser(UserRepresentation userRp, String role) {
-        RealmResource realmResource = keycloak.realm(appRealm);
-        UsersResource usersResource = realmResource.users();
-        Response response = usersResource.create(userRp);
-        String userId = CreatedResponseUtil.getCreatedId(response);
-        RoleRepresentation roleRp = realmResource.roles().get(role).toRepresentation();
-        UserResource userResource = usersResource.get(userId);
-        userResource.roles().realmLevel().add(Arrays.asList(roleRp));
-        return response.getStatus()==200;
     }
 
     public void addRoles(List<String> roles) {
@@ -139,5 +142,89 @@ public class KeyCloakUtils {
         if(!keycloak.isClosed()) {
             keycloak.close();
         }
+    }
+
+    public List<UserRepresentation> searchUser(UserSearchDTO searchDTO) {
+        return keycloak.realm(appRealm).users().search(searchDTO.getUsername(), searchDTO.getFirstName(),
+                searchDTO.getLastName(), searchDTO.getEmail(), searchDTO.getFirst(), searchDTO.getMax(),
+                searchDTO.getEnabled(), null);
+    }
+
+    public UserRepresentation getUserById(String userId) {
+        try {
+            return keycloak.realm(appRealm).users().get(userId).toRepresentation();
+        } catch (NotFoundException e){
+            return null;
+        }
+    }
+
+    public String createRandomPassword() {
+        return RandomStringUtils.random(PWD_MINI_LEN, pwdChars);
+    }
+
+    public UserRepresentation createUser(UserRepresentation user) throws UserManagementException {
+        RealmResource realmResource = keycloak.realm(appRealm);
+        Response response = realmResource.users().create(user);
+        if(response.getStatus()!= Response.Status.CREATED.getStatusCode()) {
+            throw new UserManagementException(String.format("Failed on creating new user with username: %s and email: %s. The error is: %s",
+                    user.getUsername(), user.getEmail(), ((ClientResponse) response).getReasonPhrase()));
+        }
+        String userId = CreatedResponseUtil.getCreatedId(response);
+        if(user.getRealmRoles()!=null&&user.getRealmRoles().size()>0) {
+            assignRoles(realmResource, userId, user.getRealmRoles());
+        }
+        UserResource userResource = realmResource.users().get(userId);
+        UserRepresentation newUser = userResource.toRepresentation();
+        return newUser;
+    }
+
+    private void assignRoles(RealmResource realmResource, String userId, List<String> roles){
+        if(roles !=null) {
+            UserResource userResource = realmResource.users().get(userId);
+            List<RoleRepresentation> oldRoles = userResource.roles().realmLevel().listAll();
+            userResource.roles().realmLevel().remove(oldRoles);
+            List<RoleRepresentation> newRoles = roles.stream().map(r->realmResource.roles().get(r).toRepresentation())
+                    .collect(Collectors.toList());
+            userResource.roles().realmLevel().add(newRoles);
+        }
+    }
+
+    public UserRepresentation updateUser(UserRepresentation user, boolean updateRoles) {
+        RealmResource realmResource = keycloak.realm(appRealm);
+        UserResource userRes = realmResource.users().get(user.getId());
+        userRes.update(user);
+        if(updateRoles) {
+            assignRoles(realmResource, user.getId(), user.getRealmRoles());
+        }
+        UserRepresentation updatedUser = userRes.toRepresentation();
+        return updatedUser;
+    }
+
+    public void deleteUser(String userId) {
+        keycloak.realm(appRealm).users().get(userId).remove();
+    }
+
+    public void resetPassword(String userId, ResetPasswordDTO passwordDto) {
+        CredentialRepresentation newPwd = new CredentialRepresentation();
+        newPwd.setType(CredentialRepresentation.PASSWORD);
+        newPwd.setValue(passwordDto.getNewPassword());
+        if(passwordDto.getTemporary()!=null) {
+            newPwd.setTemporary(passwordDto.getTemporary());
+        }
+        keycloak.realm(appRealm).users().get(userId).resetPassword(newPwd);
+    }
+
+    public  String getUserIdFromToken(String authToken) throws VerificationException {
+        return createAccessTokenFromAuthString(authToken).getSubject();
+    }
+
+    public boolean isAdminUser(String authToken) throws VerificationException {
+        String userId = getUserIdFromToken(authToken);
+        return listUserRoles(userId).contains(USER_ROLE_ADMIN);
+    }
+
+    private AccessToken createAccessTokenFromAuthString(String authToken) throws VerificationException {
+        String accessToken = authToken.startsWith("Bearer")? authToken.substring(7) : authToken;
+        return TokenVerifier.create(accessToken, AccessToken.class).getToken();
     }
 }

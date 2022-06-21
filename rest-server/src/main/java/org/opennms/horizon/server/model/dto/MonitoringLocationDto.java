@@ -30,13 +30,14 @@ package org.opennms.horizon.server.model.dto;
 
 import java.util.List;
 
-import io.leangen.graphql.annotations.GraphQLIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class MonitoringLocationDto {
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
     private String location;
     private String monitoringArea;

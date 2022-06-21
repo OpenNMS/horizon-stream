@@ -1,24 +1,9 @@
 name: release
 
-# This triggers only when pull request is merged (closed) into branches of
-# 'release/**'. The process is to create a new release branch from the previous
-# release branch, then create a PR from develop branch to that new release.
-# When all is approved, then merge and it should trigger this workflow. After
-# which, merge new release branch into develop. Then, developers can pull
-# develop branch and merge it into the various feature branches. Follows
-# gitflow.
 on:
-  pull_request:
-    branches: 
-      - 'release/**'
-    types: [closed]
-
-# Tmp, just until I get something working. Develop this first, all pieces on
-# release, then pull out what needed for other workflows.
-#on:  
-#  push:
-#    branches:
-#      - 'develop'
+  push:
+    branches:
+      - 'release'
 
 # For now, we have put all steps into a single job, this will allow for just
 # one vm to run. We use actions to factor out the functionality. If there is a
@@ -38,18 +23,25 @@ jobs:
       - name: init
         run: |
 
-          # This filters the tag number off of the branch (release/tab_number),
-          # puts it as an env variable to be used through out below and passed
-          # to actions for tagging the docker images after they are created.          
-          echo "branch: " ${{ github.ref }}
-          # The above github.ref, we expect this format: release/0.0.1.
-          # If that changes, update the following statement.
-          TAG=$(echo ${{ github.ref }} | sed -E  's/(.*)\/(.*)/\2/')
-          echo "tag: " "$TAG" # Appears
-          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
-          echo "release: " ${{ env.RELEASE_TAG }} # Not appears
+          TAG=$(echo ${{ github.event.head_commit.message }} | awk '{ print $2 }')
 
-          # TODO: Create a git tag for this branch as well.
+          echo "Head commit message: ${{ github.event.head_commit.message }}"
+          echo "Extracted tag: $TAG."
+
+          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+
+          # Validate tag format
+          # Format of commit message: RELEASE <tag> - <message>
+          # Format of tag (change numbers or dev, but leave everything else): 
+          #   v0.0.5-dev
+          #   v0.0.5
+          if [[ $TAG =~ ^v[0-9]+.[0-9]+.([0-9]+-[a-z]+|[0-9]+)$ ]]
+          then
+            echo "Valid format, proceed with test."
+          else
+            echo "Tag format is invalid."
+            exit 1
+          fi
 
       - name: feature-ui
         id: action-feature-ui
@@ -130,4 +122,14 @@ jobs:
 
           docker push opennms/horizon-stream-rest-server:${{ env.RELEASE_TAG }}
           docker push opennms/horizon-stream-rest-server:latest
+
+      - name: tag-release-branch
+        run: |
+
+          # The following checkouts the release branch and merges develop into
+          # it and then tags release.
+          git fetch
+          git tag ${{ env.RELEASE_TAG }}
+          git push origin ${{ env.RELEASE_TAG }}
+
 

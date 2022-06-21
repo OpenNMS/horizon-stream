@@ -11,6 +11,7 @@ api.interceptors.request.use(
 
     const defaultHeaders = {
       Authorization: `Bearer ${keycloak.value?.token}`,
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     }
 

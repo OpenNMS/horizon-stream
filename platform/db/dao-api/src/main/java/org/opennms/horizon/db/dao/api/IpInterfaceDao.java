@@ -28,7 +28,10 @@
 
 package org.opennms.horizon.db.dao.api;
 
+import org.opennms.horizon.core.lib.IPAddress;
 import org.opennms.horizon.db.model.OnmsIpInterface;
+
+import java.net.InetAddress;
 
 /**
  * <p>IpInterfaceDao interface.</p>

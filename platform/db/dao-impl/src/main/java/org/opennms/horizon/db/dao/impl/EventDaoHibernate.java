@@ -4,13 +4,15 @@ import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.opennms.horizon.db.dao.api.EventDao;
+import org.opennms.horizon.db.dao.api.EntityManagerHolder;
 import org.opennms.horizon.db.model.OnmsEvent;
+import org.opennms.horizon.db.dao.util.AbstractDaoHibernate;
 
 @Transactional
 public class EventDaoHibernate extends AbstractDaoHibernate<OnmsEvent, Integer> implements EventDao {
 
-    public EventDaoHibernate() {
-        super(OnmsEvent.class);
+    public EventDaoHibernate(EntityManagerHolder persistenceContextHolder) {
+        super(persistenceContextHolder, OnmsEvent.class);
     }
 
     @Override
