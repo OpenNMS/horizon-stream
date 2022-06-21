@@ -29,7 +29,7 @@ build:
         - '**/*.vue'
     docker:
       dockerfile: dev/Dockerfile
-  - image: opennms/horizon-stream-keycloak
+  - image: opennms/horizon-stream-keycloak-dev
     context: keycloak-ui
     sync:
       infer:
