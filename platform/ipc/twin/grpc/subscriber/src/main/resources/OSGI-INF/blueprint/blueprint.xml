@@ -19,7 +19,7 @@
 
     <reference id="configAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
 
-    <!--<reference id="minionIdentity" interface="org.opennms.distributed.core.api.MinionIdentity"/>-->
+    <reference id="minionIdentity" interface="org.opennms.horizon.core.identity.Identity"/>
 
     <reference id="tracerRegistry" interface="org.opennms.core.tracing.api.TracerRegistry"/>
 
@@ -31,6 +31,10 @@
         <argument value="${port}"/>
     </bean>
 
-    <service ref="grpcTwinSubscriber" interface="org.opennms.core.ipc.twin.api.TwinSubscriber"/>
+    <service ref="grpcTwinSubscriber" interface="org.opennms.core.ipc.twin.api.TwinSubscriber">
+      <service-properties>
+          <entry key="strategy" value="grpc" />
+      </service-properties>
+    </service>
 
 </blueprint>
