@@ -5,6 +5,9 @@ query ListMinions {
       label
       status
       location
+      date
+      latency
+      uptime
     }
     count
     totalCount

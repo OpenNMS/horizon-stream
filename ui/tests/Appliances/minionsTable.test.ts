@@ -8,9 +8,10 @@ describe('MinionsTable.vue', () => {
   beforeEach(() => {
     const minionItems = computed(() => [{
       id: '1',
-      status: 'ready',
+      date: 'date1',
+      label: 'Minion1',
       latency: 'latency1',
-      cpu_util: 'cpu1'
+      uptime: 'uptime1'
     }]) 
 
     setActivePinia(createTestingPinia({
@@ -28,9 +29,10 @@ describe('MinionsTable.vue', () => {
 
   describe('Required columns', () => {
     const requiredColumns = [
-      ['Label', 'col-label'],
-      ['Status', 'col-status'],
-      ['Location', 'col-location']
+      ['Date', 'col-date'],
+      ['Minion', 'col-minion'],
+      ['Latency', 'col-latency'],
+      ['Uptime', 'col-uptime']
     ]
 
     it.each(requiredColumns)('should have "%s" column', (_, dataTest) => {

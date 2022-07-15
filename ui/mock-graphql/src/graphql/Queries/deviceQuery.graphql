@@ -3,6 +3,7 @@ query ListDevices {
     items {
       id
       name
+      status
       icmp_latency
       snmp_uptime
     }

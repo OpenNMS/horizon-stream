@@ -1,7 +1,8 @@
 const typeDefs = `
   type Device {
-    id: ID!
+    id: String!
     name: String!
+    status: String!
     icmp_latency: String!
     snmp_uptime: String!
   }
@@ -16,6 +17,9 @@ const typeDefs = `
     label: String!
     status: String!
     location: String!
+    date: String!
+    latency: String!
+    uptime: String!
   }
   type ListMinions {
     items: [Minion!]!

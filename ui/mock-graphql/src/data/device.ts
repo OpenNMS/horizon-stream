@@ -6,7 +6,8 @@ const rndNumber = () => Math.floor(Math.random() * 100)
 casual.define('device', function () {
   return {
     id: casual.uuid,
-    name: casual.name,
+    name: casual.word,
+    status: casual.safe_color_name,
     icmp_latency: rndNumber(),
     snmp_uptime: casual.unix_time
   }

@@ -10,7 +10,8 @@ describe('DeviceTable.vue', () => {
       id: '1',
       name: 'device1',
       icmp_latency: 'latency1',
-      snmp_uptime: 'uptime1'
+      snmp_uptime: 'uptime1',
+      status: 'status1'
     }]) 
 
     setActivePinia(createTestingPinia({
@@ -30,7 +31,8 @@ describe('DeviceTable.vue', () => {
     const requiredColumns = [
       ['Device', 'col-device'],
       ['Latency', 'col-latency'],
-      ['Uptime', 'col-uptime']
+      ['Uptime', 'col-uptime'],
+      ['Status', 'col-status']
     ]
 
     it.each(requiredColumns)('should have "%s" column', (_, dataTest) => {

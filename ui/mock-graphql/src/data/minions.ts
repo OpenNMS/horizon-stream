@@ -1,14 +1,20 @@
 // @ts-nocheck
 import casual from 'casual'
 
-const rndNumber = () => Math.floor(Math.random() * 100)
+// const rndNum = () => Math.floor(Math.random() * 100)
+const rndNumLatency = () => Math.floor(Math.random() * 120)
+const rndNumUptimeDevice = () => Math.floor(Math.random() * 200)
+const rndNumUptimeMinion = () => Math.floor(Math.random() * 120)
 
 casual.define('minion', function () {
   return {
     id: casual.uuid,
     label: casual.word,
     status: casual.safe_color_name,
-    location: casual.city
+    location: casual.city,
+    date: casual.date(),
+    latency: rndNumber(),
+    uptime: casual.unix_time
   }
 })
 
