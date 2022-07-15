@@ -48,7 +48,9 @@ runs:
         # ISSUE: This produces an error, not required if the '$ kubectl apply
         # -f ...' succeeds below, means image loads were successful.
         #docker exec -it kind-control-plane crictl images ls
- 
+
+        sleep 60
+
       shell: bash
 
     - name: Setup & Run Cucumber Tests
@@ -56,7 +58,8 @@ runs:
 
         # Test
         echo "test 1"
-        kubectl get ingress; pwd
+        kubectl get all 
+        kubectl get ingress 
 
         ## Install dependecies
         #cd platform/

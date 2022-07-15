@@ -4,7 +4,7 @@ metadata:
   name: hs-ui
 spec:
   selector:
-    app: my-horizon-stream-ui
+    run: my-horizon-stream-ui
   ports:
   # Default port used by the image
   - port: 3000
