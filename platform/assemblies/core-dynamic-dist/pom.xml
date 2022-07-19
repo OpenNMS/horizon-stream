@@ -120,6 +120,7 @@
                         <feature>horizon-alarms</feature>
                         <feature>horizon-icmp</feature>
                         <feature>horizon-provision</feature>
+                        <feature>horizon-inventory</feature>
                         <feature>horizon-minion-rest</feature>
                     </bootFeatures>
                     <libraries>

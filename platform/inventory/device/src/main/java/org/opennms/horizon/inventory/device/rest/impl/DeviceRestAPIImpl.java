@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2022 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2022 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,25 +26,36 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.inventory.device.rest.impl;
 
-import java.util.Collection;
-import java.util.List;
+import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.opennms.horizon.inventory.device.rest.api.DeviceRestAPI;
+import org.opennms.horizon.inventory.device.service.DeviceService;
+import org.opennms.horizon.shared.dto.device.DeviceCollectionDTO;
+import org.opennms.horizon.shared.dto.device.DeviceDTO;
 
-public class EventCollectionDTO extends AbstractCollectionDTO<EventDTO> {
+public class DeviceRestAPIImpl implements DeviceRestAPI {
+  private DeviceService service;
 
-    public EventCollectionDTO() {
-        // No-arg constructor for JAXB
+  public void setService(DeviceService service) {
+    this.service = service;
+  }
+
+  public DeviceDTO getById(Integer id) {
+    return service.getById(id);
+  }
+
+  public DeviceCollectionDTO findAll() {
+    return service.searchDevices();
+  }
+
+  @Override
+  public Response createDevice(final DeviceDTO device) {
+    try {
+      return Response.ok(service.createDevice(device)).build();
+    } catch (Exception e){
+      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
-
-    public EventCollectionDTO(final Collection<? extends EventDTO> events) {
-        objects.addAll(events);
-    }
-
-    @JsonProperty("events")
-    public List<EventDTO> getEvents() {
-        return objects;
-    }
+  }
 }

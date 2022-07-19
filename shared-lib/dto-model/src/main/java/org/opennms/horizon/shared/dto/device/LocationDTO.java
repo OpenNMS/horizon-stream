@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2022 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2022 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,32 +26,21 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.shared.dto.device;
 
-import java.util.Objects;
+import java.util.List;
 
-public class ReductionKeyMemoDTO extends MemoDTO {
-    private String reductionKey;
+import lombok.Getter;
+import lombok.Setter;
 
-    public String getReductionKey() {
-        return reductionKey;
-    }
-
-    public void setReductionKey(String reductionKey) {
-        this.reductionKey = reductionKey;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ReductionKeyMemoDTO that = (ReductionKeyMemoDTO) o;
-        return Objects.equals(reductionKey, that.reductionKey);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), reductionKey);
-    }
+@Getter
+@Setter
+public class LocationDTO {
+  private String locationName;
+  private String monitoringArea;
+  private String geolocation;
+  private Double latitude;
+  private Double longitude;
+  private Integer priority;
+  private List<String> tags;
 }

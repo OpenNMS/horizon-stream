@@ -442,5 +442,12 @@
             osgi.service;effective:=active;objectClass=org.ops4j.pax.jdbc.pool.common.PooledDataSourceFactory
         </capability>
     </feature>
+    
+    <!-- inventory -->
+    <feature name="horizon-inventory" version="${project.version}">
+        <feature>horizon-db</feature>
+        <feature>horizon-core-rest</feature>
+        <bundle>mvn:org.opennms.horizon.inventory/device/${project.version}</bundle>
+    </feature>
 
 </features>

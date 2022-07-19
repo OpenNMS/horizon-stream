@@ -46,9 +46,9 @@ import org.opennms.horizon.db.model.OnmsAlarm;
 import org.opennms.horizon.db.model.OnmsEventParameter;
 import org.opennms.horizon.db.model.TroubleTicketState;
 import org.opennms.horizon.events.api.EventConfDao;
-import org.opennms.horizon.shared.dto.AlarmDTO;
-import org.opennms.horizon.shared.dto.AlarmSummaryDTO;
-import org.opennms.horizon.shared.dto.EventParameterDTO;
+import org.opennms.horizon.shared.dto.event.AlarmDTO;
+import org.opennms.horizon.shared.dto.event.AlarmSummaryDTO;
+import org.opennms.horizon.shared.dto.event.EventParameterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring", uses = {EventMapper.class}, injectionStrategy = InjectionStrategy.CONSTRUCTOR)

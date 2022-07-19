@@ -50,7 +50,7 @@ jobs:
           dir-location: 'grafana'
 
       - name: feature-keycloak-ui
-        id: action-feature-ui
+        id: action-feature-keycloak-ui
         uses: ./.github/actions/keycloak-ui
         with:
           dir-location: 'keycloak-ui'

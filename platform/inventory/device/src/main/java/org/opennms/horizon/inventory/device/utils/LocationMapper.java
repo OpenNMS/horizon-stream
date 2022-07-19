@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2022 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2022 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,23 +26,12 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.inventory.device.utils;
 
-import java.util.Collection;
-import java.util.List;
+import org.mapstruct.Mapper;
+import org.opennms.horizon.db.model.OnmsMonitoringLocation;
+import org.opennms.horizon.shared.dto.device.LocationDTO;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class AlarmCollectionDTO extends AbstractCollectionDTO<AlarmDTO> {
-    public AlarmCollectionDTO() {
-    }
-    public AlarmCollectionDTO(final Collection<? extends AlarmDTO> alarms) {
-        objects.addAll(alarms);
-    }
-    @JsonProperty("alarms")
-    public List<AlarmDTO> getAlarms() {
-        return objects;
-    }
-
-
+@Mapper
+public abstract class LocationMapper implements BaseMapper<OnmsMonitoringLocation, LocationDTO> {
 }

@@ -89,6 +89,7 @@
                                 <feature>horizon-snmp</feature>
                                 <feature>horizon-tracing</feature>
                                 <feature>horizon-minion-rest</feature>
+                                <feature>horizon-inventory</feature>
                                 <feature>jackson</feature>
                                 <feature>java-native-access</feature>
                                 <feature>kie-drools</feature>
@@ -397,6 +398,11 @@
             <groupId>org.opennms.horizon.shared</groupId>
             <artifactId>dto-model</artifactId>
             <version>${horizon.shared.lib.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opennms.horizon.inventory</groupId>
+            <artifactId>device</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

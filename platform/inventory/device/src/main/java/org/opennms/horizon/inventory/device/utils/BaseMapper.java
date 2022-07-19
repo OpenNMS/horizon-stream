@@ -26,34 +26,18 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.service;
+package org.opennms.horizon.inventory.device.utils;
 
-import org.opennms.horizon.shared.dto.event.EventCollectionDTO;
-import org.opennms.horizon.shared.dto.event.EventDTO;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import io.leangen.graphql.annotations.GraphQLEnvironment;
-import io.leangen.graphql.annotations.GraphQLMutation;
-import io.leangen.graphql.annotations.GraphQLQuery;
-import io.leangen.graphql.execution.ResolutionEnvironment;
-import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@GraphQLApi
-@Service
-public class EventService {
-  private final PlatformGateway gateway;
-
-  public EventService(PlatformGateway gateway) {
-    this.gateway = gateway;
-  }
-
-  @GraphQLQuery
-  public EventCollectionDTO listEvents(@GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.get(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), EventCollectionDTO.class).getBody();
-  }
-
-  @GraphQLMutation
-  public Void createEvent(EventDTO event, @GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.post(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), event, Void.class).getBody();
-  }
+public interface BaseMapper<T, D> {
+  T fromDto(D dto);
+  D toDto(T entity);
+  List<D> listToDto(List<T> entityList);
+  @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  void updateEntityFromDto(D dto, @MappingTarget T entity);
 }

@@ -26,7 +26,7 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.shared.dto.event;
 
 import java.util.Date;
 import java.util.List;

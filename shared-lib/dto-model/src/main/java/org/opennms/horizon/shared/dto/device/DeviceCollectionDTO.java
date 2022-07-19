@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2002-2016 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2016 The OpenNMS Group, Inc.
+ * Copyright (C) 2022 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2022 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -25,34 +25,20 @@
  *     http://www.opennms.org/
  *     http://www.opennms.com/
  *******************************************************************************/
-package org.opennms.horizon.shared.dto;
 
-public class EventParameterDTO {
-    private String name;
-    private String value;
-    private String type;
+package org.opennms.horizon.shared.dto.device;
 
-    public String getName() {
-        return name;
-    }
+import java.util.Collection;
+import java.util.List;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+import org.opennms.horizon.shared.dto.AbstractCollectionDTO;
 
-    public String getValue() {
-        return value;
-    }
+public class DeviceCollectionDTO extends AbstractCollectionDTO<DeviceDTO> {
+  public DeviceCollectionDTO(final Collection<? extends DeviceDTO> devices) {
+    objects.addAll(devices);
+  }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+  public List<DeviceDTO> getDevices() {
+    return objects;
+  }
 }

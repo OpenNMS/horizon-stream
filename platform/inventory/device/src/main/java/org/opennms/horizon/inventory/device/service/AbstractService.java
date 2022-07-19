@@ -26,34 +26,49 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.service;
+package org.opennms.horizon.inventory.device.service;
 
-import org.opennms.horizon.shared.dto.event.EventCollectionDTO;
-import org.opennms.horizon.shared.dto.event.EventDTO;
-import org.springframework.stereotype.Service;
+import java.io.Serializable;
+import java.util.List;
 
-import io.leangen.graphql.annotations.GraphQLEnvironment;
-import io.leangen.graphql.annotations.GraphQLMutation;
-import io.leangen.graphql.annotations.GraphQLQuery;
-import io.leangen.graphql.execution.ResolutionEnvironment;
-import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
+import org.opennms.horizon.db.dao.api.OnmsDao;
+import org.opennms.horizon.db.dao.api.SessionUtils;
+import org.opennms.horizon.inventory.device.utils.BaseMapper;
 
-@GraphQLApi
-@Service
-public class EventService {
-  private final PlatformGateway gateway;
+public abstract class AbstractService<T, D, ID extends Serializable> {
+  protected OnmsDao<T, ID> dao;
+  protected SessionUtils sessionUtils;
+  protected BaseMapper<T, D> mapper;
 
-  public EventService(PlatformGateway gateway) {
-    this.gateway = gateway;
+  public void setDao(OnmsDao<T, ID> dao) {
+    this.dao = dao;
   }
 
-  @GraphQLQuery
-  public EventCollectionDTO listEvents(@GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.get(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), EventCollectionDTO.class).getBody();
+  public void setSessionUtils(SessionUtils sessionUtils) {
+    this.sessionUtils = sessionUtils;
   }
 
-  @GraphQLMutation
-  public Void createEvent(EventDTO event, @GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.post(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), event, Void.class).getBody();
+  public void setMapper(BaseMapper mapper) {
+    this.mapper = mapper;
+  }
+
+  public D getById(ID id) {
+    return  sessionUtils.withReadOnlyTransaction(()->
+    {
+      T entity = dao.get(id);
+      return mapper.toDto(entity);
+    });
+  }
+
+  public List<D> findAll() {
+    return sessionUtils.withReadOnlyTransaction(() ->
+    {
+      List<T> list = dao.findAll();
+      return mapper.listToDto(list);
+    });
+  }
+
+  public ID createEntity(T entity) {
+    return sessionUtils.withTransaction(() -> dao.save(entity));
   }
 }

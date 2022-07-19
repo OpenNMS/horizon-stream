@@ -1,4 +1,4 @@
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.shared.dto.event;
 
 public class AlarmAckDTO {
     private String user;

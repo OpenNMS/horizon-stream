@@ -1,0 +1,35 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0
+        https://docs.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+        ">
+    <reference id="nodeDao" interface="org.opennms.horizon.db.dao.api.NodeDao" />
+    <reference id="sessionUtils" interface="org.opennms.horizon.db.dao.api.SessionUtils" />
+    <reference id="locationDao" interface="org.opennms.horizon.db.dao.api.MonitoringLocationDao" />
+
+    <bean id="locationMapper" class="org.opennms.horizon.inventory.device.utils.LocationMapperImpl" />
+
+    <bean id="deviceMapper" class="org.opennms.horizon.inventory.device.utils.DeviceMapperImpl">
+        <argument ref="locationMapper" />
+        <property name="nodeDao" ref="nodeDao" />
+        <property name="sessionUtils" ref="sessionUtils" />
+    </bean>
+
+    <bean id="deviceService" class="org.opennms.horizon.inventory.device.service.DeviceService">
+        <property name="dao" ref="nodeDao" />
+        <property name="sessionUtils" ref="sessionUtils" />
+        <property name="mapper" ref="deviceMapper" />
+        <property name="locationDao" ref="locationDao" />
+    </bean>
+
+    <bean id="deviceRestImpl" class="org.opennms.horizon.inventory.device.rest.impl.DeviceRestAPIImpl">
+        <property name="service" ref="deviceService"/>
+    </bean>
+
+    <service id="deviceRestAPIService" ref="deviceRestImpl" interface="org.opennms.horizon.inventory.device.rest.api.DeviceRestAPI">
+        <service-properties>
+            <entry key="osgi.jaxrs.resource" value="true"/>
+        </service-properties>
+    </service>
+
+</blueprint>

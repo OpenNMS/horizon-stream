@@ -26,34 +26,34 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.service;
+package org.opennms.horizon.inventory.device.service;
 
-import org.opennms.horizon.shared.dto.event.EventCollectionDTO;
-import org.opennms.horizon.shared.dto.event.EventDTO;
-import org.springframework.stereotype.Service;
+import java.util.Date;
+import java.util.List;
 
-import io.leangen.graphql.annotations.GraphQLEnvironment;
-import io.leangen.graphql.annotations.GraphQLMutation;
-import io.leangen.graphql.annotations.GraphQLQuery;
-import io.leangen.graphql.execution.ResolutionEnvironment;
-import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
+import org.opennms.horizon.db.dao.api.MonitoringLocationDao;
+import org.opennms.horizon.db.model.OnmsNode;
+import org.opennms.horizon.shared.dto.device.DeviceCollectionDTO;
+import org.opennms.horizon.shared.dto.device.DeviceDTO;
 
-@GraphQLApi
-@Service
-public class EventService {
-  private final PlatformGateway gateway;
+public class DeviceService extends AbstractService<OnmsNode, DeviceDTO, Integer> {
+  private MonitoringLocationDao locationDao;
 
-  public EventService(PlatformGateway gateway) {
-    this.gateway = gateway;
+  public void setLocationDao(MonitoringLocationDao locationDao) {
+    this.locationDao = locationDao;
   }
 
-  @GraphQLQuery
-  public EventCollectionDTO listEvents(@GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.get(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), EventCollectionDTO.class).getBody();
+  public DeviceCollectionDTO searchDevices() {
+    List<DeviceDTO> deviceDTOS = findAll();
+    return new DeviceCollectionDTO(deviceDTOS);
   }
 
-  @GraphQLMutation
-  public Void createEvent(EventDTO event, @GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.post(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), event, Void.class).getBody();
+  public Integer createDevice(DeviceDTO newDevice) {
+    OnmsNode node = mapper.fromDto(newDevice);
+    if(node.getLocation() == null) {
+      node.setLocation(sessionUtils.withReadOnlyTransaction(() -> locationDao.getDefaultLocation()));
+    }
+    node.setCreateTime(new Date());
+    return createEntity(node);
   }
 }

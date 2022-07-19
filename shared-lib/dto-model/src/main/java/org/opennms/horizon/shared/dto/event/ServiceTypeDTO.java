@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
+ * Copyright (C) 2006-2014 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,17 +26,13 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.shared.dto.event;
 
-import java.util.Date;
 import java.util.Objects;
 
-public class MemoDTO {
+public class ServiceTypeDTO {
     private Integer id;
-    private String body;
-    private String author;
-    private Date updated;
-    private Date created;
+    private String name;
 
     public Integer getId() {
         return id;
@@ -46,52 +42,25 @@ public class MemoDTO {
         this.id = id;
     }
 
-    public String getBody() {
-        return body;
+    public String getName() {
+        return name;
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public Date getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MemoDTO memoDTO = (MemoDTO) o;
-        return Objects.equals(id, memoDTO.id) &&
-                Objects.equals(body, memoDTO.body) &&
-                Objects.equals(author, memoDTO.author) &&
-                Objects.equals(updated, memoDTO.updated) &&
-                Objects.equals(created, memoDTO.created);
+        ServiceTypeDTO that = (ServiceTypeDTO) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, body, author, updated, created);
+        return Objects.hash(id, name);
     }
 }

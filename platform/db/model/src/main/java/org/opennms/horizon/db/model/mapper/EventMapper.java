@@ -43,9 +43,9 @@ import org.opennms.horizon.db.model.OnmsEvent;
 import org.opennms.horizon.db.model.OnmsEventParameter;
 import org.opennms.horizon.db.model.OnmsServiceType;
 import org.opennms.horizon.events.api.EventConfDao;
-import org.opennms.horizon.shared.dto.EventDTO;
-import org.opennms.horizon.shared.dto.EventParameterDTO;
-import org.opennms.horizon.shared.dto.ServiceTypeDTO;
+import org.opennms.horizon.shared.dto.event.EventDTO;
+import org.opennms.horizon.shared.dto.event.EventParameterDTO;
+import org.opennms.horizon.shared.dto.event.ServiceTypeDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring", uses = {})

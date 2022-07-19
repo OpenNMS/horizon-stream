@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2006-2014 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2014 The OpenNMS Group, Inc.
+ * Copyright (C) 2017-2017 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2017 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,41 +26,32 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto;
+package org.opennms.horizon.shared.dto.event;
 
 import java.util.Objects;
 
-public class ServiceTypeDTO {
-    private Integer id;
-    private String name;
+public class ReductionKeyMemoDTO extends MemoDTO {
+    private String reductionKey;
 
-    public Integer getId() {
-        return id;
+    public String getReductionKey() {
+        return reductionKey;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setReductionKey(String reductionKey) {
+        this.reductionKey = reductionKey;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ServiceTypeDTO that = (ServiceTypeDTO) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name);
+        if (!super.equals(o)) return false;
+        ReductionKeyMemoDTO that = (ReductionKeyMemoDTO) o;
+        return Objects.equals(reductionKey, that.reductionKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(super.hashCode(), reductionKey);
     }
 }

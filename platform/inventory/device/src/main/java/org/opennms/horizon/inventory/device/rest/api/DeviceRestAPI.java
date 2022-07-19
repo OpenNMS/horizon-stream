@@ -26,34 +26,34 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.service;
+package org.opennms.horizon.inventory.device.rest.api;
 
-import org.opennms.horizon.shared.dto.event.EventCollectionDTO;
-import org.opennms.horizon.shared.dto.event.EventDTO;
-import org.springframework.stereotype.Service;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import io.leangen.graphql.annotations.GraphQLEnvironment;
-import io.leangen.graphql.annotations.GraphQLMutation;
-import io.leangen.graphql.annotations.GraphQLQuery;
-import io.leangen.graphql.execution.ResolutionEnvironment;
-import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
+import org.opennms.horizon.shared.dto.device.DeviceCollectionDTO;
+import org.opennms.horizon.shared.dto.device.DeviceDTO;
 
-@GraphQLApi
-@Service
-public class EventService {
-  private final PlatformGateway gateway;
+@Path("/devices")
+public interface DeviceRestAPI {
 
-  public EventService(PlatformGateway gateway) {
-    this.gateway = gateway;
-  }
+  @GET
+  @Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  DeviceDTO getById(@PathParam("id") Integer id);
 
-  @GraphQLQuery
-  public EventCollectionDTO listEvents(@GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.get(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), EventCollectionDTO.class).getBody();
-  }
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  DeviceCollectionDTO findAll();
 
-  @GraphQLMutation
-  public Void createEvent(EventDTO event, @GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.post(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), event, Void.class).getBody();
-  }
+  @POST
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  Response createDevice(final DeviceDTO device);
 }

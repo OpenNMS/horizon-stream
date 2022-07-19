@@ -26,34 +26,40 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.server.service;
+package org.opennms.horizon.shared.dto.device;
 
-import org.opennms.horizon.shared.dto.event.EventCollectionDTO;
-import org.opennms.horizon.shared.dto.event.EventDTO;
-import org.springframework.stereotype.Service;
+import java.util.Date;
 
-import io.leangen.graphql.annotations.GraphQLEnvironment;
-import io.leangen.graphql.annotations.GraphQLMutation;
-import io.leangen.graphql.annotations.GraphQLQuery;
-import io.leangen.graphql.execution.ResolutionEnvironment;
-import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-@GraphQLApi
-@Service
-public class EventService {
-  private final PlatformGateway gateway;
+import lombok.Getter;
+import lombok.Setter;
 
-  public EventService(PlatformGateway gateway) {
-    this.gateway = gateway;
-  }
-
-  @GraphQLQuery
-  public EventCollectionDTO listEvents(@GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.get(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), EventCollectionDTO.class).getBody();
-  }
-
-  @GraphQLMutation
-  public Void createEvent(EventDTO event, @GraphQLEnvironment ResolutionEnvironment env) {
-    return gateway.post(PlatformGateway.URL_PATH_EVENTS, gateway.getAuthHeader(env), event, Void.class).getBody();
-  }
+@Getter
+@Setter
+public class DeviceDTO {
+  private Integer id;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date createTime;
+  private Integer parentId;
+  private String type;
+  private String sysOid;
+  private String sysName;
+  private String sysDescription;
+  private String sysLocation;
+  private String sysContact;
+  private String label;
+  private String labelSource;
+  private String netBiosName;
+  private String domainName;
+  private String operatingSystem;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date lastPoll;
+  private String foreignSource;
+  private String foreignId;
+  private LocationDTO location;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date lastIngressFlow;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date lastEgressFlow;
 }
