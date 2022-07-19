@@ -1,7 +1,6 @@
 const typeDefs = `
   type Device {
     id: String!
-    id_minion: String!
     name: String!
     status: String!
     icmp_latency: String!
