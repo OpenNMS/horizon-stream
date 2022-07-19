@@ -2,6 +2,7 @@ query ListDevices {
   listDevices {
     items {
       id
+      id_minion
       name
       status
       icmp_latency

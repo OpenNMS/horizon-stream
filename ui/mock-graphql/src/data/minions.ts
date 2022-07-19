@@ -1,6 +1,7 @@
 // @ts-nocheck
 import casual from 'casual'
 import { rndNumber, rndStatus, rndLatency, rndUptime } from '../helpers/random'
+import minionsMocked from './minions-mocked'
 
 casual.define('minion', function () {
   return {
@@ -15,8 +16,10 @@ casual.define('minion', function () {
 })
 
 casual.define('listMinions', function () {
+  console.log('minionsMocked',minionsMocked)
   return {
-    minions: [casual.minion, casual.minion, casual.minion, casual.minion, casual.minion]
+    // minions: [casual.minion, casual.minion, casual.minion, casual.minion, casual.minion]
+    minions: minionsMocked
     // count: rndNumber(),
     // totalCount: rndNumber(),
     // offset: rndNumber()
