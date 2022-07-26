@@ -186,6 +186,8 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     private List<OnmsMetaData> m_requisitionedMetaData = new ArrayList<>();
 
+    private String snmpCommunityString;
+
     /**
      * <p>
      * Constructor for OnmsNode. This constructor should only be used
@@ -1066,6 +1068,15 @@ public class OnmsNode extends OnmsEntity implements Serializable, Comparable<Onm
 
     public void addRequisionedMetaData(final OnmsMetaData onmsMetaData) {
         m_requisitionedMetaData.add(onmsMetaData);
+    }
+
+    @Column(name = "snmp_community_string")
+    public String getSnmpCommunityString() {
+        return snmpCommunityString;
+    }
+
+    public void setSnmpCommunityString(String snmpCommunityString) {
+        this.snmpCommunityString = snmpCommunityString;
     }
 
     /**

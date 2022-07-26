@@ -38,8 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import graphql.GraphQLContext;
 import io.leangen.graphql.execution.ResolutionEnvironment;
 import io.leangen.graphql.spqr.spring.autoconfigure.DefaultGlobalContext;
@@ -50,15 +48,15 @@ import lombok.extern.slf4j.Slf4j;
 public class PlatformGateway {
     public static final String URL_PATH_EVENTS = "/events";
     public static final String URL_PATH_ALARMS = "/alarms";
+    public static final String URL_PATH_DEVICES = "/devices";
     public static final String URL_PATH_ALARMS_LIST = URL_PATH_ALARMS + "/list";
     public static final String URL_PATH_ALARMS_ACK = URL_PATH_ALARMS + "/%d/ack";
     public static final String URL_PATH_ALARMS_CLEAR = URL_PATH_ALARMS + "/%d/clear";
     public static final String URL_PATH_MINIONS = "/minions";
     public static final String URL_PATH_MINIONS_ID = "/minions/%s";
-    private ObjectMapper jsonMapper = new ObjectMapper();
     private final String baseUrl;
 
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public PlatformGateway(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -80,8 +78,7 @@ public class PlatformGateway {
     public <T> ResponseEntity<T> get(String path, String authToken, Class<T> returnType) {
             HttpHeaders headers = createHeaders(authToken, false);
             HttpEntity request = new HttpEntity(headers);
-            ResponseEntity<T> response = executeRequest(path, HttpMethod.GET, request, returnType);
-            return response;
+            return executeRequest(path, HttpMethod.GET, request, returnType);
     }
 
     public <T> ResponseEntity<T> put(String path, String authToken, Object data, Class<T> returnType) {

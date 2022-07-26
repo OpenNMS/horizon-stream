@@ -30,10 +30,10 @@ package org.opennms.horizon.inventory.device.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.function.Supplier;
@@ -43,6 +43,7 @@ import org.junit.Test;
 import org.opennms.horizon.db.dao.api.MonitoringLocationDao;
 import org.opennms.horizon.db.dao.api.NodeDao;
 import org.opennms.horizon.db.dao.api.SessionUtils;
+import org.opennms.horizon.db.model.OnmsMonitoringLocation;
 import org.opennms.horizon.db.model.OnmsNode;
 import org.opennms.horizon.inventory.device.utils.DeviceMapper;
 import org.opennms.horizon.inventory.device.utils.DeviceMapperImpl;
@@ -53,15 +54,15 @@ import org.opennms.horizon.shared.dto.device.LocationDTO;
 
 public class DeviceServiceTest {
   private DeviceService deviceService;
-  private LocationMapper locationMapper;
-  private DeviceMapper deviceMapper;
   private NodeDao mockNodeDao;
   private MonitoringLocationDao mockLocationDao;
+  private Integer id;
+  private DeviceDTO device;
 
   @Before
   public void setup() {
-    locationMapper = new LocationMapperImpl();
-    deviceMapper = new DeviceMapperImpl(locationMapper);
+    LocationMapper locationMapper = new LocationMapperImpl();
+    DeviceMapper deviceMapper = new DeviceMapperImpl(locationMapper);
     mockNodeDao = mock(NodeDao.class);
     mockLocationDao = mock(MonitoringLocationDao.class);
     deviceService = new DeviceService();
@@ -69,29 +70,34 @@ public class DeviceServiceTest {
     deviceService.setLocationDao(mockLocationDao);
     deviceService.setMapper(deviceMapper);
     deviceService.setSessionUtils(new MockSessionUtils());
+    device = new DeviceDTO();
+    id = 1;
+
+      doNothing().when(mockLocationDao).saveOrUpdate(any(OnmsMonitoringLocation.class));
+      doReturn(id).when(mockNodeDao).save(any(OnmsNode.class));
   }
 
   @Test
   public void testCreateDeviceWithLocation() {
     LocationDTO location = new LocationDTO();
-    DeviceDTO device = new DeviceDTO();
     device.setLocation(location);
-    doReturn(1).when(mockNodeDao).save(any(OnmsNode.class));
-    Integer id = deviceService.createDevice(device);
-    assertEquals(1, id.intValue());
+    Integer deviceID = deviceService.createDevice(device);
+    assertEquals(id, deviceID);
     verify(mockNodeDao).save(any(OnmsNode.class));
     verifyNoMoreInteractions(mockNodeDao);
-    verifyNoInteractions(mockLocationDao);
+    verify(mockLocationDao).saveOrUpdate(any(OnmsMonitoringLocation.class));
+    verifyNoMoreInteractions(mockLocationDao);
   }
 
   @Test
   public void testCreateDeviceWithDefaultLocation() {
-    DeviceDTO device = new DeviceDTO();
-    doReturn(1).when(mockNodeDao).save(any(OnmsNode.class));
-    Integer id = deviceService.createDevice(device);
-    assertEquals(1, id.intValue());
+    OnmsMonitoringLocation defaultLocation = new OnmsMonitoringLocation();
+    doReturn(defaultLocation).when(mockLocationDao).getDefaultLocation();
+    Integer deviceID = deviceService.createDevice(device);
+    assertEquals(id, deviceID);
     verify(mockNodeDao).save(any(OnmsNode.class));
     verify(mockLocationDao).getDefaultLocation();
+    verify(mockLocationDao).saveOrUpdate(any(OnmsMonitoringLocation.class));
     verifyNoMoreInteractions(mockLocationDao);
     verifyNoMoreInteractions(mockNodeDao);
   }

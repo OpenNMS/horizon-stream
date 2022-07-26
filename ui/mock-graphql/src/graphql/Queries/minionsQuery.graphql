@@ -6,8 +6,6 @@ query ListMinions {
       status
       location
       lastUpdated
-      icmp_latency
-      snmp_uptime
     }
   }
 }

@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# DEBUG NOTE: 
-# 
-# Because this leverages a lot of background processes, if there is
-# an issue with images not being made. Run each build manually in the same way
-# done in the script below and see the output.
-#
-# The output from each is put into the tmp/*.log files.
-
 ENV_RUN=$1
 
 if [[ $ENV_RUN == "local" ]] || [[ $ENV_RUN == "dev" ]] || [[ $ENV_RUN == "cicd" ]]; then
@@ -33,35 +25,6 @@ printf "\n# Pull in env vars for $1.\n"
 source ./config-run
 
 echo "Domain: $DOMAIN"
-
-# Start background docker image builds.
-if [[ $ENV_RUN == "dev" ]]; then
-
-  echo 0 > tmp/HS_CORE
-  echo 0 > tmp/HS_GRAFANA
-  echo 0 > tmp/HS_UI
-  echo 0 > tmp/HS_KEYCLOAK_UI
-  echo 0 > tmp/HS_REST_SERVER
-
-  # This is required to run before some of the builds below can be run.
-  cd ../shared-lib/; mvn clean install
-  cd ../local-sample/
-
-  source hs-core.sh&
-  source hs-grafana.sh&
-  source hs-keycloak-ui.sh&
-  source hs-rest-server.sh&
-  source hs-ui.sh&
- 
-  pwd
-
-  HS_CORE=$(cat tmp/HS_CORE)
-  HS_GRAFANA=$(cat tmp/HS_GRAFANA)
-  HS_UI=$(cat tmp/HS_UI)
-  HS_KEYCLOAK_UI=$(cat tmp/HS_KEYCLOAK_UI)
-  HS_REST_SERVER=$(cat tmp/HS_REST_SERVER)
-
-fi
 
 printf "\n# Create Kind cluster\n"
 printf "################################################################################\n\n"
@@ -109,7 +72,7 @@ printf "########################################################################
 kubectl -n local-instance apply -f secrets.yaml
 kubectl -n local-instance apply -f postgres.yaml
 
-kubectl -n local-instance wait --for=condition=ready pod --timeout=200s -l app=postgresql-db
+kubectl -n local-instance wait --for=condition=ready pod --timeout=600s -l app=postgresql-db
 
 kubectl -n local-instance apply -f kc-deployment.yaml
 kubectl -n local-instance apply -f kc-service.yaml
@@ -119,7 +82,7 @@ printf "\n\n# Grafana\n"
 printf "################################################################################\n\n"
 
 # TODO: Publish this image.
-#kind load docker-image opennms/horizon-stream-grafana:latest
+#kind load docker-image opennms/horizon-stream-grafana:latest 
 
 kubectl -n local-instance apply -f grafana-a-configmap.yaml
 kubectl -n local-instance apply -f grafana-b-secrets.yaml
@@ -132,73 +95,74 @@ printf "########################################################################
 
 kubectl -n local-instance apply -f hs-ingress.yaml
 
-printf "\n\n# Check images for dev, else ignore. \n"
+printf "\n\n# Update Configs Based on Env\n"
 printf "################################################################################\n\n"
 
-# At end, run this. Once all background processes are complete, then import the
-# images.
-if [[ $ENV_RUN == "dev" ]]; then
+if [[ $ENV_RUN == "local" ]]; then
 
-  counter=0
-  
-  until \
-    [ $HS_UI -eq 1 ] && \
-    [ $HS_CORE -eq 1 ] && \
-    [ $HS_GRAFANA -eq 1 ] && \
-    [ $HS_KEYCLOAK_UI -eq 1 ] && \
-    [ $HS_REST_SERVER -eq 1 ]
-  do
-    sleep 2
-  
-    echo Counter: $counter
-    ((counter++))
-  
-    HS_CORE=$(cat tmp/HS_CORE)
-    HS_GRAFANA=$(cat tmp/HS_GRAFANA)
-    HS_UI=$(cat tmp/HS_UI)
-    HS_KEYCLOAK_UI=$(cat tmp/HS_KEYCLOAK_UI)
-    HS_REST_SERVER=$(cat tmp/HS_REST_SERVER)
-  
-    echo $HS_CORE
-    echo $HS_GRAFANA
-    echo $HS_UI
-    echo $HS_KEYCLOAK_UI
-    echo $HS_REST_SERVER
-  
-  done
-  
-  echo "Images created"
+  echo "Pulls public repos."
 
-fi
+elif [[ $ENV_RUN == "dev" ]]; then
 
-printf "\n\n# Import Images & Update K8s Configs \n"
-printf "################################################################################\n\n"
+  # Build shared-lib/
+  cd ../shared-lib/; mvn clean install
 
-# At end, run this. Once all background processes are complete, then import the
-# images.
-if [[ $ENV_RUN == "dev" ]] || [[ $ENV_RUN == "cicd" ]]; then
+  # Build all images:
+  cd ../platform/; mvn -Prun-it clean install
+  cd ../keycloak-ui/; docker build -t opennms/horizon-stream-keycloak:local -f ./Dockerfile . 
+  cd ../grafana/; docker build -t opennms/horizon-stream-grafana:local -f ./Dockerfile .
+  cd ../rest-server/; mvn clean install jib:dockerBuild -Dimage=opennms/horizon-stream-rest-server:local
+  cd ../ui/; docker build -t opennms/horizon-stream-ui:local -f ./dev/Dockerfile .
 
-  # Do import.
-  printf "\n\n# Import Images for Testing, run in background \n"
-  kind load docker-image opennms/horizon-stream-grafana:local&
-  kind load docker-image opennms/horizon-stream-ui:local&
-  kind load docker-image opennms/horizon-stream-keycloak:local&
-  kind load docker-image opennms/horizon-stream-core:local&
-  kind load docker-image opennms/horizon-stream-rest-server:local&
+  # Go back to local sample dir.
+  cd ../local-sample/
 
-  # Need to wait for the images to be loaded, if we setup a Kind registry, this
-  # could be removed.
+  docker images
+
+  # TODO: Publish this image.
+  kind load docker-image opennms/horizon-stream-keycloak:latest 
+  kubectl -n local-instance patch deployments keycloak -p '{"spec": {"template": {"spec":{"containers":[{"name": "keycloak", "imagePullPolicy":"Never"}]}}}}'
+  
+  kind load docker-image opennms/horizon-stream-grafana:latest
+  kubectl -n local-instance patch deployments grafana -p '{"spec": {"template": {"spec":{"containers":[{"name": "grafana", "imagePullPolicy":"Never"}]}}}}'
+
+  #kubectl -n local-instance wait --for=condition=ready pod --timeout=120s -l app=opennms-ui
   sleep 120
 
-  # Debug
-  kubectl -n local-instance get pods
+  echo # IMPORTANT: If the following do not catch, then update them manually until we can get these integrated.
+  # TODO: Publish this image.
+  kind load docker-image opennms/horizon-stream-ui:0.0.14
+  kubectl -n local-instance patch deployments opennms-ui -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-ui", "image":"opennms/horizon-stream-ui:0.0.14"}]}}}}'
+  kubectl -n local-instance patch deployments opennms-ui -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-ui", "imagePullPolicy":"Never"}]}}}}'
+  kubectl -n local-instance patch deployments opennms-ui -p "{\"spec\": {\"template\": {\"spec\":{\"containers\":[{\"name\": \"opennms-ui\", \"env\":[{\"name\": \"DOMAIN_KEYCLOAK\", \"value\":\"https://$DOMAIN/auth\"}]}]}}}}"
 
+  sleep 120
+
+  # The ingress is not working, just use the default installed one.
+  # TODO: This fails if the opennms operator has not created this object yet.
+  kubectl -n local-instance patch ingress opennms-ingress -p '{"spec":{"ingressClassName":"nginx"}}'
+
+elif [[ $ENV_RUN == "cicd" ]]; then
+
+  # Remove this ingress, forces http->https, we do not have that ready yet for
+  # automated testing in the ci-cd pipeline.
+  kubectl -n local-instance delete deployment.apps/ingress-nginx-controller 
+
+  printf "\n\n# Import Images for Testing \n"
+  kind load docker-image opennms/horizon-stream-grafana:local
+  kind load docker-image opennms/horizon-stream-ui:local
+  kind load docker-image opennms/horizon-stream-keycloak:local 
+  kind load docker-image opennms/horizon-stream-core:local
+  kind load docker-image opennms/horizon-stream-rest-server:local
+
+  sleep 120
+  
   kubectl -n local-instance patch deployments opennms-ui           -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-ui",  "image":"opennms/horizon-stream-ui:local"}]}}}}'
   kubectl -n local-instance patch deployments opennms-core         -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-core","image":"opennms/horizon-stream-core:local"}]}}}}'
   kubectl -n local-instance patch deployments opennms-rest-server  -p '{"spec": {"template": {"spec":{"containers":[{"name": "horizon-stream-api", "image":"opennms/horizon-stream-rest-server:local"}]}}}}'
   kubectl -n local-instance patch deployments keycloak             -p '{"spec": {"template": {"spec":{"containers":[{"name": "keycloak",           "image":"opennms/horizon-stream-keycloak:local"}]}}}}'
   kubectl -n local-instance patch deployments grafana              -p '{"spec": {"template": {"spec":{"containers":[{"name": "grafana",           "image":"opennms/horizon-stream-grafana:local"}]}}}}'
- 
+  
   kubectl -n local-instance patch deployments opennms-ui           -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-ui", "imagePullPolicy":"Never"}]}}}}'
   kubectl -n local-instance patch deployments opennms-core         -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-core","imagePullPolicy":"Never"}]}}}}'
   kubectl -n local-instance patch deployments opennms-rest-server  -p '{"spec": {"template": {"spec":{"containers":[{"name": "horizon-stream-api", "imagePullPolicy":"Never"}]}}}}'
@@ -207,28 +171,18 @@ if [[ $ENV_RUN == "dev" ]] || [[ $ENV_RUN == "cicd" ]]; then
 
   kubectl -n local-instance patch deployments opennms-ui -p "{\"spec\": {\"template\": {\"spec\":{\"containers\":[{\"name\": \"opennms-ui\", \"env\":[{\"name\": \"DOMAIN_KEYCLOAK\", \"value\":\"https://$DOMAIN/auth\"}]}]}}}}"
 
-  # Debug
-  kubectl -n local-instance get ingress
+  sleep 120
 
   # The ingress is not working, just use the default installed one.
   # TODO: This fails if the opennms operator has not created this object yet.
   kubectl -n local-instance patch ingress opennms-ingress -p '{"spec":{"ingressClassName":"nginx"}}'
 
+else
+  printf "\n\nIssue, ENV_RUN must have been over written.\n\n"
 fi
-
-# Debug
-kubectl -n local-instance get pods
-kubectl -n local-instance get ingress
-
-# Keycloak needs some time, after it is shown to be running, before its API is
-# functioning. When we move to keycloak operator, this could be removed.
-sleep 240
 
 printf "\n\n# Create realm, user, and role mappings through keycloak api.\n"
 printf "################################################################################\n\n"
-
-# Debug
-kubectl -n local-instance get pods
 
 ./run.kc-config.sh
 
@@ -237,14 +191,7 @@ printf "########################################################################
 
 printf "\n\nDone\n\nGo to https://$DOMAIN\n\n"
 
-## Debug
-#cd ../external-it/
-#mvn clean install
-#HORIZON_STREAM_BASE_URL=https://onmshs/core
-#KEYCLOAK_BASE_URL=https://onmshs/auth
-#KEYCLOAK_REALM=opennms
-#KEYCLOAK_USERNAME=admin
-#KEYCLOAK_PASSWORD=admin
-#export HORIZON_STREAM_BASE_URL KEYCLOAK_BASE_URL KEYCLOAK_REALM KEYCLOAK_USERNAME KEYCLOAK_PASSWORD
-#PROJECT_VERSION="$(mvn -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive -q org.codehaus.mojo:exec-maven-plugin:1.6.0:exec)"
-#java -jar "external-horizon-stream-it/target/external-horizon-stream-it-${PROJECT_VERSION}.jar"
+printf "\n\n# TODO\n"
+printf "################################################################################\n\n"
+
+printf "\nUpdate the ingress from operator to use the nginx className.\n"

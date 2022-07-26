@@ -108,5 +108,8 @@
 	<include file="stored-procedures/getPercentAvailabilityInWindow.xml" />
 	<include file="stored-procedures/dropTriggerIfExists.xml" />
 	<include file="stored-procedures/generate_daily_series.xml"/>
+    
+    <!-- Horizon Stream changes -->
+    <include file="hs-0.1.0/changelog.xml" />
 
 </databaseChangeLog>

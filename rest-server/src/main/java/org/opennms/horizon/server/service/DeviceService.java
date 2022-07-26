@@ -26,36 +26,41 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.inventory.device.rest.impl;
+package org.opennms.horizon.server.service;
 
-import javax.ws.rs.core.Response;
-
-import org.opennms.horizon.inventory.device.rest.api.DeviceRestAPI;
-import org.opennms.horizon.inventory.device.service.DeviceService;
 import org.opennms.horizon.shared.dto.device.DeviceCollectionDTO;
 import org.opennms.horizon.shared.dto.device.DeviceDTO;
+import org.springframework.stereotype.Service;
 
-public class DeviceRestAPIImpl implements DeviceRestAPI {
-  private DeviceService service;
+import io.leangen.graphql.annotations.GraphQLArgument;
+import io.leangen.graphql.annotations.GraphQLEnvironment;
+import io.leangen.graphql.annotations.GraphQLMutation;
+import io.leangen.graphql.annotations.GraphQLQuery;
+import io.leangen.graphql.execution.ResolutionEnvironment;
+import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
 
-  public void setService(DeviceService service) {
-    this.service = service;
+@GraphQLApi
+@Service
+public class DeviceService {
+  private final PlatformGateway gateway;
+
+  public DeviceService(PlatformGateway gateway) {
+    this.gateway = gateway;
   }
 
-  public DeviceDTO getById(Integer id) {
-    return service.getById(id);
+  @GraphQLQuery
+  public DeviceCollectionDTO listDevices(@GraphQLEnvironment ResolutionEnvironment env) {
+    return gateway.get(PlatformGateway.URL_PATH_DEVICES, gateway.getAuthHeader(env), DeviceCollectionDTO.class).getBody();
   }
 
-  public DeviceCollectionDTO findAll() {
-    return service.searchDevices();
+  @GraphQLQuery
+  public DeviceDTO getDeviceById(@GraphQLArgument(name = "id") Integer id, @GraphQLEnvironment ResolutionEnvironment env) {
+    return gateway.get(PlatformGateway.URL_PATH_DEVICES + "/" + id, gateway.getAuthHeader(env), DeviceDTO.class).getBody();
   }
 
-  @Override
-  public Response createDevice(final DeviceDTO device) {
-    try {
-      return Response.ok(service.createDevice(device)).build();
-    } catch (Exception e){
-      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-    }
+  @GraphQLMutation
+  public Integer addDevice(DeviceDTO device, @GraphQLEnvironment ResolutionEnvironment env) {
+    return gateway.post(PlatformGateway.URL_PATH_DEVICES, gateway.getAuthHeader(env), device, Integer.class).getBody();
   }
 }
+

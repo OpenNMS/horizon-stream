@@ -10,10 +10,8 @@ describe('MinionsTable.vue', () => {
       id: '1',
       date: 'date1',
       label: 'minion1',
-      status: 'status1',
-      location: 'location1',
-      icmp_latency: 'latency1',
-      snmp_uptime: 'uptime1'
+      status: 'UP',
+      location: 'default'
     }]) 
 
     setActivePinia(createTestingPinia({
@@ -34,7 +32,8 @@ describe('MinionsTable.vue', () => {
       ['Date', 'col-date'],
       ['Minion', 'col-minion'],
       ['Latency', 'col-latency'],
-      ['Uptime', 'col-uptime']
+      ['Uptime', 'col-uptime'],
+      ['Status', 'col-status']
     ]
 
     it.each(requiredColumns)('should have "%s" column', (_, dataTest) => {

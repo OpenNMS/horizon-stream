@@ -82,16 +82,21 @@ a {
   cursor: pointer;
 }
 
-.bg-success {
+.bg-ok {
   background-color: var($success);
   color: var($primary-text-on-color);
 }
-.bg-error {
+.bg-failed {
   background-color: var($error);
   color: var($primary-text-on-color);
 }
-.bg-warning {
-  background-color: var($warning);
-  color: var($primary-text-on-warning);
+.bg-unknown {
+    background-color: grey;
+    color: var($primary-text-on-color);
+}
+.open-dark {
+  .bg-unknown {
+    color: rgb(10, 12, 27);
+  }
 }
 </style>

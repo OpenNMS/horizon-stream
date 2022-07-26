@@ -151,6 +151,82 @@ spec:
   selector:
     run: horizon-mail-server
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  labels:
+    run: prometheus
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      protocol: TCP
+      name: prometheus-port
+  selector:
+    run: prometheus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-pushgateway
+  labels:
+    run: prometheus-pushgateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9091
+      protocol: TCP
+      name: pushgateway-port
+  selector:
+    run: prometheus-pushgateway
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-pushgateway
+spec:
+  selector:
+    matchLabels:
+      run: prometheus-pushgateway
+  template:
+    metadata:
+      labels:
+        run: prometheus-pushgateway
+    spec:
+      containers:
+        - name: prometheus-pushgateway
+          image: prom/pushgateway
+          ports:
+            - containerPort: 9091
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+spec:
+  selector:
+    matchLabels:
+      run: prometheus
+  template:
+    metadata:
+      labels:
+        run: prometheus
+    spec:
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config-map
+      containers:
+        - name: prometheus
+          image: prom/prometheus
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: "/etc/prometheus/prometheus.yml"
+              subPath: "prometheus.yml"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -470,6 +546,8 @@ spec:
               value: "keycloak-admin"
             - name: KEYCLOAK_ADMIN_PASSWORD
               value: "admin"
+            - name: PROMETHEUS_PUSHGATEWAY_URL
+              value: "http://prometheus-pushgateway:9091"
           ports:
             - containerPort: 8101
             - containerPort: 8181
@@ -545,6 +623,8 @@ spec:
               value: "512M"
             - name: JAVA_MAX_MEM
               value: "2048M"
+            - name: PROMETHEUS_PUSHGATEWAY_URL
+              value: "http://prometheus-pushgateway:9091"
           ports:
             - containerPort: 8201
             - containerPort: 1162
@@ -703,6 +783,31 @@ data:
         root   /usr/share/nginx/html;
       }
     }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config-map
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval:     15s # By default, scrape targets every 15 seconds.
+      # Attach these labels to any time series or alerts when communicating with
+      # external systems (federation, remote storage, Alertmanager).
+      external_labels:
+        monitor: 'codelab-monitor'
+    # A scrape configuration containing exactly one endpoint to scrape:
+    # Here it's Prometheus itself.
+    scrape_configs:
+      # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+      - job_name: 'pushgateway'
+        honor_labels: true
+        # Override the global default and scrape targets from this job every 5 seconds.
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['prometheus-pushgateway:9091']
+            labels:
+              pushgateway_instance: metricfire
 ---
 apiVersion: v1
 kind: Secret

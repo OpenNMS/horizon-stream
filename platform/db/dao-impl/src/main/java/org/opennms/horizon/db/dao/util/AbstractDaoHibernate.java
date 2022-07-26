@@ -6,6 +6,8 @@ import java.util.Objects;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.Transactional;
+
+import org.hibernate.Session;
 import org.opennms.horizon.db.dao.api.OnmsDao;
 import org.opennms.horizon.db.dao.api.EntityManagerHolder;
 
@@ -62,8 +64,9 @@ public abstract class AbstractDaoHibernate<T, K extends Serializable> implements
     @Transactional(Transactional.TxType.REQUIRED)
     @Override
     public void saveOrUpdate(T entity) {
-        // FIXME: OOPS: Need more here
-        getEntityManager().persist(entity);
+        EntityManager entityManager = getEntityManager();
+        Session session = entityManager.unwrap(Session.class);
+        session.saveOrUpdate(entity);
     }
 
     @Transactional(Transactional.TxType.REQUIRED)

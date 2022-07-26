@@ -46,8 +46,8 @@ runs:
         sudo echo "127.0.0.1 $DOMAIN" | sudo tee -a /etc/hosts
 
         sed -i.bak 's/IMAGE_TAG=latest/IMAGE_TAG=local/g' ./local-sample/config-run
-        sed -i.bak 's/CI_CD_RUN=false/CI_CD_RUN=true/g' ./local-sample/config-run
-        ./local-sample/run.sh
+        sed -i.bak 's/image: opennms\/operator:latest/image: opennms\/operator:local-build/g' charts/opennms-operator/values.yaml
+        ./local-sample/run.sh cicd
 
         # List images in kind cluster container.  
         # ISSUE: This produces an error, not required if the '$ kubectl apply

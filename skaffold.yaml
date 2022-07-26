@@ -84,6 +84,14 @@ portForward:
     resourceName: my-postgres
     port: 5432 # Postgres
     localPort: 5432
+  - resourceType: deployment
+    resourceName: prometheus
+    port: 9090 # prometheus tcp
+    localPort: 59090
+  - resourceType: deployment
+    resourceName: prometheus-pushgateway
+    port: 9091 #prometheus-pushgateway tcp
+    localPort: 59091
 deploy:
   kubectl:
     manifests:

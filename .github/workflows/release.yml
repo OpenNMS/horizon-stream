@@ -144,6 +144,19 @@ jobs:
           docker push opennms/horizon-stream-keycloak:${{ env.RELEASE_TAG }}
           docker push opennms/horizon-stream-keycloak:latest
 
+      - name: publish-image-grafana
+        run: |
+
+          # Login to dockerhub.
+          echo ${{ secrets.DOCKERHUB_PASS }} | docker login -u ${{ secrets.DOCKERHUB_LOGIN }} --password-stdin
+
+          # Tag and save the image as a file to be published. Both release version and latest.
+          docker tag opennms/horizon-stream-grafana:local opennms/horizon-stream-grafana:${{ env.RELEASE_TAG }}
+          docker tag opennms/horizon-stream-grafana:local opennms/horizon-stream-grafana:latest
+
+          docker push opennms/horizon-stream-grafana:${{ env.RELEASE_TAG }}
+          docker push opennms/horizon-stream-grafana:latest
+
       - name: publish-image-rest-server
         run: |
 

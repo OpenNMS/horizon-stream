@@ -26,41 +26,39 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.horizon.shared.dto.device;
+package org.opennms.horizon.inventory.device.rest.impl;
 
-import java.util.Date;
+import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.opennms.horizon.inventory.device.rest.api.DeviceRestService;
+import org.opennms.horizon.inventory.device.service.DeviceService;
+import org.opennms.horizon.shared.dto.device.DeviceDTO;
 
-import lombok.Getter;
-import lombok.Setter;
+public class DeviceRestServiceImpl implements DeviceRestService {
+  private DeviceService service;
 
-@Getter
-@Setter
-public class DeviceDTO {
-  private Integer id;
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-  private Date createTime;
-  private Integer parentId;
-  private String type;
-  private String sysOid;
-  private String sysName;
-  private String sysDescription;
-  private String sysLocation;
-  private String sysContact;
-  private String label;
-  private String labelSource;
-  private String netBiosName;
-  private String domainName;
-  private String operatingSystem;
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-  private Date lastPoll;
-  private String foreignSource;
-  private String foreignId;
-  private LocationDTO location;
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-  private Date lastIngressFlow;
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-  private Date lastEgressFlow;
-  private String snmpCommunityString;
+  public void setService(DeviceService service) {
+    this.service = service;
+  }
+
+  public Response getById(Integer id) {
+      DeviceDTO device = service.getById(id);
+      if(device == null) {
+          return Response.noContent().build();
+      }
+    return Response.ok(device).build();
+  }
+
+  public Response findAll() {
+    return Response.ok(service.searchDevices()).build();
+  }
+
+  @Override
+  public Response createDevice(final DeviceDTO device) {
+    try {
+        return Response.ok(service.createDevice(device)).build();
+    } catch (Exception e){
+      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+    }
+  }
 }

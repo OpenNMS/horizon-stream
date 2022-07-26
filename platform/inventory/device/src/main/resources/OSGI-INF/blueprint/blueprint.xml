@@ -22,14 +22,13 @@
         <property name="locationDao" ref="locationDao" />
     </bean>
 
-    <bean id="deviceRestImpl" class="org.opennms.horizon.inventory.device.rest.impl.DeviceRestAPIImpl">
+    <bean id="deviceRestImpl" class="org.opennms.horizon.inventory.device.rest.impl.DeviceRestServiceImpl">
         <property name="service" ref="deviceService"/>
     </bean>
 
-    <service id="deviceRestAPIService" ref="deviceRestImpl" interface="org.opennms.horizon.inventory.device.rest.api.DeviceRestAPI">
+    <service id="deviceRestService" ref="deviceRestImpl" interface="org.opennms.horizon.inventory.device.rest.api.DeviceRestService">
         <service-properties>
             <entry key="osgi.jaxrs.resource" value="true"/>
         </service-properties>
     </service>
-
 </blueprint>

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-CI_CD_RUN=false
-
 IMAGE_TAG=latest
 
 DOMAIN=onmshs

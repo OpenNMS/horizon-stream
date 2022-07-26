@@ -1,20 +1,21 @@
 export const formatItemBgColor = (list: [any]) => list.map(item => {
   const bg = {
-    success: 'bg-success',
-    warning: 'bg-warning',
-    error: 'bg-error'
+    ok: 'bg-ok',
+    unknown: 'bg-unknown',
+    failed: 'bg-failed'
   }
   
-  let statusClass = bg.success
-  if(item?.status === 'DOWN') statusClass = bg.error
+  let statusClass = bg.ok
+  if(item?.status === 'DOWN') statusClass = bg.failed
+  else if(item?.status === 'UNKNOWN') statusClass = bg.unknown
 
-  let latencyClass = bg.success
-  if(Number(item?.icmp_latency) >= 100) latencyClass = bg.error
-  else if(Number(item?.icmp_latency) >= 60) latencyClass = bg.warning
+  let latencyClass = bg.ok
+  if(item?.icmp_latency === 'FAILED') latencyClass = bg.failed
+  else if(item?.icmp_latency === 'UNKNOWN') latencyClass = bg.unknown
 
-  let uptimeClass = bg.success
-  if(Number(item?.snmp_uptime) >= 168) uptimeClass = bg.error
-  else if(Number(item?.snmp_uptime) >= 48) uptimeClass = bg.warning
+  let uptimeClass = bg.ok
+  if(item?.snmp_uptime === 'FAILED') uptimeClass = bg.failed
+  else if(item?.snmp_uptime === 'UNKNOWN') uptimeClass = bg.unknown
 
   return {
     ...item,

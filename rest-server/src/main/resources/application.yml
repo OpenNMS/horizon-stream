@@ -10,6 +10,8 @@ graphql:
   spqr:
     gui:
       enabled: true
+    base-packages:
+      - org.opennms.horizon.shared.dto
 
 # keycloak admin client properties
 horizon-stream:

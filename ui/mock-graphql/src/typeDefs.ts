@@ -26,8 +26,6 @@ const typeDefs = `
     status: String!
     location: String!
     lastUpdated: String!
-    icmp_latency: String!
-    snmp_uptime: String!
   }
   type ListMinions {
     minions: [Minion!]!

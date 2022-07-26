@@ -4,12 +4,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnitUtil;
+
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -34,6 +37,8 @@ public class ForeignSourceRepositoryImplTest {
     EntityManagerFactory entityManagerFactory;
     @Mock
     PersistenceUnitUtil persistenceUnitUtil;
+    @Mock
+    Session session;
 
     HibernateForeignSourceEntity hibernateForeignSourceEntity;
 
@@ -46,7 +51,7 @@ public class ForeignSourceRepositoryImplTest {
 
         when(entityManager.getEntityManagerFactory()).thenReturn(entityManagerFactory);
         when(entityManagerFactory.getPersistenceUnitUtil()).thenReturn(persistenceUnitUtil);
-
+        doReturn(session).when(entityManager).unwrap(Session.class);
         dto = new ForeignSourceDTO(BLAH_ID);
         hibernateForeignSourceEntity = new HibernateForeignSourceEntity(dto.getName(), dto);
     }

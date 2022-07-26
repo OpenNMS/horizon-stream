@@ -34,10 +34,13 @@ import java.util.List;
 import org.opennms.horizon.shared.dto.AbstractCollectionDTO;
 
 public class DeviceCollectionDTO extends AbstractCollectionDTO<DeviceDTO> {
+
+  public DeviceCollectionDTO() {
+  }
+
   public DeviceCollectionDTO(final Collection<? extends DeviceDTO> devices) {
     objects.addAll(devices);
   }
-
   public List<DeviceDTO> getDevices() {
     return objects;
   }

@@ -1,7 +1,7 @@
 Operator:
   Namespace: opennms
   serviceName: opennms-operator
-  image: opennms/operator:local-build
+  image: opennms/operator:latest
   imagePullPolicy: IfNotPresent
   imageUpdateFreq: 60
   resources:
