@@ -3,6 +3,7 @@ package org.opennms.horizon.core.monitor;
 import org.opennms.core.ipc.grpc.server.manager.MinionInfo;
 import org.opennms.horizon.echo.monitor.SimpleMinionRpcMonitor;
 import org.opennms.horizon.ipc.rpc.api.RpcClientFactory;
+import org.opennms.horizon.metrics.api.OnmsMetricsAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +24,14 @@ public class MinionRpcMonitorManager {
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
     private RpcClientFactory rpcClientFactory;
+    private OnmsMetricsAdapter metricsAdapter;
 
     private final Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
     private final Object lock = new Object();
     private final AtomicLong threadNumber = new AtomicLong(0);
 
     private int monitorInitialDelay = 3_000;
-    private int monitorPeriod = 90_000;
+    private int monitorPeriod = 30_000;
 
 //========================================
 // Getters and Setters
@@ -51,7 +53,15 @@ public class MinionRpcMonitorManager {
         this.rpcClientFactory = rpcClientFactory;
     }
 
-//========================================
+    public OnmsMetricsAdapter getMetricsAdapter() {
+        return metricsAdapter;
+    }
+
+    public void setMetricsAdapter(OnmsMetricsAdapter metricsAdapter) {
+        this.metricsAdapter = metricsAdapter;
+    }
+
+    //========================================
 // Lifecycle
 //----------------------------------------
 
@@ -117,6 +127,7 @@ public class MinionRpcMonitorManager {
             monitor.setNodeId(minionInfo.getId());
             monitor.setNodeLocation(minionInfo.getLocation());
             monitor.setRpcClientFactory(rpcClientFactory);
+            monitor.setMetricsAdapter(metricsAdapter);
 
             // TBD888: how to get real values for these?
             monitor.setAddress(InetAddress.getLocalHost());

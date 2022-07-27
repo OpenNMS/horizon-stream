@@ -7,10 +7,13 @@
 
     <reference id="rpcClientFactory" interface="org.opennms.horizon.ipc.rpc.api.RpcClientFactory"/>
     <reference id="minionManager" interface="org.opennms.core.ipc.grpc.server.manager.MinionManager"/>
+    <reference id="metricsAdapter" interface="org.opennms.horizon.metrics.api.OnmsMetricsAdapter" />
 
     <bean id="minionRpcMonitorManager" class="org.opennms.horizon.core.monitor.MinionRpcMonitorManager" init-method="init">
         <property name="rpcClientFactory" ref="rpcClientFactory"/>
+        <property name="metricsAdapter" ref="metricsAdapter"/>
     </bean>
+
     <bean id="minionRpcMonitorMinionManagerListener" class="org.opennms.horizon.core.monitor.MinionRpcMonitorMinionManagerListener">
         <property name="minionRpcMonitorManager" ref="minionRpcMonitorManager"/>
     </bean>

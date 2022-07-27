@@ -9,12 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>org.opennms.horizon.minion</artifactId>
+    <artifactId>metrics</artifactId>
     <packaging>pom</packaging>
-    <name>OpenNMS Horizon :: Minion</name>
+    <name>OpenNMS Horizon :: Metrics</name>
+
     <modules>
-        <module>rest</module>
-        <module>heartbeat</module>
+        <module>api</module>
+        <module>impl</module>
     </modules>
 
 </project>

@@ -121,7 +121,9 @@
                         <feature>horizon-icmp</feature>
                         <feature>horizon-provision</feature>
                         <feature>horizon-inventory</feature>
+                        <feature>horizon-minion-heartbeat</feature>
                         <feature>horizon-minion-rest</feature>
+                        <feature>horizon-metrics-prometheus</feature>
                     </bootFeatures>
                     <libraries>
                     </libraries>

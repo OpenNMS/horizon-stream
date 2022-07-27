@@ -29,6 +29,7 @@
 package org.opennms.horizon.echo.monitor;
 
 import com.google.common.base.Strings;
+import io.prometheus.client.Gauge;
 import org.opennms.horizon.core.lib.InetAddressUtils;
 import org.opennms.horizon.echo.EchoRequest;
 import org.opennms.horizon.echo.EchoResponse;
@@ -36,9 +37,11 @@ import org.opennms.horizon.echo.EchoRpcModule;
 import org.opennms.horizon.ipc.rpc.api.RpcClient;
 import org.opennms.horizon.ipc.rpc.api.RpcClientFactory;
 import org.opennms.horizon.ipc.rpc.api.RpcRequest;
+import org.opennms.horizon.metrics.api.OnmsMetricsAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.concurrent.ExecutionException;
 
@@ -46,11 +49,12 @@ public class SimpleMinionRpcMonitor {
 
     private final static int DEFAULT_MESSAGE_SIZE = 1024;
 
-    private static final Logger DEFAULT_LOGGER = LoggerFactory.getLogger(SimpleMinionRpcMonitor.class);
-
-    private Logger log = DEFAULT_LOGGER;
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleMinionRpcMonitor.class);
 
     private RpcClientFactory rpcClientFactory;
+
+    private OnmsMetricsAdapter metricsAdapter;
+
 
     private String nodeId;
     private String ipAddr;
@@ -69,6 +73,14 @@ public class SimpleMinionRpcMonitor {
 
     public void setRpcClientFactory(RpcClientFactory rpcClientFactory) {
         this.rpcClientFactory = rpcClientFactory;
+    }
+
+    public OnmsMetricsAdapter getMetricsAdapter() {
+        return metricsAdapter;
+    }
+
+    public void setMetricsAdapter(OnmsMetricsAdapter metricsAdapter) {
+        this.metricsAdapter = metricsAdapter;
     }
 
     public String getNodeId() {
@@ -142,9 +154,23 @@ public class SimpleMinionRpcMonitor {
         try {
             EchoResponse response = client.execute(request).get();
             long responseTime = ( System.nanoTime() / 1000000 ) - response.getId();
-            log.info("ECHO RESPONSE: node-id={}; node-location={}; duration={}ms", nodeId, nodeLocation, responseTime);
+            LOG.info("ECHO RESPONSE: node-id={}; node-location={}; duration={}ms", nodeId, nodeLocation, responseTime);
+            updateMetrics(responseTime, nodeId, nodeId, nodeLocation);
         } catch (InterruptedException|ExecutionException t) {
-            log.warn("ECHO REQUEST failed", t);
+            LOG.warn("ECHO REQUEST failed", t);
         }
+    }
+
+    private void updateMetrics(long responseTime, String minionId, String... labelValues) {
+        Gauge responseTimeGauge = Gauge.build().name("minion_response_time").help("Response time of Minion RPC")
+            .unit("msec").labelNames("instance", "location").create();
+        responseTimeGauge.labels(labelValues).set(responseTime);
+        try {
+            metricsAdapter.push(responseTimeGauge);
+            LOG.debug("Updated response time metrics for {}", minionId);
+        } catch (IOException e) {
+            LOG.error("Exception while pushing response time metrics", e);
+        }
+
     }
 }

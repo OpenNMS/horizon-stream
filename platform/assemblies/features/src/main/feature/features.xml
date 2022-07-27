@@ -120,7 +120,7 @@
     <feature name="horizon-grpc" version="${project.version}" description="Horizon :: gRPC">
         <feature>horizon-ipc-api</feature>
         <feature>horizon-db</feature>
-
+        <feature>horizon-metrics-api</feature>
         <bundle>mvn:org.opennms.horizon.3rdparty/grpc/${project.version}</bundle>
         <bundle>mvn:com.google.protobuf/protobuf-java/${protobuf.version}</bundle>
 
@@ -128,7 +128,6 @@
         <bundle>mvn:org.opennms.horizon.ipc.grpc/common/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.ipc.grpc/server/${project.version}</bundle>
         <bundle>mvn:org.opennms.horizon.ipc/echo/${project.version}</bundle>
-        <bundle>mvn:org.opennms.horizon.ipc/heartbeat/${project.version}</bundle>
     </feature>
 
     <feature name="horizon-icmp" version="${project.version}" description="Horizon :: ICMP">
@@ -295,6 +294,13 @@
         <bundle start-level="80">mvn:org.opennms.horizon.minion/org.opennms.horizon.minion.rest/${project.version}</bundle>
     </feature>
 
+    <feature name="horizon-minion-heartbeat" version="${project.version}" description="Horizon: Minion :: Heartbeat">
+        <feature>horizon-db</feature>
+        <feature>horizon-metrics-api</feature>
+        <feature>horizon-ipc-api</feature>
+        <bundle>mvn:org.opennms.horizon.minion/heartbeat/${project.version}</bundle>
+    </feature>
+
     <!--        -->
     <!-- MINION -->
     <!--        -->
@@ -448,6 +454,21 @@
         <feature>horizon-db</feature>
         <feature>horizon-core-rest</feature>
         <bundle>mvn:org.opennms.horizon.inventory/device/${project.version}</bundle>
+    </feature>
+
+    <feature name="horizon-metrics-api" version="${project.version}">
+        <bundle>mvn:org.opennms.horizon.metrics/api/${project.version}</bundle>
+        <bundle>mvn:io.prometheus/simpleclient/${prometheus.version}</bundle>
+        <bundle>mvn:io.prometheus/simpleclient_tracer_otel/${prometheus.version}</bundle>
+        <bundle>mvn:io.prometheus/simpleclient_tracer_common/${prometheus.version}</bundle>
+        <bundle>mvn:io.prometheus/simpleclient_tracer_otel_agent/${prometheus.version}</bundle>
+    </feature>
+
+    <feature name="horizon-metrics-prometheus" version="${project.version}">
+        <feature>horizon-metrics-api</feature>
+        <bundle>mvn:org.opennms.horizon.metrics/impl/${project.version}</bundle>
+        <bundle>mvn:io.prometheus/simpleclient_common/${prometheus.version}</bundle>
+        <bundle>mvn:io.prometheus/simpleclient_pushgateway/${prometheus.version}</bundle>
     </feature>
 
 </features>

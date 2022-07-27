@@ -21,7 +21,6 @@
     <module>shell</module>
     <module>echo</module>
     <module>twin</module>
-    <module>heartbeat</module>
   </modules>
 
 </project>

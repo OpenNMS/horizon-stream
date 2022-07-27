@@ -1,0 +1,17 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0"
+           xsi:schemaLocation="
+		http://www.osgi.org/xmlns/blueprint/v1.0.0
+		https://osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+		http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.3.0
+		http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.3.0.xsd
+">
+
+
+    <bean id="onmsMetricsAdapter" class="org.opennms.horizon.metrics.impl.OnmsMetricsAdapterImpl">
+        <argument value="prometheus-pushgateway:9091"/>
+    </bean>
+    <service ref="onmsMetricsAdapter" interface="org.opennms.horizon.metrics.api.OnmsMetricsAdapter"/>
+
+</blueprint>
