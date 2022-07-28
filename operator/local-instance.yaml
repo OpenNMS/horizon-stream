@@ -7,16 +7,16 @@ spec:
   host: ignore-for-now-onmshs
   namespace: local-instance
   core:
-    version: opennms/horizon-stream-core
-    cpu: "0"
-    mem: 100Mi
+    image: opennms/horizon-stream-core
+    cpu: "2"
+    mem: 4Gi # FIXME: find appropriate value
   api:
-    version: opennms/horizon-stream-rest-server
-    cpu: "0"
-    mem: 100Mi
+    image: opennms/horizon-stream-rest-server
+    cpu: "2"
+    mem: 2Gi # FIXME: find appropriate value
   ui:
-    version: opennms/horizon-stream-ui
-    cpu: "0"
-    mem: 100Mi
+    image: opennms/horizon-stream-ui
+    cpu: "2"
+    mem: 2Gi # FIXME: find appropriate value
   postgres:
-    version: postgres:13.3-alpine
+    image: postgres:13.3-alpine

@@ -8,4 +8,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["echo" "started"]
+CMD ["echo", "started"]

@@ -1,0 +1,429 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minion
+  labels:
+    run: my-minion
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8201
+      protocol: TCP
+      name: ssh
+    - port: 1162
+      protocol: UDP
+      name: snmp-trap
+    - port: 1514
+      protocol: UDP
+      name: syslog
+  selector:
+    run: my-minion
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  labels:
+    run: my-zookeeper
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2181
+      protocol: TCP
+      name: http
+  selector:
+    run: my-zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    run: my-kafka
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9092
+      protocol: TCP
+      name: http
+  selector:
+    run: my-kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  labels:
+    run: api-gateway
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+      name: gateway-http
+  selector:
+    run: api-gateway
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mail-server
+  labels:
+    run: horizon-mail-server
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8025
+      protocol: TCP
+      name: http
+    - port: 1025
+      protocol: TCP
+      name: smtp
+  selector:
+    run: horizon-mail-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: horizon-mail-server
+spec:
+  selector:
+    matchLabels:
+      run: horizon-mail-server
+  template:
+    metadata:
+      labels:
+        run: horizon-mail-server
+    spec:
+      containers:
+        - name: mail-server
+          image: mailhog/mailhog:latest
+          ports:
+            - containerPort: 8025
+            - containerPort: 1025
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  selector:
+    matchLabels:
+      run: api-gateway
+  template:
+    metadata:
+      labels:
+        run: api-gateway
+    spec:
+      volumes:
+        - name: nginx-conf-volume
+          configMap:
+            name: nginx-conf-template
+      containers:
+        - name: api-gateway
+          image: nginx:1.21.6-alpine
+          ports:
+            - containerPort: 80
+          env:
+            - name: API_SERVER_URL
+              value: "http://opennms-rest-server:9090"
+            - name: KEYCLOAK_URL
+              value: "http://keycloak:8080"
+            - name: KEYCLOAK_REALM
+              value: "opennms"
+          volumeMounts:
+            - name: nginx-conf-volume
+              mountPath: "/etc/nginx/templates/default.conf.template"
+              subPath: "default.conf.template"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-zookeeper
+spec:
+  selector:
+    matchLabels:
+      run: my-zookeeper
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-zookeeper
+    spec:
+      volumes:
+        - name: zookeeper-volume
+      containers:
+        - name: zookeeper
+          image: docker.io/bitnami/zookeeper:3.7
+          env:
+            - name: ALLOW_ANONYMOUS_LOGIN
+              value: "no"
+            - name: ZOO_ENABLE_AUTH
+              value: "yes"
+            - name: ZOO_SERVER_USERS
+              valueFrom:
+                secretKeyRef:
+                  name: zookeeper-secret
+                  key: username
+            - name: ZOO_SERVER_PASSWORDS
+              valueFrom:
+                secretKeyRef:
+                  name: zookeeper-secret
+                  key: password
+            - name: ZOO_CLIENT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: zookeeper-secret
+                  key: username
+            - name: ZOO_CLIENT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zookeeper-secret
+                  key: password
+          ports:
+            - containerPort: 2181
+          volumeMounts:
+            - mountPath: /bitnami/zookeeper
+              name: zookeeper-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-kafka
+spec:
+  selector:
+    matchLabels:
+      run: my-kafka
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-kafka
+    spec:
+      volumes:
+        - name: kafka-volume
+      containers:
+        - name: kafka
+          image: docker.io/bitnami/kafka:3
+          env:
+            - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+              value: "zookeeper:2181"
+            - name: KAFKA_ZOOKEEPER_PROTOCOL
+              value: "SASL"
+            - name: KAFKA_ZOOKEEPER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: zookeeper-secret
+                  key: username
+            - name: KAFKA_ZOOKEEPER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zookeeper-secret
+                  key: password
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+            - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "CLIENT:PLAINTEXT"
+            - name: KAFKA_CFG_LISTENERS
+              value: "CLIENT://:9092"
+            - name: KAFKA_CFG_ADVERTISED_LISTENERS
+              value: "CLIENT://kafka:9092"
+            - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+              value: "CLIENT"
+            - name: KAFKA_CLIENT_USERS
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-secret
+                  key: username
+            - name: KAFKA_CLIENT_PASSWORDS
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-secret
+                  key: password
+          ports:
+            - containerPort: 9092
+          volumeMounts:
+            - mountPath: /bitnami/kafka
+              name: kafka-volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-minion
+spec:
+  selector:
+    matchLabels:
+      run: my-minion
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-minion
+    spec:
+      volumes:
+        - name: minion-config-volume
+          configMap:
+            name: minion-config-map
+      containers:
+        - name: minion
+          image: opennms/minion:29.0.10
+          args: ["-f"]
+          env:
+            - name: KARAF_DEBUG
+              value: "true"
+            - name: TZ
+              value: "America/New_York"
+            - name: JAVA_MIN_MEM
+              value: "512M"
+            - name: JAVA_MAX_MEM
+              value: "2048M"
+          ports:
+            - containerPort: 8201
+            - containerPort: 1162
+              protocol: UDP
+            - containerPort: 1514
+              protocol: UDP
+#          livenessProbe:
+#            exec:
+#              command: ["/health.sh"]
+#            initialDelaySeconds: 30
+#            periodSeconds: 30
+#            timeoutSeconds: 20
+#            failureThreshold: 3
+          volumeMounts:
+            - name: minion-config-volume
+              mountPath: "/opt/minion/minion-config.yaml"
+              subPath: "minion-config.yaml"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: camel-config
+data:
+  useKafka: |
+    useSeda=false
+    useKafka=true
+    useActiveMq=false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minion-config-map
+data:
+  minion-config.yaml: |
+    http-url: "http://horizon:8980/opennms"
+    id: "minion-01"
+    location: "Default"
+
+    karaf:
+      shell:
+        ssh:
+          host: "0.0.0.0"
+
+    ipc:
+      grpc:
+        host: "horizon-stream-core"
+        port: "8990"
+
+    netmgt:
+      syslog:
+        syslog.listen.interface: "0.0.0.0"
+        syslog.listen.port: 1514
+
+      traps:
+        trapd.listen.interface: "0.0.0.0"
+        trapd.listen.port: 1162
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf-template
+data:
+  default.conf.template: |
+    server {
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      listen       80;
+      listen  [::]:80;
+      server_name  localhost;
+
+      set $cors_credentials '';
+      set $cors_content_type '';
+      set $cors_content_length '';
+      if ($http_origin ~ '.+') {
+        set $cors_credentials 'true';
+      }
+
+      if ($request_method = OPTIONS) {
+        set $cors_content_type 'text/plain';
+        set $cors_content_length '0';
+      }
+
+      add_header Access-Control-Allow-Origin $http_origin always;
+      add_header Access-Control-Allow-Credentials $cors_credentials always;
+      add_header Access-Control-Allow-Methods $http_access_control_request_method always;
+      add_header Access-Control-Allow-Headers $http_access_control_request_headers always;
+      add_header Content-Type $cors_content_type;
+      add_header Content-Length $cors_content_length;
+
+      if ($request_method = OPTIONS) {
+        return 204;
+      }
+
+      location / {
+        auth_request /verifytoken;
+        auth_request_set $auth_status $upstream_status;
+        proxy_pass ${API_SERVER_URL};
+        proxy_hide_header Access-Control-Allow-Origin;
+      }
+
+      location /verifytoken {
+        internal;
+        proxy_pass ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/userinfo;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+      }
+
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+        root   /usr/share/nginx/html;
+      }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-admin-secret
+type: Opaque
+stringData:
+  username: postgres
+  password: passw0rd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zookeeper-secret
+type: Opaque
+stringData:
+  username: zookeeper-user
+  password: passw0rd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-secret
+type: Opaque
+stringData:
+  username: kafka-user
+  password: passw0rd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: karaf-users-secret
+type: Opaque
+stringData:
+  data: |
+    admin=admin,_g_:admingroup
+    _g_\:admingroup=group,admin,manager,viewer,systembundles,ssh
+

@@ -35,7 +35,7 @@ spec:
                       type: string
                     mem:
                       type: string
-                    version:
+                    image:
                       description: Docker Image tag for the service
                       type: string
                 api:
@@ -48,7 +48,7 @@ spec:
                       type: string
                     mem:
                       type: string
-                    version:
+                    image:
                       description: Docker Image tag for the service
                       type: string
                 ui:
@@ -61,7 +61,7 @@ spec:
                       type: string
                     mem:
                       type: string
-                    version:
+                    image:
                       description: Docker Image tag for the service
                       type: string
                 postgres:
@@ -74,7 +74,7 @@ spec:
                       type: string
                     mem:
                       type: string
-                    version:
+                    image:
                       description: Docker Image tag for the service
                       type: string
                 host:

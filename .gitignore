@@ -36,4 +36,5 @@ dependency-reduced-pom.xml
 java/bin/
 *.swp
 *.iml
+idea/
 

@@ -53,8 +53,8 @@ func ConvertCRDToValues(crd v1alpha1.OpenNMS, defaultValues values.TemplateValue
 
 //getCoreValues - get ONMS core values from the crd
 func getCoreValues(spec v1alpha1.OpenNMSSpec, v values.OpenNMSValues) values.OpenNMSValues {
-	if spec.Core.Version != "" {
-		v.Core.Image = spec.Core.Version
+	if spec.Core.Image != "" {
+		v.Core.Image = spec.Core.Image
 	}
 	if spec.Core.CPU != "" {
 		v.Core.Resources.Requests.Cpu = spec.Core.CPU
@@ -72,8 +72,8 @@ func getCoreValues(spec v1alpha1.OpenNMSSpec, v values.OpenNMSValues) values.Ope
 
 //getAPIValues - get ONMS core values from the crd
 func getAPIValues(spec v1alpha1.OpenNMSSpec, v values.OpenNMSValues) values.OpenNMSValues {
-	if spec.API.Version != "" {
-		v.API.Image = spec.API.Version
+	if spec.API.Image != "" {
+		v.API.Image = spec.API.Image
 	}
 	if spec.API.CPU != "" {
 		v.API.Resources.Requests.Cpu = spec.API.CPU
@@ -91,8 +91,8 @@ func getAPIValues(spec v1alpha1.OpenNMSSpec, v values.OpenNMSValues) values.Open
 
 //getUIValues - get ONMS core values from the crd
 func getUIValues(spec v1alpha1.OpenNMSSpec, v values.OpenNMSValues) values.OpenNMSValues {
-	if spec.UI.Version != "" {
-		v.UI.Image = spec.UI.Version
+	if spec.UI.Image != "" {
+		v.UI.Image = spec.UI.Image
 	}
 	if spec.UI.CPU != "" {
 		v.UI.Resources.Requests.Cpu = spec.UI.CPU

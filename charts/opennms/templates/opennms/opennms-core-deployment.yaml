@@ -44,8 +44,9 @@ spec:
           args: [ "-f" ]
           {{ end }}
           env:
-            - name: JAVA_TOOL_OPTIONS # Let `skaffold debug` see that this is a jvm container TODO still needed?
-              value: "-Djava.security.egd=file:/dev/./urandom"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-agentlib:jdwp=transport=dt_socket,server=y,address=5005,suspend=n,quiet=y" # Permanent debug port
+              # value: "-Djava.security.egd=file:/dev/./urandom"
             - name: PGSQL_SERVICE_NAME
               value: {{ .Values.Postgres.ServiceName }}
             - name: PGSQL_ADMIN_USERNAME

@@ -192,6 +192,13 @@ if [[ $ENV_RUN == "dev" ]] || [[ $ENV_RUN == "cicd" ]]; then
 
   # Debug
   kubectl -n local-instance get pods
+  
+  # The instance needs to finish its cycle or else the following will be over
+  # written.
+  sleep 120
+
+  # Debug
+  kubectl -n local-instance get pods
 
   kubectl -n local-instance patch deployments opennms-ui           -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-ui",  "image":"opennms/horizon-stream-ui:local"}]}}}}'
   kubectl -n local-instance patch deployments opennms-core         -p '{"spec": {"template": {"spec":{"containers":[{"name": "opennms-core","image":"opennms/horizon-stream-core:local"}]}}}}'
@@ -236,6 +243,20 @@ printf "\n\n# Output\n"
 printf "################################################################################\n\n"
 
 printf "\n\nDone\n\nGo to https://$DOMAIN\n\n"
+
+printf "\n\n# Fixes to be integrated into operator\n"
+printf "################################################################################\n\n"
+
+# Mainly, the domains need to be changed, but they cannot be added to the
+# local-instance.yaml until the ingress gets working.
+kubectl -n local-instance patch deployments opennms-ui -p "{\"spec\": {\"template\": {\"spec\":{\"containers\":[{\"name\": \"opennms-ui\", \"env\":[{\"name\": \"DOMAIN_API\", \"value\":\"https://$DOMAIN/api\"}]}]}}}}"
+kubectl -n local-instance patch deployments opennms-ui -p "{\"spec\": {\"template\": {\"spec\":{\"containers\":[{\"name\": \"opennms-ui\", \"env\":[{\"name\": \"DOMAIN_KEYCLOAK\", \"value\":\"https://$DOMAIN/auth\"}]}]}}}}"
+kubectl -n local-instance patch deployments opennms-rest-server -p "{\"spec\": {\"template\": {\"spec\":{\"containers\":[{\"name\": \"horizon-stream-api\", \"env\":[{\"name\": \"HORIZON_STREAM_KEYCLOAK_ADMIN_USERNAME\", \"value\":\"admin\"}]}]}}}}"
+kubectl -n local-instance patch deployments opennms-core -p "{\"spec\": {\"template\": {\"spec\":{\"containers\":[{\"name\": \"opennms-core\", \"env\":[{\"name\": \"KEYCLOAK_ADMIN_USERNAME\", \"value\":\"admin\"}]}]}}}}"
+
+kubectl -n local-instance apply -f to-be-added-to-operator.yaml
+
+sleep 60
 
 ## Debug
 #cd ../external-it/
