@@ -4,6 +4,10 @@ query ListDevices {
       id
       label
       createTime
+      location {
+        latitude
+        longitude
+      }
     }
   }
 }

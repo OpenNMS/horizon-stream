@@ -26,15 +26,15 @@
       <!-- Management IP -->
       <FeatherInput
         data-test="ip-input"
-        label="Management IP"
-        v-model="device.management_ip"
+        label="Management IP (Optional temp)"
+        v-model="device.managementIp"
       />
 
       <!-- Community String -->
       <FeatherInput
         data-test="string-input"
         label="Community String (Optional)"
-        v-model="device.community_string"
+        v-model="device.snmpCommunityString"
       />
 
       <!-- Port -->
@@ -43,6 +43,22 @@
         data-test="port-input"
         label="Port (Optional)"
         v-model="device.port"
+      />
+      
+      <!-- Latitude -->
+      <FeatherInput
+        type="number"
+        data-test="port-latitude"
+        label="Latitude (Optional)"
+        v-model="device.location.latitude"
+      />
+      
+      <!-- Longitude -->
+      <FeatherInput
+        type="number"
+        data-test="port-longitude"
+        label="Longitude (Optional)"
+        v-model="device.location.longitude"
       />
     </template>
 
@@ -80,9 +96,13 @@ const deviceQueries = useDeviceQueries()
 
 const defaultDevice = {
   label: undefined,
-  management_ip: undefined,
-  community_string: undefined,
-  port: undefined
+  managementIp: undefined,
+  snmpCommunityString: undefined,
+  port: undefined,
+  location: {
+    latitude: undefined,
+    longitude: undefined
+  }
 }
 
 const device = reactive({...defaultDevice})
