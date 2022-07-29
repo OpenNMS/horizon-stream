@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.Prometheus.Server.ServiceName }}
+  labels:
+    app: {{ .Values.Prometheus.Server.ServiceName }}
+  namespace: {{ .Values.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.Prometheus.Server.ServiceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Prometheus.Server.ServiceName }}
+    spec:
+      {{ if .Values.NodeRestrictions.Enabled }}
+      tolerations:
+        - effect: "NoSchedule"
+          key: "{{ .Values.NodeRestrictions.Key }}"
+          operator: "Equal"
+          value: {{ .Values.NodeRestrictions.Value }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: "{{ .Values.NodeRestrictions.Key }}"
+                    operator: In
+                    values:
+                      - {{ .Values.NodeRestrictions.Value }}
+      {{ end }}
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            name: prometheus-config-map
+      containers:
+        - name: {{ .Values.Prometheus.Server.ServiceName }}
+          image: {{ .Values.Prometheus.Server.Image }}
+          ports:
+            - containerPort: 9090
+          #TODO add probe
+          resources:
+            limits:
+              cpu: "2"
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: "/etc/prometheus/prometheus.yml"
+              subPath: "prometheus.yml"

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.Prometheus.PushGateway.ServiceName }}
+  labels:
+    app: {{ .Values.Prometheus.PushGateway.ServiceName }}
+  namespace: {{ .Values.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.Prometheus.PushGateway.ServiceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.Prometheus.PushGateway.ServiceName }}
+    spec:
+      {{ if .Values.NodeRestrictions.Enabled }}
+      tolerations:
+        - effect: "NoSchedule"
+          key: "{{ .Values.NodeRestrictions.Key }}"
+          operator: "Equal"
+          value: {{ .Values.NodeRestrictions.Value }}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: "{{ .Values.NodeRestrictions.Key }}"
+                    operator: In
+                    values:
+                      - {{ .Values.NodeRestrictions.Value }}
+      {{ end }}
+      containers:
+        - name: {{ .Values.Prometheus.PushGateway.ServiceName }}
+          image: {{ .Values.Prometheus.PushGateway.Image }}
+          ports:
+            - containerPort: 9091
+          resources:
+            limits:
+              cpu: "2"
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+

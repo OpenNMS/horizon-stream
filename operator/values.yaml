@@ -10,3 +10,10 @@ Operator:
       memory: 50Mi
 TLS:
   Enabled: false
+Prometheus:
+  Server:
+    ServiceName: prometheus
+    Image: prom/prometheus
+  PushGateway:
+    ServiceName: prometheus-pushgateway
+    Image: prom/pushgateway

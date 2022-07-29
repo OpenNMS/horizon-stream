@@ -32,11 +32,12 @@ func (r *OpenNMSReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func (r *OpenNMSReconciler) InitServiceHandlers() {
 	r.Handlers = []handlers.ServiceHandler{
+		&handlers.PrometheusHandler{},
 		&handlers.BaseHandler{},
 		&handlers.PostgresHandler{},
 		&handlers.KeycloakHandler{},
-		&handlers.OpenNMSHandler{},
 		&handlers.IngressHandler{},
 		&handlers.ElasticsearchHandler{},
+		&handlers.OpenNMSHandler{},
 	}
 }

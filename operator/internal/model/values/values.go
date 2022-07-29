@@ -23,6 +23,7 @@ type Values struct {
 	Namespace        string                 `yaml:"Namespace"`
 	Host             string                 `yaml:"Host"`
 	TestDeploy       bool                   `yaml:"TestDeploy"`
+	Prometheus       PrometheusValues       `yaml:"Prometheus"`
 	OpenNMS          OpenNMSValues          `yaml:"OpenNMS"`
 	TLS              TLSValues              `yaml:"TLS"`
 	Postgres         PostgresValues         `yaml:"Postgres"`

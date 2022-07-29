@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.Prometheus.Server.ServiceName }}
+  name: {{ .Values.Prometheus.Server.ServiceName }}
+  namespace: {{ .Values.Namespace }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      protocol: TCP
+      name: prometheus-http
+  selector:
+    app: {{ .Values.Prometheus.Server.ServiceName }}
