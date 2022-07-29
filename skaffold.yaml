@@ -19,6 +19,11 @@ build:
     jib: {}
     sync:
       auto: true
+  - image: opennms/horizon-stream-notification
+    context: notifications
+    jib: {}
+    sync:
+      auto: true
   - image: opennms/horizon-stream-ui-dev
     context: ui
     sync:
@@ -44,6 +49,14 @@ portForward:
   - resourceType: deployment
     resourceName: my-horizon-stream-api
     port: 9090 # HTTP
+  - resourceType: deployment
+    resourceName: my-horizon-stream-notification
+    port: 8080 # HTTP
+    localPort: 38080
+  - resourceType: deployment
+    resourceName: my-horizon-stream-notification
+    port: 5005 # Debug
+    localPort: 5007
   - resourceType: deployment
     resourceName: my-horizon-stream-api
     port: 5005 # Debug

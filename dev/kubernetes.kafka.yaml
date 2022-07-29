@@ -37,6 +37,21 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: horizon-stream-notification
+  labels:
+    run: my-horizon-stream-notification
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      protocol: TCP
+      name: http
+  selector:
+    run: my-horizon-stream-notification
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: minion
   labels:
     run: my-minion
@@ -633,6 +648,30 @@ spec:
               value: "http://horizon-stream-core:8181"
           ports:
             - containerPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-horizon-stream-notification
+spec:
+  selector:
+    matchLabels:
+      run: my-horizon-stream-notification
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-horizon-stream-notification
+    spec:
+      containers:
+        - name: horizon-stream-notification
+          image: opennms/horizon-stream-notification
+          imagePullPolicy: Never
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-agentlib:jdwp=transport=dt_socket,server=y,address=5005,suspend=n,quiet=y" # Permanent debug port in `skaffold dev`
+          ports:
+            - containerPort: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
